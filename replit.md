@@ -48,6 +48,26 @@ Every package extends `tsconfig.base.json` which sets `composite: true`. The roo
 - `pnpm run build` — runs `typecheck` first, then recursively runs `build` in all packages that define it
 - `pnpm run typecheck` — runs `tsc --build --emitDeclarationOnly` using project references
 
+## Artifacts
+
+### `artifacts/collegeandfees` (`@workspace/collegeandfees`)
+
+Next.js 14 web application using the **Pages Router** (NOT App Router). SEO-focused website about engineering college admissions in Bangalore.
+
+- **Framework**: Next.js 14.2.29
+- **Routing**: Pages Router (`pages/` directory)
+- **Styling**: Tailwind CSS v3 + PostCSS
+- **Data**: `@supabase/supabase-js` for optional Supabase integration
+- **SSR**: All pages use `getServerSideProps` for true server-side rendering
+- **Structure**:
+  - `pages/` — Next.js pages (Pages Router)
+  - `components/` — Reusable React components
+  - `lib/supabase.js` — Supabase client (reads `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`)
+  - `styles/globals.css` — Global Tailwind CSS styles
+  - `public/` — Static assets
+- **Dev command**: `pnpm --filter @workspace/collegeandfees run dev`
+- **Environment variables needed**: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+
 ## Packages
 
 ### `artifacts/api-server` (`@workspace/api-server`)
