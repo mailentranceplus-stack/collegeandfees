@@ -1,0 +1,26 @@
+kind = "web"
+previewPath = "/"
+title = "College and Fees"
+version = "1.0.0"
+id = "artifacts/collegeandfees"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 23705
+
+[services.development]
+run = "pnpm --filter @workspace/collegeandfees run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/collegeandfees", "run", "build" ]
+run = [ "pnpm", "--filter", "@workspace/collegeandfees", "run", "start" ]
+
+[services.env]
+PORT = "23705"
+BASE_PATH = "/"

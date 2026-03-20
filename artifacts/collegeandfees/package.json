@@ -3,9 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p ${PORT:-3000}",
+    "dev": "next dev -p ${PORT:-23705}",
     "build": "next build",
-    "start": "next start -p $PORT"
+    "start": "next start -p ${PORT:-23705}"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.50.0",
