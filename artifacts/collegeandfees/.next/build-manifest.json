@@ -36,6 +36,16 @@
       "static/chunks/webpack.js",
       "static/chunks/main.js",
       "static/chunks/pages/direct-admission/bangalore.js"
+    ],
+    "/management-quota/[college-slug]": [
+      "static/chunks/webpack.js",
+      "static/chunks/main.js",
+      "static/chunks/pages/management-quota/[college-slug].js"
+    ],
+    "/management-quota/bangalore": [
+      "static/chunks/webpack.js",
+      "static/chunks/main.js",
+      "static/chunks/pages/management-quota/bangalore.js"
     ]
   },
   "ampFirstPages": []
