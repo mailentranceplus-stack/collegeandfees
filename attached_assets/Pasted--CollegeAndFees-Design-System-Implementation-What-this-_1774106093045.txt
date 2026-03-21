@@ -1,0 +1,632 @@
+# CollegeAndFees — Design System Implementation
+
+## What this prompt does
+This prompt applies a locked design system across the entire Next.js project. It does NOT change any page content, Supabase queries, SEO logic, routing, or data. It only changes how things look.
+
+All content, text, numbers, and data come from Supabase and the existing page logic — do not hardcode anything from this prompt into page content.
+
+---
+
+## Step 1 — Install the font
+
+In `pages/_document.js`, add Plus Jakarta Sans from Google Fonts:
+
+```html
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+```
+
+---
+
+## Step 2 — Replace globals.css completely
+
+Replace the entire contents of `styles/globals.css` with this:
+
+```css
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --background:       #0B1121;
+  --foreground:       #F0F4F8;
+  --card:             #0F1A2E;
+  --card-foreground:  #F0F4F8;
+  --primary:          #EFAF26;
+  --primary-light:    #F0C04A;
+  --primary-foreground: #0B1121;
+  --secondary:        #1D2A3F;
+  --secondary-foreground: #F0F4F8;
+  --muted:            #182234;
+  --muted-foreground: #7A8BA0;
+  --accent-green:     #22C35E;
+  --whatsapp:         #25D366;
+  --whatsapp-dark:    #1DA34E;
+  --border:           #1F2D42;
+  --glass-bg:         rgba(24, 34, 52, 0.6);
+  --glass-border:     #2A3B52;
+  --navy-light:       #151E2D;
+  --radius:           0.75rem;
+  --radius-lg:        1rem;
+  --font-sans:        'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--foreground);
+}
+
+a { color: inherit; text-decoration: none; }
+img { max-width: 100%; display: block; }
+
+/* Utility classes */
+.text-gold {
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.glass-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.glass-card:hover {
+  border-color: rgba(239,175,38,0.3);
+  box-shadow: 0 8px 32px rgba(239,175,38,0.08);
+}
+
+.section-alt { background-color: var(--navy-light); }
+
+.badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--primary);
+  border: 1px solid rgba(239,175,38,0.3);
+  border-radius: 999px;
+  padding: 4px 14px;
+  margin-bottom: 12px;
+}
+
+/* Buttons */
+.btn-whatsapp {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, var(--accent-green), var(--whatsapp-dark));
+  color: #fff;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 16px;
+  padding: 14px 32px;
+  border-radius: calc(var(--radius) - 2px);
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(34,195,94,0.25);
+  transition: transform 0.2s, box-shadow 0.2s;
+  text-decoration: none;
+}
+.btn-whatsapp:hover {
+  transform: scale(1.04);
+  box-shadow: 0 12px 32px rgba(34,195,94,0.4);
+}
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(11,17,33,0.1);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 15px;
+  padding: 13px 28px;
+  border-radius: calc(var(--radius) - 2px);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.2s;
+  text-decoration: none;
+}
+.btn-outline:hover { background: rgba(11,17,33,0.2); }
+
+/* Sections */
+.section { padding: 80px 0; }
+.section-sm { padding: 48px 0; }
+.container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+.section-title {
+  font-size: clamp(28px, 4vw, 40px);
+  font-weight: 800;
+  margin-bottom: 12px;
+  text-align: center;
+}
+.section-subtitle {
+  font-size: 16px;
+  color: var(--muted-foreground);
+  text-align: center;
+  max-width: 560px;
+  margin: 0 auto 48px;
+}
+
+/* College cards */
+.college-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  backdrop-filter: blur(12px);
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+.college-card:hover {
+  border-color: rgba(239,175,38,0.3);
+  box-shadow: 0 8px 32px rgba(239,175,38,0.08);
+  transform: translateY(-2px);
+}
+.college-card-image {
+  width: 100%;
+  height: 192px;
+  object-fit: cover;
+  transition: transform 0.3s;
+}
+.college-card:hover .college-card-image { transform: scale(1.05); }
+.college-card-body { padding: 20px; }
+
+/* Fees table */
+.fees-table { width: 100%; border-collapse: collapse; }
+.fees-table th {
+  background: var(--muted);
+  color: var(--primary);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 14px 16px;
+  text-align: left;
+}
+.fees-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  color: var(--foreground);
+  font-size: 15px;
+}
+.fees-table tr:last-child td { border-bottom: none; }
+.fees-table tr:hover td { background: rgba(239,175,38,0.04); }
+.fees-highlight { color: var(--primary); font-weight: 700; }
+
+/* FAQ accordion */
+.faq-item {
+  border-bottom: 1px solid var(--border);
+  padding: 20px 0;
+}
+.faq-question {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--foreground);
+  gap: 16px;
+}
+.faq-answer {
+  margin-top: 12px;
+  color: var(--muted-foreground);
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+/* Stats bar */
+.stats-bar {
+  background: var(--card);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: 32px 40px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  text-align: center;
+}
+.stat-number {
+  font-size: clamp(28px, 3vw, 36px);
+  font-weight: 800;
+  color: var(--primary);
+}
+.stat-label {
+  font-size: 13px;
+  color: var(--muted-foreground);
+  margin-top: 4px;
+}
+
+/* Testimonials */
+.testimonial-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  backdrop-filter: blur(12px);
+}
+.testimonial-stars { color: var(--primary); font-size: 18px; margin-bottom: 12px; }
+.testimonial-text { color: var(--foreground); font-size: 15px; line-height: 1.7; margin-bottom: 20px; font-style: italic; }
+.testimonial-author { display: flex; align-items: center; gap: 12px; }
+.testimonial-avatar {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: var(--muted);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; color: var(--primary); font-size: 16px;
+}
+.testimonial-name { font-weight: 700; font-size: 14px; }
+.testimonial-meta { font-size: 13px; color: var(--muted-foreground); }
+
+/* Floating WhatsApp button */
+.whatsapp-float {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 999;
+  background: linear-gradient(135deg, var(--accent-green), var(--whatsapp-dark));
+  color: #fff;
+  border-radius: 50px;
+  padding: 14px 22px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 15px;
+  box-shadow: 0 8px 24px rgba(34,195,94,0.35);
+  text-decoration: none;
+  transition: transform 0.2s, box-shadow 0.2s;
+  animation: pulse-ring 2.5s infinite;
+}
+.whatsapp-float:hover {
+  transform: scale(1.06);
+  box-shadow: 0 12px 32px rgba(34,195,94,0.5);
+}
+@keyframes pulse-ring {
+  0%, 100% { box-shadow: 0 8px 24px rgba(34,195,94,0.35); }
+  50% { box-shadow: 0 8px 36px rgba(34,195,94,0.6); }
+}
+
+/* Header */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(11,17,33,0.85);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+.header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.logo { font-size: 20px; font-weight: 800; }
+.logo span { color: var(--primary); }
+
+/* Nav */
+.nav { display: flex; align-items: center; gap: 32px; }
+.nav a { font-size: 14px; font-weight: 500; color: var(--muted-foreground); transition: color 0.15s; }
+.nav a:hover { color: var(--foreground); }
+.nav-cta {
+  background: linear-gradient(135deg, var(--accent-green), var(--whatsapp-dark));
+  color: #fff !important;
+  padding: 8px 18px;
+  border-radius: calc(var(--radius) - 2px);
+  font-weight: 700 !important;
+  font-size: 14px;
+}
+
+/* Hero */
+.hero {
+  position: relative;
+  min-height: 560px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+  opacity: 0.18;
+  filter: grayscale(30%);
+}
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(11,17,33,0.95) 0%, rgba(11,17,33,0.75) 100%);
+}
+.hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 720px;
+  padding: 80px 24px;
+}
+.hero-title {
+  font-size: clamp(36px, 5vw, 60px);
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: 20px;
+}
+.hero-subtitle {
+  font-size: clamp(15px, 2vw, 18px);
+  color: var(--muted-foreground);
+  margin-bottom: 36px;
+  max-width: 540px;
+  line-height: 1.7;
+}
+.hero-actions { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
+.hero-trust {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--muted-foreground);
+  background: rgba(239,175,38,0.08);
+  border: 1px solid rgba(239,175,38,0.2);
+  border-radius: 999px;
+  padding: 6px 16px;
+  margin-bottom: 20px;
+}
+
+/* How it works */
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  position: relative;
+}
+.step-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: 32px 28px;
+  text-align: center;
+}
+.step-number {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: var(--primary-foreground);
+  font-size: 20px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+}
+.step-title { font-size: 18px; font-weight: 700; margin-bottom: 10px; }
+.step-desc { font-size: 14px; color: var(--muted-foreground); line-height: 1.6; }
+
+/* Counsellor quote */
+.counsellor-section {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: 48px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 48px;
+  align-items: center;
+  max-width: 900px;
+  margin: 0 auto;
+}
+.counsellor-quote {
+  font-size: clamp(18px, 2.5vw, 24px);
+  font-weight: 600;
+  line-height: 1.6;
+  font-style: italic;
+  margin-bottom: 24px;
+}
+.counsellor-quote::before { content: '\201C'; color: var(--primary); font-size: 2em; line-height: 0; vertical-align: -0.4em; margin-right: 4px; }
+.counsellor-image {
+  width: 220px;
+  height: 280px;
+  object-fit: cover;
+  border-radius: var(--radius-lg);
+  border: 2px solid var(--glass-border);
+}
+
+/* Footer */
+.footer {
+  background: var(--card);
+  border-top: 1px solid var(--border);
+  padding: 56px 0 32px;
+}
+.footer-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1.5fr;
+  gap: 48px;
+  margin-bottom: 48px;
+}
+.footer-heading { font-size: 13px; font-weight: 700; color: var(--foreground); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 16px; }
+.footer-links { list-style: none; }
+.footer-links li { margin-bottom: 10px; }
+.footer-links a { font-size: 14px; color: var(--muted-foreground); transition: color 0.15s; }
+.footer-links a:hover { color: var(--primary); }
+.footer-bottom { border-top: 1px solid var(--border); padding-top: 24px; text-align: center; font-size: 13px; color: var(--muted-foreground); }
+
+/* Breadcrumb */
+.breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted-foreground); margin-bottom: 16px; }
+.breadcrumb a:hover { color: var(--primary); }
+.breadcrumb-sep { color: var(--border); }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .stats-bar { grid-template-columns: repeat(2, 1fr); }
+  .steps-grid { grid-template-columns: 1fr; }
+  .footer-grid { grid-template-columns: 1fr 1fr; }
+  .counsellor-section { grid-template-columns: 1fr; text-align: center; }
+  .counsellor-image { width: 160px; height: 200px; margin: 0 auto; }
+  .nav { display: none; }
+  .whatsapp-float { padding: 12px 16px; font-size: 13px; }
+}
+@media (max-width: 480px) {
+  .stats-bar { grid-template-columns: repeat(2, 1fr); padding: 24px 20px; }
+  .footer-grid { grid-template-columns: 1fr; }
+  .hero-actions { flex-direction: column; align-items: flex-start; }
+}
+```
+
+---
+
+## Step 3 — Update components/Header.js
+
+Rebuild Header.js to use the new CSS classes. Keep all existing nav links and the WhatsApp CTA. Structure:
+- `<header className="header">` → `<div className="header-inner">` → logo on left, `<nav className="nav">` on right
+- Logo: `<span>College</span><span className="text-gold">AndFees</span>` (with `.logo` class)
+- Nav links: Colleges, Fees, Direct Admission, FAQ
+- Nav CTA button: "WhatsApp Us" with `.nav-cta` class, linking to `https://wa.me/917975193033`
+
+---
+
+## Step 4 — Update components/Footer.js
+
+Rebuild Footer.js using the `.footer`, `.footer-grid`, `.footer-heading`, `.footer-links`, `.footer-bottom` classes. Keep all existing links. Add WhatsApp contact in the "Get in Touch" column.
+
+---
+
+## Step 5 — Update components/WhatsAppFloat.js
+
+Replace the existing floating button with:
+```jsx
+export default function WhatsAppFloat() {
+  return (
+    <a
+      href="https://wa.me/917975193033"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="whatsapp-float"
+      aria-label="Chat on WhatsApp"
+    >
+      <svg width="22" height="22" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+      </svg>
+      Chat on WhatsApp
+    </a>
+  );
+}
+```
+
+---
+
+## Step 6 — Add a Testimonials component
+
+Create `components/Testimonials.js`:
+
+```jsx
+const testimonials = [
+  {
+    text: "We were completely lost after my son got 45,000 rank in KCET. The team here explained everything about management quota clearly and helped us get a CSE seat at RVCE. No false promises.",
+    name: "Ramesh K.",
+    meta: "Parent of RVCE CSE student, 2025",
+    initials: "RK",
+  },
+  {
+    text: "I was worried about hidden fees and agents who mislead. CollegeAndFees showed us the exact fee structure upfront. My daughter is now at BMS College studying ECE.",
+    name: "Sunitha Rao",
+    meta: "Parent of BMS College student, 2025",
+    initials: "SR",
+  },
+  {
+    text: "The WhatsApp support was fast and honest. They told us exactly what documents to keep ready and guided us through the entire process step by step.",
+    name: "Vikram S.",
+    meta: "Student, PES University CSE, 2025",
+    initials: "VS",
+  },
+];
+
+export default function Testimonials() {
+  return (
+    <section className="section">
+      <div className="container">
+        <div className="badge">Student Stories</div>
+        <h2 className="section-title">What Families Say</h2>
+        <p className="section-subtitle">Real experiences from students and parents we have helped with management quota admissions in Bangalore.</p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
+          {testimonials.map((t, i) => (
+            <div key={i} className="testimonial-card">
+              <div className="testimonial-stars">★★★★★</div>
+              <p className="testimonial-text">"{t.text}"</p>
+              <div className="testimonial-author">
+                <div className="testimonial-avatar">{t.initials}</div>
+                <div>
+                  <div className="testimonial-name">{t.name}</div>
+                  <div className="testimonial-meta">{t.meta}</div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+```
+
+---
+
+## Step 7 — Update all existing pages to use new CSS classes
+
+For every existing page (`pages/direct-admission/bangalore.js`, `pages/direct-admission/[college-slug].js`, and any others already built):
+
+- Replace inline styles and old class names with the new CSS classes from globals.css
+- Use `.container`, `.section`, `.section-alt` for layout
+- Use `.glass-card` for info boxes and content cards
+- Use `.btn-whatsapp` for all WhatsApp CTA buttons
+- Use `.btn-outline` for secondary buttons
+- Use `.badge` for section labels
+- Use `.fees-table`, `.fees-highlight` for any fee tables
+- Use `.faq-item`, `.faq-question`, `.faq-answer` for FAQ sections
+- Use `.breadcrumb`, `.breadcrumb-sep` for breadcrumb navigation
+- Keep all existing `getServerSideProps` and Supabase logic completely unchanged
+
+---
+
+## Step 8 — Add Testimonials to the homepage (index.js)
+
+When index.js is built (or if it already exists), import and render the `<Testimonials />` component between the "How It Works" section and the FAQ section.
+
+---
+
+## Important rules
+
+1. **Do not change any Supabase queries, getServerSideProps logic, or data fetching code**
+2. **Do not hardcode any college names, fees, or text from this document into page content** — all content comes from Supabase
+3. **Do not change any page routes, slugs, or URL structure**
+4. **Do not change any SEO meta tags, structured data, or noindex logic**
+5. **Apply this design system to ALL pages you build now and in the future** — including management quota pages, college pages, and the homepage
+6. The design tokens in globals.css are the single source of truth for all colors and typography. Do not use inline hex values — always use the CSS variables.
+
+---
+
+## Visual reference
+
+The overall look is: dark navy background (#0B1121), gold accents (#EFAF26), green WhatsApp CTAs (#22C35E), glassmorphism cards, Plus Jakarta Sans font. Think premium education platform — not a government site, not a basic template. Every page should feel like it belongs to a serious, trustworthy counselling service.
