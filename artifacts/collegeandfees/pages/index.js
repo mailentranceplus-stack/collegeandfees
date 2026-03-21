@@ -1,5 +1,6 @@
 import Head from "next/head";
 import Link from "next/link";
+import { useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import CollegeCard from "../components/CollegeCard";
@@ -23,6 +24,13 @@ const FEES_DATA = [
   { type: "Deemed Universities", gov: "₹2,00,000 – ₹3,00,000", mgmt: "₹3,00,000 – ₹5,00,000", nri: "₹10,00,000+" },
 ];
 
+const HOME_FAQS = [
+  { id: 1, question: "What is management quota / direct admission in Bangalore?", answer: "Management quota refers to seats that private engineering colleges fill directly without KCET or COMEDK counselling. Typically 30–35% of total intake is reserved under management quota, and colleges admit students directly on payment of a higher fee." },
+  { id: 2, question: "What is the minimum eligibility for direct admission?", answer: "You need a minimum of 45% aggregate marks in PCM (Physics, Chemistry, Mathematics) in Class 12 / PUC. No minimum KCET or COMEDK rank is required for management quota seats." },
+  { id: 3, question: "How much does CSE direct admission cost at top Bangalore colleges?", answer: "CSE management quota fees range from ₹1,60,000/year at RVCE to ₹3,00,000–₹5,00,000/year at deemed universities such as PES and Christ. Contact our counsellor for confirmed 2026-27 fee figures." },
+  { id: 4, question: "When does direct admission open for 2026?", answer: "Management quota applications typically open in June 2026 after KCET results are declared. The process continues through July 2026 until all management seats are filled. Apply early — seats go fast at top colleges." },
+];
+
 const ADMISSION_STEPS = [
   { title: "Appear for Entrance Exams", desc: "Register for KCET, JEE Main, or COMEDK UGET based on your target colleges." },
   { title: "Check Eligibility", desc: "Ensure you have minimum 45% in PCM (Physics, Chemistry, Maths) in Class 12." },
@@ -37,6 +45,46 @@ function WaIcon() {
     <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
       <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
     </svg>
+  );
+}
+
+function HomeFaqAccordion({ faqs }) {
+  const [openId, setOpenId] = useState(null);
+  return (
+    <div>
+      {faqs.map((faq) => {
+        const isOpen = openId === faq.id;
+        return (
+          <div key={faq.id} className="faq-item">
+            <button
+              className="faq-question"
+              onClick={() => setOpenId(isOpen ? null : faq.id)}
+              aria-expanded={isOpen}
+            >
+              <span>{faq.question}</span>
+              <span style={{
+                flexShrink: 0,
+                width: "28px",
+                height: "28px",
+                border: "1px solid var(--border)",
+                borderRadius: "50%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "var(--primary)",
+                fontSize: "18px",
+                fontWeight: 700,
+                transform: isOpen ? "rotate(45deg)" : "none",
+                transition: "transform 0.2s",
+              }}>+</span>
+            </button>
+            {isOpen && (
+              <div className="faq-answer">{faq.answer}</div>
+            )}
+          </div>
+        );
+      })}
+    </div>
   );
 }
 
@@ -210,10 +258,20 @@ export default function Home({ colleges }) {
         </div>
       </section>
 
+      {/* FAQ Section */}
+      <section className="section" style={{ background: "var(--navy-light)" }}>
+        <div className="container">
+          <div className="badge">Common Questions</div>
+          <h2 className="section-title">Frequently Asked Questions</h2>
+          <p className="section-subtitle">
+            Quick answers about direct admission and management quota fees in Bangalore engineering colleges.
+          </p>
+          <HomeFaqAccordion faqs={HOME_FAQS} />
+        </div>
+      </section>
+
       {/* Testimonials */}
-      <div style={{ background: "var(--navy-light)" }}>
-        <Testimonials />
-      </div>
+      <Testimonials />
 
       <Footer />
     </>

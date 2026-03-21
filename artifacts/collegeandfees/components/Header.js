@@ -28,30 +28,13 @@ export default function Header() {
           <Link href="/direct-admission/bangalore">Direct Admission</Link>
           <a href={WA_LINK} target="_blank" rel="noopener noreferrer" className="nav-cta">
             <WaIcon />
-            WhatsApp Us
+            WhatsApp Counsellor
           </a>
         </nav>
 
         <button
-          style={{ background: "none", border: "none", cursor: "pointer", color: "var(--muted-foreground)", padding: "8px", display: "none" }}
-          className="md:hidden p-2"
-          onClick={() => setMenuOpen(!menuOpen)}
-          aria-label="Toggle menu"
-        >
-          {menuOpen ? (
-            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          ) : (
-            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          )}
-        </button>
-
-        <button
-          style={{ background: "none", border: "1px solid var(--border)", borderRadius: "8px", cursor: "pointer", color: "var(--muted-foreground)", padding: "8px 10px" }}
           className="md:hidden"
+          style={{ background: "none", border: "1px solid var(--border)", borderRadius: "8px", cursor: "pointer", color: "var(--muted-foreground)", padding: "6px 10px", fontSize: "18px" }}
           onClick={() => setMenuOpen(!menuOpen)}
           aria-label="Toggle menu"
         >
@@ -65,8 +48,14 @@ export default function Header() {
           <Link href="/direct-admission/bangalore" onClick={() => setMenuOpen(false)}>Colleges</Link>
           <Link href="/direct-admission/bangalore" onClick={() => setMenuOpen(false)}>Fees</Link>
           <Link href="/direct-admission/bangalore" onClick={() => setMenuOpen(false)}>Direct Admission</Link>
-          <a href={WA_LINK} target="_blank" rel="noopener noreferrer" onClick={() => setMenuOpen(false)} style={{ color: "var(--accent-green)", fontWeight: 700 }}>
-            WhatsApp Us →
+          <a
+            href={WA_LINK}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => setMenuOpen(false)}
+            style={{ color: "var(--accent-green)", fontWeight: 700 }}
+          >
+            WhatsApp Counsellor →
           </a>
         </div>
       )}
