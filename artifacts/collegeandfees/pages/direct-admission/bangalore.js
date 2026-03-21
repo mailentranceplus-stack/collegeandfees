@@ -1,5 +1,6 @@
 import Head from "next/head";
 import Link from "next/link";
+import { useState } from "react";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import { getSupabase } from "../../lib/supabase";
@@ -22,6 +23,36 @@ const PLACEHOLDER_FAQS = [
   { id: 3, question: "How much does direct admission cost in Bangalore?", answer: "Management quota fees range from ₹80,000/year at government-aided colleges to ₹3,50,000/year at top private colleges for CSE/IT branches. Contact our counsellor for exact 2026-27 figures." },
   { id: 4, question: "When does direct admission open in 2026?", answer: "Management quota applications typically open in June 2026 after KCET results are announced. The process continues through July 2026 until all seats are filled." },
 ];
+
+function FaqAccordion({ faqs }) {
+  const [openId, setOpenId] = useState(null);
+  return (
+    <div className="space-y-2">
+      {faqs.map((faq) => {
+        const isOpen = openId === faq.id;
+        return (
+          <div key={faq.id} className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+            <button
+              className="w-full flex items-center justify-between px-6 py-4 text-left focus:outline-none"
+              onClick={() => setOpenId(isOpen ? null : faq.id)}
+              aria-expanded={isOpen}
+            >
+              <span className="font-semibold text-gray-900 pr-4">{faq.question}</span>
+              <span className={`flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-full border border-gray-200 text-[#1a3c6e] transition-transform ${isOpen ? "rotate-45" : ""}`}>
+                +
+              </span>
+            </button>
+            {isOpen && (
+              <div className="px-6 pb-5">
+                <p className="text-gray-600 text-sm leading-relaxed">{faq.answer}</p>
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 
 export default function BangalorePage({ colleges, faqs }) {
   const displayColleges = colleges.length > 0 ? colleges : PLACEHOLDER_COLLEGES;
@@ -187,19 +218,12 @@ export default function BangalorePage({ colleges, faqs }) {
               </div>
             </section>
 
-            {/* FAQs */}
+            {/* FAQs — Accordion */}
             <section className="mb-12">
               <h2 className="text-2xl font-bold text-gray-900 mb-6">
                 Frequently Asked Questions — Direct Admission Bangalore
               </h2>
-              <div className="space-y-4">
-                {displayFaqs.map((faq) => (
-                  <div key={faq.id} className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
-                    <h3 className="font-semibold text-gray-900 mb-2">{faq.question}</h3>
-                    <p className="text-gray-600 text-sm leading-relaxed">{faq.answer}</p>
-                  </div>
-                ))}
-              </div>
+              <FaqAccordion faqs={displayFaqs} />
             </section>
           </div>
         </main>
