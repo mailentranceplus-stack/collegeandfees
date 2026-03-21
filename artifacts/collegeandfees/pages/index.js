@@ -258,6 +258,9 @@ export default function Home({ colleges }) {
         </div>
       </section>
 
+      {/* Testimonials */}
+      <Testimonials />
+
       {/* FAQ Section */}
       <section className="section" style={{ background: "var(--navy-light)" }}>
         <div className="container">
@@ -269,9 +272,6 @@ export default function Home({ colleges }) {
           <HomeFaqAccordion faqs={HOME_FAQS} />
         </div>
       </section>
-
-      {/* Testimonials */}
-      <Testimonials />
 
       <Footer />
     </>

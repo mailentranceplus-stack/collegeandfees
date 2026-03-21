@@ -53,9 +53,11 @@ export default function Header() {
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => setMenuOpen(false)}
-            style={{ color: "var(--accent-green)", fontWeight: 700 }}
+            className="btn-whatsapp-sm"
+            style={{ marginTop: "8px", display: "inline-flex" }}
           >
-            WhatsApp Counsellor →
+            <WaIcon />
+            WhatsApp Counsellor
           </a>
         </div>
       )}
