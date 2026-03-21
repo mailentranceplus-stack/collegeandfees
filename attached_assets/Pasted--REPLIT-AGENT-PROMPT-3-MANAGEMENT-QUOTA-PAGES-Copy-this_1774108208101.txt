@@ -1,0 +1,198 @@
+# REPLIT AGENT PROMPT 3 — MANAGEMENT QUOTA PAGES
+
+> **Copy this entire prompt and paste it into Replit Agent.**
+> Run AFTER Prompt 2 (direct admission pages) is complete and pushed to GitHub.
+> This builds 6 pages: 5 management quota college pages + /management-quota/bangalore hub.
+
+---
+
+## PASTE BELOW THIS LINE INTO REPLIT AGENT
+
+---
+
+We are continuing to build the CollegeAndFees.com Next.js 14 app located in the `artifacts/collegeandfees/` subdirectory. Prompts 1 and 2 are complete. The direct admission pages and infrastructure are already built.
+
+**Do NOT modify any existing files. Do NOT re-scaffold anything. Add only the new files listed below.**
+
+---
+
+### WHAT TO BUILD IN THIS SESSION
+
+Build exactly these 6 pages:
+
+1. `pages/management-quota/bangalore.js` — static hub page (separate static file, NOT dynamic)
+2. `pages/management-quota/[college-slug].js` — dynamic template for 5 college management quota pages
+
+The static `bangalore.js` automatically takes priority over `[college-slug].js` for `/management-quota/bangalore` in Next.js Pages Router. This is correct — do not change it.
+
+The 5 college slugs that must work on the dynamic template:
+- `rvce-bangalore`
+- `bms-college-of-engineering`
+- `pes-university-bangalore`
+- `msrit-bangalore`
+- `christ-university-bangalore`
+
+---
+
+### THE MANAGEMENT QUOTA TEMPLATE IS NEARLY IDENTICAL TO THE DIRECT ADMISSION TEMPLATE
+
+You already built `pages/direct-admission/[college-slug].js` in Prompt 2. The management quota template follows the SAME structure with these differences:
+
+| Element | Direct Admission | Management Quota |
+|---------|-----------------|-----------------|
+| URL prefix | `/direct-admission/` | `/management-quota/` |
+| H1 pattern | `Direct Admission in {name} 2026 — Fees, Process and Seats` | `Management Quota Admission in {name} 2026 — Fees, Seats and Process` |
+| WhatsApp message | `Hi, I want to know about direct admission in {name}. What are the fees and process?` | `Hi, I want to know about management quota seats at {name}. Can you guide me?` |
+| Active tab | `Admission` | `Admission` (same) |
+| Fees section heading | `Direct Admission Fees at {name} 2026-27` | `Management Quota Fees at {name} 2026-27` |
+| Mid-content CTA | `Is {name} worth it for your budget?` | `Is management quota at {name} worth it for your budget?` |
+| Meta title | `Direct Admission {name} 2026 — Fees, Process and Seats` | `Management Quota {name} 2026 — Fees, Seats and Process` |
+| Meta desc pattern | direct admission focused | management quota focused |
+
+**The Supabase queries are IDENTICAL.** Management quota fees are still in the `fees` table with `quota = 'management'` (lowercase — this is the actual value in the database). There is no separate management_quota table — the same fees table serves both pages.
+
+---
+
+### DATABASE QUERIES — SAME AS PROMPT 2
+
+Same tables, same query structure as the direct admission template. Do not change anything about how data is fetched. Refer to the Prompt 2 code you already wrote for the query pattern.
+
+---
+
+### SPECIFIC CONTENT DIFFERENCES FOR MANAGEMENT QUOTA PAGES
+
+**Section 3 H1:**
+`Management Quota Admission in {college.name} 2026 — Fees, Seats and Process`
+
+**Section 5 — Fees table heading:**
+`Management Quota Fees at {college.short_name || college.name} 2026-27`
+
+Add a note above the fees table that is NOT on the direct admission page:
+```
+Management quota seats are allocated by the college management directly — not through
+KCET or COMEDK counselling. These seats are typically 30-35% of total intake.
+The fees below are significantly higher than government quota fees.
+```
+
+**Section 6 — Process section heading and content:**
+H2: `Management Quota Admission Process at {college.short_name || college.name}`
+
+If `admissions.mgmt_quota_process` exists: render it.
+
+If null, use this specific placeholder (different from direct admission):
+```
+The management quota admission process at {college.name} typically involves:
+1. Contacting the college admissions office directly (not through KCET/COMEDK counselling)
+2. Expressing interest and getting on the college's informal waiting list
+3. Submitting academic documents and paying a registration deposit
+4. Receiving a seat offer once your academic profile is reviewed
+5. Completing document verification within 48 hours of seat offer
+6. Paying the first-year management quota fees (significant amount — confirm total before accepting)
+
+Important: Management quota seats move quickly. Students who are prepared with documents
+and funds ready get the seats. Delays of even 24-48 hours can result in losing a seat to
+another student.
+
+Contact our counsellor to understand the exact current situation at {college.name} for 2026.
+```
+
+**Section 12 — FAQ H2:**
+`Frequently Asked Questions — Management Quota at {college.short_name || college.name}`
+
+---
+
+### PAGE 1: `pages/management-quota/bangalore.js` — STATIC HUB PAGE
+
+This page is similar to `/direct-admission/bangalore` but focused on management quota.
+
+**getServerSideProps:** Same queries as the direct admission hub. Fetch all active colleges with management quota seats, and general FAQs.
+
+**Meta:**
+- title: `Management Quota Engineering Colleges Bangalore 2026 — Fees, Seats and Process`
+- description: `Complete guide to management quota admission in Bangalore engineering colleges 2026. College-wise fees, seats available, eligibility and process. Free counsellor guidance on WhatsApp.`
+- canonical: `https://collegeandfees.com/management-quota/bangalore`
+
+**H1:** `Management Quota Engineering Colleges in Bangalore 2026`
+
+**Counsellor intro block:**
+```
+Management quota in engineering colleges refers to seats filled directly by the college
+management — outside the KCET and COMEDK counselling process. At most private engineering
+colleges in Bangalore, 30-35% of seats are management quota.
+
+These seats come with significantly higher fees than government quota seats. But they offer
+admission certainty — students who know their academic profile will not secure a KCET or
+COMEDK seat can lock in a good college through management quota, provided they can manage
+the fees.
+
+As an RVCE alumnus who has guided hundreds of families through this decision, I can tell you:
+the single most important thing is having the correct branch-wise fee before you commit.
+Colleges rarely publish this clearly. The figures on this page are verified from official
+sources and direct contact with admissions offices.
+```
+
+**College cards:** Same structure as direct admission hub, but link to `/management-quota/{slug}`.
+
+**WhatsApp CTA:**
+Message: `Hi, I want to know about management quota seats in Bangalore engineering colleges. Can you guide me?`
+Text: `Want to know if management quota is worth it for your child? Our counsellor is an RVCE alumnus — free guidance on WhatsApp.`
+
+**Key Facts (4 cards, hardcoded):**
+- "Management quota seats: 30-35% of total intake at most Bangalore private engineering colleges"
+- "Fees: Typically 3–10x higher than KCET government quota fees, varies by college and branch"
+- "No entrance rank required: Management quota does not need KCET or COMEDK rank"
+- "Seats available after counselling: Remaining management quota seats are available after KCET/COMEDK rounds end"
+
+---
+
+### RVCE MANAGEMENT QUOTA — BRANCH-WISE FEES (IMPORTANT)
+
+RVCE (id=1, slug=rvce-bangalore) has confirmed 2026-27 management quota fees. These are seeded in the database. The fees table should return these figures for RVCE. When this page renders, the fees table must show:
+
+| Branch | Annual Fees |
+|--------|-------------|
+| CSE | ₹36,00,000 (Year 1), ₹13,00,000 (Years 2-4) |
+| CSE AIML | ₹28,00,000 / ₹13,00,000 |
+| ECE | ₹19,00,000 / ₹8,00,000 |
+| ... etc |
+
+**Note for Replit Agent:** The fees table stores `tuition_fee` as a flat annual figure. The above is the actual data — if the fees table shows these numbers, the page is correct. If RVCE fees are missing or wrong, do NOT hardcode them. Instead, add a note in the Done checklist that the fee data needs to be verified in Supabase.
+
+The 4-year total for RVCE CSE management quota is ₹75L (36L + 13L + 13L + 13L). The simple `tuition_fee * 4` calculation in the table will NOT be accurate for RVCE because Year 1 fees differ from Years 2-4. For now, show a note below the table:
+```
+* For RVCE, Year 1 management quota fees are higher than subsequent years.
+  The 4-year total above is an estimate. Contact our counsellor for the exact total.
+```
+
+---
+
+### CHRIST UNIVERSITY MANAGEMENT QUOTA — SPECIAL CASE
+
+Christ University (id=2, slug=christ-university-bangalore) has both Engineering and MBA management quota. When the fees table query returns results for Christ, there may be both Engineering and MBA course fees.
+
+If multiple degree types exist in the fees results, split them into two separate tables on the page:
+1. `B.Tech / B.E. Management Quota Fees` — Engineering courses only
+2. `MBA Management Quota Fees` — MBA courses only
+
+This is the same approach used on the fees page design (two separate HTML tables, no JS tabs).
+
+---
+
+### STYLING
+
+Same as direct admission pages — use the same components, same CSS, no new styles needed.
+
+---
+
+### DONE WHEN:
+
+- [ ] `/management-quota/bangalore` renders with college cards and counsellor intro
+- [ ] `/management-quota/rvce-bangalore` renders with management quota fees table
+- [ ] `/management-quota/christ-university-bangalore` renders with split Engineering + MBA fees tables
+- [ ] `/management-quota/bms-college-of-engineering` renders placeholder with noindex
+- [ ] `/management-quota/pes-university-bangalore` renders placeholder with noindex
+- [ ] `/management-quota/msrit-bangalore` renders placeholder with noindex
+- [ ] All 5 college slugs return a page (no 404 errors)
+- [ ] WhatsApp messages are management-quota-specific (not the direct admission message)
+- [ ] View Source on RVCE MQ page shows fully rendered HTML (SSR confirmed)
+- [ ] Pushed to GitHub and Vercel deployment successful
