@@ -308,7 +308,7 @@ export default function MgmtQuotaCollegePage({ college, fees, admissions, conten
               <p style={{ color: "var(--primary)", fontSize: "12px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "6px" }}>
                 Management Quota 2026
               </p>
-              <h1 style={{ fontSize: "clamp(22px, 3vw, 32px)", fontWeight: 800, lineHeight: 1.2 }}>{college.name}</h1>
+              <div style={{ fontSize: "clamp(22px, 3vw, 32px)", fontWeight: 800, lineHeight: 1.2, color: "var(--foreground)" }}>{college.name}</div>
               <p style={{ color: "var(--muted-foreground)", marginTop: "8px", fontSize: "14px" }}>
                 {[college.city, college.established && `Estd. ${college.established}`, college.affiliation, college.naac_grade && `NAAC ${college.naac_grade}`].filter(Boolean).join(" | ")}
               </p>
@@ -363,10 +363,10 @@ export default function MgmtQuotaCollegePage({ college, fees, admissions, conten
             <span style={{ color: "var(--foreground)", fontWeight: 600 }}>{shortName}</span>
           </nav>
 
-          {/* ── SECTION 3: H2 + Lead Capture Strip ── */}
-          <h2 style={{ fontSize: "clamp(20px, 3vw, 28px)", fontWeight: 800, marginBottom: "20px" }}>
+          {/* ── SECTION 3: H1 + Lead Capture Strip ── */}
+          <h1 style={{ fontSize: "clamp(20px, 3vw, 28px)", fontWeight: 800, marginBottom: "20px" }}>
             Management Quota Admission in {college.name} 2026 — Fees, Seats and Process
-          </h2>
+          </h1>
           <div className="cta-strip">
             <span className="cta-strip-text" style={{ fontWeight: 500, color: "var(--foreground)" }}>{shortName}</span>
             <input

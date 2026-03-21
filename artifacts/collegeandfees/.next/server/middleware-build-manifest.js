@@ -38,11 +38,6 @@ self.__BUILD_MANIFEST = {
       "static/chunks/webpack.js",
       "static/chunks/main.js",
       "static/chunks/pages/management-quota/[college-slug].js"
-    ],
-    "/management-quota/bangalore": [
-      "static/chunks/webpack.js",
-      "static/chunks/main.js",
-      "static/chunks/pages/management-quota/bangalore.js"
     ]
   },
   "ampFirstPages": []

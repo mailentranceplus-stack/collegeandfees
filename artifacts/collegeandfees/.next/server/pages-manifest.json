@@ -4,7 +4,6 @@
   "/_document": "pages/_document.js",
   "/direct-admission/bangalore": "pages/direct-admission/bangalore.js",
   "/": "pages/index.js",
-  "/direct-admission/[college-slug]": "pages/direct-admission/[college-slug].js",
   "/management-quota/[college-slug]": "pages/management-quota/[college-slug].js",
-  "/management-quota/bangalore": "pages/management-quota/bangalore.js"
+  "/direct-admission/[college-slug]": "pages/direct-admission/[college-slug].js"
 }
