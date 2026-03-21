@@ -1,0 +1,469 @@
+# REPLIT AGENT PROMPT 4 — CATEGORY AND COLLEGE PAGES
+
+> **Copy this entire prompt and paste it into Replit Agent.**
+> Run AFTER Prompt 3 (management quota pages) is complete and pushed to GitHub.
+> This builds 5 pages: engineering colleges listing, RVCE overview + fees, Christ overview + fees.
+
+---
+
+## PASTE BELOW THIS LINE INTO REPLIT AGENT
+
+---
+
+We are continuing to build the CollegeAndFees.com Next.js 14 app in `artifacts/collegeandfees/`. Prompts 1, 2, and 3 are complete. Direct admission pages, management quota pages, and infrastructure are all built and live on Vercel.
+
+**Do NOT modify existing files. Add only the 5 new files listed below.**
+
+---
+
+### WHAT TO BUILD IN THIS SESSION
+
+Five new files:
+
+1. `pages/engineering-colleges/bangalore.js` — category listing page (static file)
+2. `pages/colleges/[college-slug].js` — college overview dynamic page
+3. `pages/colleges/[college-slug]/fees.js` — college fees sub-page
+4. One-time: verify `pages/colleges/rvce-bangalore.js` is NOT needed (dynamic route handles it)
+5. One-time: verify `pages/colleges/christ-university-bangalore.js` is NOT needed (dynamic route handles it)
+
+Note: You only need the dynamic templates `[college-slug].js` and `[college-slug]/fees.js`. The dynamic routes serve both RVCE and Christ University without needing separate static files for each college.
+
+---
+
+### DATABASE SCHEMA — SAME TABLES AS PREVIOUS PROMPTS
+
+Same Supabase tables: colleges, courses, college_courses, fees, cutoffs, rankings, facilities, college_facilities, placements, leads, lead_interactions, college_content, news, reviews, faqs, admissions.
+
+Environment variables are already set in Replit Secrets.
+
+---
+
+### PAGE 1: `pages/engineering-colleges/bangalore.js`
+
+**Purpose:** Rank for "engineering colleges in Bangalore" and related searches.
+
+**getServerSideProps:**
+```js
+// All colleges, active ones first, then inactive
+const { data: colleges } = await supabase
+  .from('colleges')
+  .select(`
+    id, slug, name, short_name, city, established, type, naac_grade, is_active,
+    rankings(rank, source, year),
+    placements(avg_package_lpa, highest_package_lpa, year),
+    college_courses(mgmt_quota_seats, govt_quota_seats, total_seats)
+  `)
+  .eq('city', 'Bangalore')
+  .order('is_active', { ascending: false })  // active first
+
+// General FAQs about engineering colleges in Bangalore
+const { data: faqs } = await supabase
+  .from('faqs')
+  .select('question, answer')
+  .is('college_id', null)
+  .eq('is_active', true)
+  .order('sort_order')
+  .limit(6)
+```
+
+**Meta:**
+- title: `Engineering Colleges in Bangalore 2026 — Fees, Cutoffs and Rankings`
+- description: `Complete list of engineering colleges in Bangalore 2026 with fees, KCET cutoffs, NIRF rankings and management quota information. Free counsellor guidance on WhatsApp.`
+- canonical: `https://collegeandfees.com/engineering-colleges/bangalore`
+
+**Page Structure:**
+
+1. Breadcrumb: `Home > Engineering Colleges > Bangalore`
+
+2. H1: `Engineering Colleges in Bangalore 2026 — Fees, Rankings and Admission Guide`
+
+3. Intro paragraph (hardcoded):
+   ```
+   Bangalore has over 60 engineering colleges affiliated to VTU Belagavi and several deemed
+   universities. The range is wide — from RVCE (NIRF #99) to smaller colleges with single-digit
+   rankings. This page lists every engineering college in Bangalore with verified fee information,
+   NIRF rankings, and direct links to management quota and direct admission guidance.
+   ```
+
+4. **Featured Colleges section** (only is_active = true colleges):
+   H2: `Top Engineering Colleges in Bangalore 2026`
+   Cards grid (3 columns desktop, 2 tablet, 1 mobile):
+   Each card:
+   - College name (large, linked to `/colleges/{slug}`)
+   - NAAC grade badge + NIRF rank
+   - Type (Private Autonomous / Deemed / Government)
+   - Established year
+   - Three action links: "Overview" | "Fees" | "Direct Admission"
+   - WhatsApp button (small, per card) — message: `Hi, I need help choosing an engineering college in Bangalore. Can you guide me?`
+
+5. **All Colleges table** (both active and inactive):
+   H2: `All Engineering Colleges in Bangalore — Complete List`
+   HTML table:
+   ```
+   | College Name | Type | NAAC | NIRF | Management Quota | More Info |
+   ```
+   - College Name: linked to `/colleges/{slug}` (active) or same link (inactive shows placeholder)
+   - Type: from `college.type`
+   - NAAC: grade badge
+   - NIRF: rank number or "—"
+   - Management Quota: "Available" (green) or "Check" (grey) based on mgmt_quota_seats > 0
+   - More Info: "View Details →" link
+
+6. **WhatsApp CTA block:**
+   `Confused about which Bangalore engineering college is right for your rank and budget?
+   Our counsellor is an RVCE alumnus — free guidance on WhatsApp.`
+   Message: `Hi, I need help choosing an engineering college in Bangalore. Can you guide me?`
+
+7. **FAQ section** with FAQPage JSON-LD.
+
+8. Footer.
+
+---
+
+### PAGE 2: `pages/colleges/[college-slug].js` — COLLEGE OVERVIEW PAGE
+
+This is the main college page. Tab bar shows **Overview** as active.
+
+**getServerSideProps:**
+```js
+export async function getServerSideProps({ params }) {
+  const slug = params['college-slug']
+
+  const { data: college } = await supabase
+    .from('colleges')
+    .select('*')
+    .eq('slug', slug)
+    .single()
+
+  if (!college) return { notFound: true }
+
+  // College content (SEO text, highlights, about)
+  const { data: content } = await supabase
+    .from('college_content')
+    .select('*')
+    .eq('college_id', college.id)
+    .single()
+
+  // Latest placements
+  const { data: placements } = await supabase
+    .from('placements')
+    .select('*')
+    .eq('college_id', college.id)
+    .order('year', { ascending: false })
+    .limit(1)
+    .single()
+
+  // NIRF ranking
+  const { data: ranking } = await supabase
+    .from('rankings')
+    .select('rank, year')
+    .eq('college_id', college.id)
+    .eq('source', 'NIRF')
+    .order('year', { ascending: false })
+    .limit(1)
+    .single()
+
+  // Summary fee info (management quota only, latest year, first few courses)
+  const { data: fees } = await supabase
+    .from('fees')
+    .select(`tuition_fee, quota, courses(name, short_name)`)
+    .eq('college_id', college.id)
+    .eq('quota', 'management')   // DB value is lowercase 'management'
+    .eq('academic_year', '2024-25')
+    .order('tuition_fee', { ascending: false })
+    .limit(5)
+
+  // Courses offered
+  const { data: courses } = await supabase
+    .from('college_courses')
+    .select(`
+      total_seats, mgmt_quota_seats, govt_quota_seats,
+      courses(name, short_name, degree)
+    `)
+    .eq('college_id', college.id)
+
+  // Facilities
+  const { data: facilities } = await supabase
+    .from('college_facilities')
+    .select(`facilities(name, icon)`)
+    .eq('college_id', college.id)
+
+  // FAQs
+  const { data: faqs } = await supabase
+    .from('faqs')
+    .select('question, answer')
+    .eq('college_id', college.id)
+    .eq('is_active', true)
+    .order('sort_order')
+    .limit(6)
+
+  // Similar colleges
+  const { data: similarColleges } = await supabase
+    .from('colleges')
+    .select('id, slug, name, short_name, naac_grade')
+    .eq('city', college.city)
+    .eq('is_active', true)
+    .neq('id', college.id)
+    .limit(4)
+
+  return {
+    props: {
+      college,
+      content: content || null,
+      placements: placements || null,
+      ranking: ranking || null,
+      fees: fees || [],
+      courses: courses || [],
+      facilities: facilities || [],
+      faqs: faqs || [],
+      similarColleges: similarColleges || [],
+    }
+  }
+}
+```
+
+**META:**
+```js
+const metaTitle = content?.meta_title ||
+  `${college.name} — Fees, Cutoffs, Placements and Admission 2026`
+const metaDesc = content?.meta_desc ||
+  `${college.name} fees 2026, KCET cutoff, COMEDK cutoff, management quota fees, placements and direct admission process. Free counsellor guidance on WhatsApp.`
+```
+
+**JSON-LD:**
+EducationalOrganization + BreadcrumbList (as in Prompt 2). Add `FAQPage` JSON-LD if faqs exist.
+
+---
+
+**COLLEGE OVERVIEW PAGE STRUCTURE:**
+
+**Section 1: College Header Band** (same as direct admission pages — navy band, name, stats, WhatsApp buttons)
+WhatsApp message: `Hi, I want guidance about admission to {college.name}. Can you help me?`
+
+**Section 2: Tab Bar** (sticky, same 7 tabs — Overview tab active)
+
+**Section 3: H1 + Quick Lead Strip** (same as direct admission pages)
+H1: `{college.name} — Fees, Cutoffs, Placements and Admission 2026`
+
+**Section 4: Key Stats Row** (4 stats — NAAC, NIRF, Highest Package, Management Quota available)
+
+**Section 5: About / Key Facts**
+H2: `About {college.name}`
+If `content.about` exists: render full text.
+If null: 2-sentence auto-generated from college fields.
+
+**Highlights** (if `content.highlights` array exists):
+Render as a clean bulleted list in a side-by-side card format. Label: `Key Highlights`
+
+**Section 6: Management Quota Fees Summary**
+H2: `Management Quota Fees at {college.short_name} 2026-27`
+Show top 5 courses (already limited in query). Small table: Branch | Annual Fees
+Add CTA: "See all branch-wise fees →" linking to `/colleges/{slug}/fees`
+
+**IMMEDIATELY AFTER FEES SUMMARY — MID-CONTENT CTA:**
+`Is {college.short_name} worth it for your budget?
+Our counsellor can tell you in 5 minutes — WhatsApp now.`
+
+**Section 7: Courses Offered**
+H2: `Courses at {college.name}`
+Table: Course Name | Degree | Total Seats | Management Quota Seats | Govt Quota Seats
+
+**Section 8: Placements**
+H2: `Placements at {college.short_name} — {placements.year || '2024'}`
+3 big stat numbers: Average Package | Highest Package | Placement Rate
+Below: Top Recruiters (comma-separated list)
+If no data: placeholder with WhatsApp CTA.
+
+**Section 9: Facilities**
+H2: `Facilities at {college.name}`
+Icon grid — render each facility name. If facilities are empty, skip this section.
+
+**Section 10: Admission Process**
+H2: `Admission to {college.short_name} — How it Works`
+If `content.admission_process` exists: render as prose.
+If null:
+```
+{college.name} offers admission through three routes:
+1. KCET Quota — for Karnataka students with KCET rank
+2. COMEDK Quota — open to students across India
+3. Management Quota — direct admission, no entrance rank required
+
+For management quota admission, contact our counsellor for the current process and fee structure.
+```
+Two CTA buttons: "Direct Admission →" (links to `/direct-admission/{slug}`) | "Management Quota →" (links to `/management-quota/{slug}`)
+
+**Section 11: Similar Colleges** (same as other pages)
+
+**Section 12: FAQs** (same structure, FAQPage JSON-LD)
+
+---
+
+**PLACEHOLDER BEHAVIOUR (is_active = false):**
+Same as direct admission pages:
+- noindex meta tag
+- Show header band, tab bar
+- Replace all content sections with:
+  ```
+  Full details for {college.name} are being verified by our counsellor.
+  For accurate fees, cutoffs and admission information, contact us directly on WhatsApp.
+  ```
+- Show similar colleges section
+- Show global floating WhatsApp button
+
+---
+
+### PAGE 3: `pages/colleges/[college-slug]/fees.js` — FEES SUB-PAGE
+
+This requires a nested dynamic route: `pages/colleges/[college-slug]/fees.js`
+
+**The slug is in the URL as `[college-slug]` — access via `params['college-slug']`**
+
+**getServerSideProps:**
+```js
+export async function getServerSideProps({ params }) {
+  const slug = params['college-slug']
+
+  const { data: college } = await supabase
+    .from('colleges')
+    .select('*')
+    .eq('slug', slug)
+    .single()
+
+  if (!college) return { notFound: true }
+
+  // ALL fees for this college, latest academic year, ALL quotas
+  const { data: fees } = await supabase
+    .from('fees')
+    .select(`
+      tuition_fee, hostel_fee, other_fees, total_fee, academic_year, quota,
+      courses(id, name, short_name, degree)
+    `)
+    .eq('college_id', college.id)
+    .eq('academic_year', '2024-25')
+    .order('quota', { ascending: true })
+    .order('tuition_fee', { ascending: false })
+
+  const { data: content } = await supabase
+    .from('college_content')
+    .select('meta_title, meta_desc')
+    .eq('college_id', college.id)
+    .single()
+
+  const { data: ranking } = await supabase
+    .from('rankings')
+    .select('rank')
+    .eq('college_id', college.id)
+    .eq('source', 'NIRF')
+    .order('year', { ascending: false })
+    .limit(1)
+    .single()
+
+  return {
+    props: { college, fees: fees || [], content: content || null, ranking: ranking || null }
+  }
+}
+```
+
+**META:**
+```js
+const metaTitle = `${college.name} Fees 2026-27 — KCET, COMEDK and Management Quota`
+const metaDesc = `${college.short_name || college.name} fees 2026-27. KCET quota, COMEDK quota and management quota fees for all branches. Verified figures from official sources.`
+```
+
+**FEES PAGE STRUCTURE:**
+
+**Section 1: College Header Band** (same component, same style)
+WhatsApp message: `Hi, I want to know the exact fees at {college.name}. Can you help?`
+
+**Section 2: Tab Bar** (Fees tab active)
+
+**Section 3: H1**
+`{college.name} Fees 2026-27 — KCET, COMEDK and Management Quota`
+
+**Section 4: Fees Tables — CRITICAL LOGIC**
+
+Group all fees by quota type. For each quota type, render a SEPARATE HTML table:
+
+```js
+// Group fees by quota
+const quotaGroups = fees.reduce((acc, fee) => {
+  if (!acc[fee.quota]) acc[fee.quota] = []
+  acc[fee.quota].push(fee)
+  return acc
+}, {})
+
+// Render in this order: management first, then govt, then others
+// DB values are lowercase: 'management', 'govt'
+// Display labels mapped below
+const quotaOrder = ['management', 'govt', 'comedk', 'nri']
+const quotaLabels = {
+  'management': 'Management Quota',
+  'govt': 'Government Quota (KCET)',
+  'comedk': 'COMEDK Quota',
+  'nri': 'NRI Quota',
+}
+```
+
+**For each quota group, render:**
+- H3: `{quotaLabels[quota] || quota} — Branch-wise Fees`
+- HTML table:
+  ```
+  | Branch | Degree | Annual Tuition | Hostel (Annual) | Total Annual | 4-Year Estimate |
+  |--------|--------|---------------|-----------------|--------------|-----------------|
+  ```
+  - Total Annual = `tuition_fee + (hostel_fee || 0) + (other_fees || 0)` — or use `total_fee` generated column
+  - 4-Year Estimate = `tuition_fee * 4` (simple) — add note this is an estimate
+- **IMPORTANT FOR CHRIST UNIVERSITY:** Christ University has both Engineering (B.E./B.Tech) and MBA courses. When `courses.degree` is not `B.E.` or `B.Tech`, render those in a SEPARATE table under a subheading `MBA / Postgraduate Fees`. Do NOT mix B.Tech and MBA rows in the same table.
+
+**After Management Quota table — MID-CONTENT CTA:**
+`Is {college.short_name} management quota worth ₹{approximate_total}?
+Talk to our counsellor for an honest assessment.
+[WhatsApp — Free Guidance]`
+
+**Section 5: Fee Notes**
+```
+Notes on the fees above:
+• Fees shown are for the 2024-25 academic year. 2026-27 fees may be higher.
+• Management quota fees for 2026-27 at RVCE have been officially announced.
+  Contact our counsellor for confirmed 2026-27 figures at other colleges.
+• Hostel fees are optional and not included in all course fee calculations.
+• Other fees (lab, library, development) vary by college and are not always listed.
+• Government quota (KCET) fees are regulated by the Karnataka Examinations Authority.
+• NRI quota fees are typically in USD — consult the college directly.
+```
+
+**Section 6: Quick Comparison**
+H2: `How {college.short_name} Fees Compare`
+3 stat boxes (hardcoded based on data):
+- KCET Quota (government regulated): lowest fee
+- COMEDK Quota: mid-range fee
+- Management Quota: highest fee (show CSE as example if available)
+
+**Section 7: WhatsApp CTA**
+`Want the exact 2026-27 management quota fees for {college.short_name}?
+Our counsellor has confirmed figures — WhatsApp for free guidance.`
+
+---
+
+**NESTED ROUTE STRUCTURE NOTE:**
+
+For the fees sub-page, the file path must be:
+`artifacts/collegeandfees/pages/colleges/[college-slug]/fees.js`
+
+Next.js Pages Router supports this nesting. The `[college-slug]` folder contains `fees.js` (and in future, other tab pages). Access the slug via `params['college-slug']`.
+
+---
+
+### DONE WHEN:
+
+- [ ] `/engineering-colleges/bangalore` renders with college cards and full table
+- [ ] `/colleges/rvce-bangalore` renders full overview with real data from Supabase
+- [ ] `/colleges/rvce-bangalore/fees` renders with separate tables per quota type
+- [ ] `/colleges/christ-university-bangalore` renders with both Engineering and MBA sections
+- [ ] `/colleges/christ-university-bangalore/fees` renders with separate B.Tech table and MBA table
+- [ ] `/colleges/bms-college-of-engineering` renders placeholder (is_active=false)
+- [ ] Tab navigation on all college pages works correctly (correct tab highlighted)
+- [ ] WhatsApp messages are page-type-specific (fees page has fees-specific message)
+- [ ] View Source on RVCE page shows fully rendered HTML (SSR confirmed)
+- [ ] No 404 errors on any of the 5 new pages
+- [ ] Pushed to GitHub and Vercel deployment successful
