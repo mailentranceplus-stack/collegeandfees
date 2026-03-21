@@ -67,6 +67,19 @@ Next.js 14 web application using the **Pages Router** (NOT App Router). SEO-focu
   - `public/` — Static assets
 - **Dev command**: `pnpm --filter @workspace/collegeandfees run dev`
 - **Environment variables needed**: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- **Supabase URL**: `https://safucmoasypfvnwhrovo.supabase.co`
+- **WhatsApp number**: `917975193033`
+- **Brand colors**: navy `#1a3c6e`, wa-green `#25d366`
+
+#### Pages built
+- `pages/index.js` — Homepage with hero, college cards, fees table, admissions steps
+- `pages/direct-admission/bangalore.js` — Hub page: breadcrumb, counsellor intro block, college cards grid from Supabase, WhatsApp CTA, key facts, FAQs. JSON-LD: FAQPage + BreadcrumbList
+- `pages/direct-admission/[college-slug].js` — Dynamic college template (SSR): navy header band, sticky tabs, lead phone strip, key stats, fees table, admission process, docs required, important dates, about section, placements, similar colleges, FAQs. Active colleges show all 12 sections; inactive show noindex placeholder. JSON-LD: EducationalOrganization + BreadcrumbList + FAQPage
+
+#### Components
+- `components/Header.js` — Sticky top header; logo + nav + WhatsApp button; mobile hamburger
+- `components/Footer.js` — Three-column footer; quick links + entrance exams
+- `components/WhatsAppFloat.js` — Fixed bottom-right WhatsApp bubble (rendered in `_app.js` on every page)
 
 ## Packages
 

@@ -1,0 +1,198 @@
+Got it. Here is the full Prompt 2 — copy this entire text and paste it into the Replit Agent input box yourself:
+
+---
+
+We are continuing to build CollegeAndFees.com in `artifacts/collegeandfees/`. The project uses Next.js 14 Pages Router + Tailwind CSS. Currently only `pages/index.js` exists.
+
+**BUILD THESE 9 PAGES:**
+1. `pages/direct-admission/bangalore.js` — static hub (NOT dynamic)
+2. `pages/direct-admission/[college-slug].js` — dynamic template
+
+**SUPABASE:**
+URL: `https://safucmoasypfvnwhrovo.supabase.co`
+ANON KEY: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhZnVjbW9hc3lwZnZud2hyb3ZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjA3NzgsImV4cCI6MjA4OTU5Njc3OH0.QarIG8tDABf1hy9ifOIrMmNaP5KmkxiNV65hyK_ZFgA`
+Check if `lib/supabase.js` exists — use it. If not, create it using @supabase/supabase-js.
+
+**WHATSAPP NUMBER:** 917975193033
+
+**DATABASE TABLES (already exist — do NOT create new ones):**
+- `colleges`: id, slug, name, short_name, city, established, affiliation, type, naac_grade, is_active
+- `fees`: id, college_id, course_id, academic_year, quota, tuition_fee, hostel_fee, other_fees, total_fee — quota values: "Management Quota", "KCET Quota", "COMEDK Quota"
+- `admissions`: id, college_id, mgmt_quota_process (text), documents_required (text[]), important_dates (jsonb), contact_person, contact_phone
+- `college_content`: college_id, about, highlights (text[]), meta_title, meta_desc
+- `placements`: id, college_id, year, avg_package_lpa, highest_package_lpa, placement_pct, top_recruiters (text[])
+- `rankings`: id, college_id, source, year, rank
+- `faqs`: id, college_id (nullable), question, answer, sort_order, is_active
+- `courses`: id, name, short_name, degree
+- `college_courses`: college_id, course_id, total_seats, mgmt_quota_seats
+
+**8 COLLEGE SLUGS for dynamic template:**
+- rv-college-of-engineering-bangalore → is_active=true, has fee data
+- christ-university-bangalore → is_active=true, has fee data
+- bms-college-of-engineering-bangalore → is_active=false, show placeholder
+- pes-university-bangalore → is_active=false
+- ms-ramaiah-institute-of-technology-bangalore → is_active=false
+- jain-university-bangalore → is_active=false
+- dayananda-sagar-college-of-engineering-bangalore → is_active=false
+- new-horizon-college-of-engineering-bangalore → is_active=false
+
+---
+
+**PAGE 1: pages/direct-admission/bangalore.js**
+
+getServerSideProps: fetch active colleges + general FAQs (college_id IS NULL, is_active=true, limit 8)
+
+Head: title="Direct Admission in Bangalore Engineering Colleges 2026 — Fees, Process and Guide" | description="Complete guide to direct admission in Bangalore engineering colleges 2026. Management quota fees, eligibility and process. Free counsellor guidance on WhatsApp." | canonical=https://collegeandfees.com/direct-admission/bangalore
+
+Page sections:
+1. Shared Header component (create if doesn't exist — logo left, nav links centre, WhatsApp button right in #25d366)
+2. Breadcrumb: Home > Direct Admission > Bangalore
+3. H1: "Direct Admission in Bangalore Engineering Colleges 2026"
+4. Counsellor intro block (navy left border #1a3c6e, italic text): "Direct admission in Bangalore engineering colleges refers to admission through Management Quota seats — seats that colleges fill directly without KCET or COMEDK counselling. These seats are available at every private engineering college in Bangalore, typically 30-35% of total intake. As an RVCE alumnus who has counselled hundreds of students through this process, I can tell you: the fees vary wildly by branch and college, the process moves fast once admissions open, and having accurate fee information before you approach a college makes a significant difference."
+5. College cards grid (3 cols desktop, 1 col mobile): college name linked to /direct-admission/{slug}, NAAC badge, "Management Quota Available" green tag
+6. WhatsApp CTA block (bg #f0f7ff): "Want direct admission in a top Bangalore engineering college? Our counsellor is an RVCE alumnus — free guidance on WhatsApp." → button opens https://wa.me/917975193033?text=Hi%2C%20I%20want%20to%20know%20about%20direct%20admission%20in%20Bangalore%20engineering%20colleges.%20Can%20you%20guide%20me%3F
+7. Key Facts (4 cards): "Management quota: 30-35% of total seats at most private colleges" | "Open: June–July 2026 after KCET counselling" | "Documents: 10th, 12th marksheets, CET rank card" | "No KCET/COMEDK rank required for management quota"
+8. FAQs from DB — FAQPage JSON-LD
+9. BreadcrumbList JSON-LD
+10. Shared Footer component
+
+---
+
+**PAGE 2: pages/direct-admission/[college-slug].js**
+
+getServerSideProps({ params }):
+- slug = params['college-slug']
+- Fetch college by slug (.single()) — if not found return { notFound: true }
+- Fetch fees: college_id=college.id, quota='Management Quota', academic_year='2024-25', order tuition_fee desc
+- Fetch admissions: college_id=college.id (.single() — handle null gracefully with try/catch or check error)
+- Fetch college_content: college_id=college.id (.single() — may be null)
+- Fetch placements: college_id=college.id, order year desc, limit 1 (.single() — may be null)
+- Fetch ranking: college_id=college.id, source='NIRF', order year desc, limit 1 (.single() — may be null)
+- Fetch college FAQs: college_id=college.id, is_active=true, order sort_order
+- Fetch general FAQs: college_id IS NULL, is_active=true, limit 4
+- Merge: [...collegeFaqs, ...generalFaqs].slice(0, 8)
+- Similar colleges: city=college.city, is_active=true, id != college.id, limit 4
+- Return all as props with || null and || [] fallbacks
+
+**ACTIVE PAGE (college.is_active = true):**
+
+Head:
+- title = content?.meta_title || `Direct Admission ${college.name} 2026 — Fees, Process and Seats`
+- description = content?.meta_desc || `Direct admission in ${college.short_name || college.name} 2026. Management quota fees, seat availability and admission process.`
+- canonical: https://collegeandfees.com/direct-admission/{slug}
+- robots: index, follow
+- OG tags (og:title, og:description, og:url)
+- JSON-LD: EducationalOrganization + BreadcrumbList + FAQPage
+
+**SECTION 1 — COLLEGE HEADER BAND** (full width, bg-[#1a3c6e], white text):
+Left: college name in large bold white (this is the visual H1, the SEO H1 is in Section 3), below it: "{city} | Estd. {established} | {affiliation} | NAAC {naac_grade}"
+Right: "Will I Get In? Ask Counsellor" (white outline button) + "WhatsApp Now" (bg-[#25d366] solid)
+WhatsApp message: `Hi, I want to know about direct admission in {college.name}. What are the fees and process?`
+Mobile: stack vertically, both buttons visible above fold
+
+**SECTION 2 — STICKY TAB BAR** (sticky top-0 z-50 bg-white border-b, overflow-x-auto on mobile):
+Full-page-load links (NOT JS tabs):
+Overview → /colleges/{slug}
+Fees → /colleges/{slug}/fees
+Placements → /colleges/{slug}/placements
+Cutoff → /colleges/{slug}/cutoff
+Admission → /colleges/{slug}/admission ← ACTIVE TAB (border-b-2 border-[#1a3c6e] font-bold)
+Hostel → /colleges/{slug}/hostel
+Courses → /colleges/{slug}/courses
+
+**SECTION 3 — H1 + QUICK LEAD STRIP:**
+H1: "Direct Admission in {college.name} 2026 — Fees, Process and Seats"
+Below H1, flex row: [college name (grey, display only)] [tel input placeholder="Enter your mobile number"] [button "Get Free Guidance" bg-[#25d366]]
+On click: window.open(`https://wa.me/917975193033?text=Hi, I want guidance about direct admission to ${encodeURIComponent(college.name)}. My number is ${phone}`)
+No form submission — pure WhatsApp redirect.
+
+**SECTION 4 — KEY STATS ROW** (4 boxes, 2×2 on mobile):
+NAAC: {college.naac_grade} | NIRF Rank: #{ranking?.rank || "Not Ranked"} | Highest Package: {placements?.highest_package_lpa + " LPA" || "Data Awaited"} | Management Quota: "Available ✓"
+
+**SECTION 5 — FEES TABLE:**
+H2: "Direct Admission Fees at {college.short_name || college.name} 2026-27"
+If fees.length > 0: HTML table with columns: Branch | Annual Fees | 4-Year Total | Seats
+- Annual Fees: ₹{tuition_fee.toLocaleString('en-IN')}
+- 4-Year Total: ₹{(tuition_fee * 4).toLocaleString('en-IN')}
+- Seats: mgmt_quota_seats from college_courses join, else "Ask Counsellor"
+- Sort by tuition_fee descending
+- Table note: "* Fees shown are for 2024-25. 2026-27 fees may vary. Contact counsellor for confirmed figures."
+If fees empty: "Fee data for {college.name} is being verified. Contact counsellor for accurate 2026-27 fees." + WA button
+
+Immediately after fees table — MID CTA (bg-[#e8f5e9] full width, p-6):
+"Is {college.short_name} worth it for your budget? Our counsellor can tell you in 5 minutes."
+Green WA button — same message as header band.
+
+**SECTION 6 — ADMISSION PROCESS:**
+H2: "How to Get Direct Admission in {college.short_name || college.name}"
+If admissions?.mgmt_quota_process: render as prose (whitespace-pre-wrap)
+Else fallback text: "The direct admission process for {college.name} typically involves: 1. Contacting the college admissions office directly 2. Submitting academic documents (10th, 12th marksheets, CET scorecard) 3. Paying the initial registration fee 4. Document verification and seat allotment 5. Paying first year fees to confirm the seat. Contact our counsellor for the exact 2026 process and timeline."
+
+**SECTION 7 — DOCUMENTS REQUIRED:**
+H2: "Documents Required for Direct Admission"
+If admissions?.documents_required array non-empty: render as ul
+Else hardcoded list: 10th Marksheet (original + 2 copies), 12th Marksheet (original + 2 copies), KCET/COMEDK Rank Card (if applicable), Transfer Certificate, Migration Certificate (if from another state board), Category Certificate (SC/ST/OBC), 6 passport photos, Aadhar Card copy
+
+**SECTION 8 — IMPORTANT DATES:**
+H2: "Important Dates — Direct Admission 2026"
+If admissions?.important_dates (JSONB): render as 2-col table (Event | Date)
+Else default table: KCET 2026 Results → May 2026 | MQ Applications Open → June 2026 | Document Verification → June–July 2026 | Seat Confirmation → July 2026 | Classes Begin → August 2026
+Note: "* Exact dates to be announced by {college.name}."
+
+**SECTION 9 — ABOUT:**
+H2: "About {college.name}"
+content?.about or auto-generate: "{college.name} is a {college.type} engineering college in {college.city}, established in {college.established}. Affiliated to {college.affiliation}, NAAC grade {college.naac_grade}."
+
+**SECTION 10 — PLACEMENTS:**
+H2: "Placements at {college.short_name || college.name}"
+If placements: "{avg_package_lpa} LPA average | {highest_package_lpa} LPA highest | {placement_pct}% placed | Top recruiters: {top_recruiters.join(', ')}"
+Else: "Placement data being updated."
+
+**SECTION 11 — SIMILAR COLLEGES** (skip entirely if array empty):
+H2: "Other Colleges with Direct Admission in Bangalore"
+4 cards: name, NAAC badge, link to /direct-admission/{slug}
+
+**SECTION 12 — FAQs:**
+H2: "FAQs — Direct Admission {college.short_name || college.name}"
+Render all (max 8), static expanded list.
+FAQPage JSON-LD.
+
+**PLACEHOLDER PAGE (college.is_active = false):**
+- `<meta name="robots" content="noindex, nofollow" />`
+- Show Section 1 (header band) and Section 2 (tab bar) — same as active
+- Replace all data sections with: "Detailed information about direct admission in {college.name} is being verified. For accurate 2026 fees and process, contact our counsellor on WhatsApp." + WA button
+- Show Section 11 (similar colleges)
+- Show global floating WA button
+
+---
+
+**GLOBAL FLOATING WHATSAPP BUTTON:**
+Create `components/WhatsAppFloat.js` if it doesn't exist:
+- position fixed, bottom-4 right-4, z-50
+- Circular, bg-[#25d366], white WhatsApp SVG icon
+- href: https://wa.me/917975193033
+- Visible on all pages, never hidden
+Add `<WhatsAppFloat />` to `pages/_app.js` so it appears on every page automatically.
+
+---
+
+**STYLING:**
+- Tailwind CSS only (already configured) — no new CSS files
+- Primary colour #1a3c6e — use as bg-[#1a3c6e] or add to tailwind.config.js theme.extend.colors
+- WA green #25d366
+- Inter font — check _app.js or _document.js, add via next/font/google if missing
+- Mobile-first
+
+---
+
+**AFTER BUILDING — VERIFY THEN PUSH:**
+1. Preview /direct-admission/bangalore — should show college cards
+2. Preview /direct-admission/rv-college-of-engineering-bangalore — should show fees table with real Supabase data
+3. Preview /direct-admission/bms-college-of-engineering-bangalore — should show placeholder + noindex meta
+4. View Source on RVCE page — must show fully rendered HTML (not empty divs) confirming SSR
+5. Fix all errors before pushing
+6. `git add . && git commit -m "Add direct admission pages - Prompt 2" && git push origin master`
+
+---
+
+Copy this text, paste it into the Replit Agent input box, and press Enter. The agent will build all 9 pages. Once it finishes and pushes to GitHub, let me know and I'll verify the Vercel deployment via the connector and then give you Prompt 3.
