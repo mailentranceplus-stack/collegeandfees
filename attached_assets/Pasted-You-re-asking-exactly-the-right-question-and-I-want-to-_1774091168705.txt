@@ -1,0 +1,39 @@
+You're asking exactly the right question, and I want to be completely honest with you before we go any further.
+
+**The ultimate objective** of CollegeAndFees.com is this: a parent whose child didn't get a good KCET rank searches Google for "RVCE management quota fees 2026" at 11pm, lands on our page, sees the fee clearly, feels the counsellor is trustworthy, and clicks WhatsApp. That's it. One WhatsApp click = one lead = the entire purpose of the site.
+
+**Does our current approach achieve this?** The infrastructure direction is correct — SSR pages on Next.js get indexed by Google, Supabase holds the fee data, Vercel serves it fast. That foundation is right. But Replit has never been told what the business is. It's been told to "build pages" — so it built technically correct but commercially empty pages. It built a website. We needed a lead machine.
+
+**Is Replit aligned?** No, and that's the real problem. Replit doesn't know:
+- That the visitor is an anxious parent making a ₹10–20 lakh decision in 2 weeks
+- That showing the ₹ fee number prominently is the single most important thing on every page
+- That every design decision should answer: "does this make the parent click WhatsApp faster?"
+- That trust signals (RVCE alumnus, 500+ students helped) matter more than visual prettiness
+
+The design isn't ugly because Replit made bad choices — it's empty because Replit was never given a human context. It was given technical specifications.
+
+**Here is what I suggest you paste into Replit — not technical questions, but a business brief:**
+
+---
+
+Stop. Before any coding, I need you to understand what this business actually is.
+
+This site has ONE goal: get a parent to click the WhatsApp button.
+
+The visitor is a parent. Their child scored 60,000 rank in KCET. They cannot get CSE at RVCE through government quota. They have ₹15-20 lakhs and 2-3 weeks to make a decision. They are anxious, slightly desperate, and searching Google at night. They will land on our page and in 10 seconds decide: "does this site know what it's talking about, and can I trust this person on WhatsApp?"
+
+Every single design decision — card layout, font size, color, what data is shown — must answer: does this make that parent click WhatsApp faster?
+
+Given this, here is what I need you to tell me honestly before writing any code:
+
+1. Do the college cards on the homepage and direct-admission/bangalore.js currently show the management quota fee amount (like ₹1,60,000/year) pulled from the database? If not, is the fee data being fetched at all on these listing pages, or only on the individual college page?
+
+2. Looking at the current components/ folder — is there a reusable CollegeCard component, or is the card HTML written directly inside each page?
+
+3. What is the single most impactful change you can make — the one thing that if changed would most increase the chance of that anxious parent clicking WhatsApp?
+
+Answer these three questions only. Do not write code yet.
+
+---
+
+That's it. Short, sharp, and it puts Replit in the right mental frame. Once we get those three answers back, we'll know exactly what one instruction to give it next.
