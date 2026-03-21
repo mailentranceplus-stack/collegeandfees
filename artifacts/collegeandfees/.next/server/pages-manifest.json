@@ -3,6 +3,6 @@
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
   "/": "pages/index.js",
-  "/direct-admission/[college-slug]": "pages/direct-admission/[college-slug].js",
-  "/direct-admission/bangalore": "pages/direct-admission/bangalore.js"
+  "/direct-admission/bangalore": "pages/direct-admission/bangalore.js",
+  "/direct-admission/[college-slug]": "pages/direct-admission/[college-slug].js"
 }

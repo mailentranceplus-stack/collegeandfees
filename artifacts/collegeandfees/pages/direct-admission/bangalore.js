@@ -9,12 +9,11 @@ const WA_NUMBER = "917975193033";
 const WA_GENERAL = `https://wa.me/${WA_NUMBER}?text=Hi%2C%20I%20want%20to%20know%20about%20direct%20admission%20in%20Bangalore%20engineering%20colleges.%20Can%20you%20guide%20me%3F`;
 
 const PLACEHOLDER_COLLEGES = [
-  { id: 1, slug: "rv-college-of-engineering-bangalore", name: "RV College of Engineering", naac_grade: "A+" },
-  { id: 2, slug: "christ-university-bangalore", name: "Christ University", naac_grade: "A+" },
-  { id: 3, slug: "bms-college-of-engineering-bangalore", name: "BMS College of Engineering", naac_grade: "A" },
-  { id: 4, slug: "pes-university-bangalore", name: "PES University", naac_grade: "A" },
-  { id: 5, slug: "ms-ramaiah-institute-of-technology-bangalore", name: "MS Ramaiah Institute of Technology", naac_grade: "A" },
-  { id: 6, slug: "jain-university-bangalore", name: "Jain University", naac_grade: "A" },
+  { id: 1, slug: "rvce-bangalore", name: "RV College of Engineering", city: "Bangalore", naac_grade: "A+" },
+  { id: 2, slug: "bms-college-of-engineering", name: "BMS College of Engineering", city: "Bangalore", naac_grade: "A" },
+  { id: 3, slug: "christ-university-bangalore", name: "Christ University – Faculty of Engineering", city: "Bangalore", naac_grade: "A+" },
+  { id: 4, slug: "msrit-bangalore", name: "MS Ramaiah Institute of Technology", city: "Bangalore", naac_grade: "A+" },
+  { id: 5, slug: "pes-university-bangalore", name: "PES University", city: "Bangalore", naac_grade: "A" },
 ];
 
 const PLACEHOLDER_FAQS = [

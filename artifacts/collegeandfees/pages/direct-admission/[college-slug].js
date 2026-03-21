@@ -548,7 +548,14 @@ export async function getServerSideProps({ params }) {
   const supabase = getSupabase();
 
   if (!supabase) {
-    return { notFound: true };
+    return {
+      props: {
+        slug,
+        college: { id: 0, slug, name: slug.replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase()), short_name: null, city: "Bangalore", established: null, affiliation: null, type: "Private", naac_grade: null, is_active: false },
+        fees: [], admissions: null, content: null, placements: null, ranking: null, faqs: [], similarColleges: [],
+        _noSupabase: true,
+      },
+    };
   }
 
   try {
