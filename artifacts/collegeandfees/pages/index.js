@@ -2,6 +2,7 @@ import Head from "next/head";
 import Link from "next/link";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import CollegeCard from "../components/CollegeCard";
 import { getSupabase } from "../lib/supabase";
 
 const WA_GENERAL = "https://wa.me/917975193033?text=Hi%2C%20I%20want%20to%20know%20about%20direct%20admission%20in%20Bangalore%20engineering%20colleges.";
@@ -140,32 +141,7 @@ export default function Home({ colleges }) {
             </p>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {displayColleges.map((college) => (
-                <Link
-                  key={college.id}
-                  href={`/direct-admission/${college.slug}`}
-                  className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md hover:border-[#1a3c6e] transition-all group"
-                >
-                  <div className="flex items-start justify-between mb-3">
-                    {college.naac_grade && (
-                      <span className="inline-block bg-blue-50 text-[#1a3c6e] text-xs font-bold px-2.5 py-1 rounded-full border border-blue-100">
-                        NAAC {college.naac_grade}
-                      </span>
-                    )}
-                    <span className="text-xs text-gray-400">{college.type}</span>
-                  </div>
-                  <h3 className="font-semibold text-lg text-gray-900 group-hover:text-[#1a3c6e] transition-colors mb-1">
-                    {college.name}
-                  </h3>
-                  <p className="text-sm text-gray-500 mb-4">
-                    {college.city}{college.established ? ` · Estd. ${college.established}` : ""}
-                  </p>
-                  <div className="border-t border-gray-100 pt-3 flex items-center justify-between">
-                    <span className="inline-block bg-green-50 text-green-700 text-xs font-medium px-2.5 py-1 rounded-full border border-green-100">
-                      Management Quota Available
-                    </span>
-                    <span className="text-xs text-[#1a3c6e] font-medium group-hover:underline">View →</span>
-                  </div>
-                </Link>
+                <CollegeCard key={college.id} college={college} />
               ))}
             </div>
             <div className="mt-8 text-center">
@@ -265,13 +241,32 @@ export async function getServerSideProps() {
   try {
     const supabase = getSupabase();
     if (supabase) {
-      const { data } = await supabase
-        .from("colleges")
-        .select("id, slug, name, short_name, city, established, type, naac_grade")
-        .eq("is_active", true)
-        .order("name")
-        .limit(6);
-      if (data) colleges = data;
+      const [{ data: collegeData }, { data: feesData }] = await Promise.all([
+        supabase
+          .from("colleges")
+          .select("id, slug, name, short_name, city, established, type, naac_grade")
+          .eq("is_active", true)
+          .order("name")
+          .limit(6),
+        supabase
+          .from("fees")
+          .select("college_id, course_id, tuition_fee, courses(name, short_name)")
+          .eq("quota", "management")
+          .order("tuition_fee", { ascending: false }),
+      ]);
+
+      if (collegeData) {
+        const feeMap = {};
+        (feesData || []).forEach((fee) => {
+          const cid = fee.college_id;
+          if (!feeMap[cid]) {
+            feeMap[cid] = { top_fee: fee.tuition_fee, top_course: fee.courses?.short_name || "CSE" };
+          } else if (fee.course_id === 1) {
+            feeMap[cid] = { top_fee: fee.tuition_fee, top_course: "CSE" };
+          }
+        });
+        colleges = collegeData.map((c) => ({ ...c, ...(feeMap[c.id] || {}) }));
+      }
     }
   } catch (err) {
     console.error("Failed to fetch colleges:", err.message);

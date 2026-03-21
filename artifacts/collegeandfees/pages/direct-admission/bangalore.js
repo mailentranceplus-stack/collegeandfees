@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useState } from "react";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
+import CollegeCard from "../../components/CollegeCard";
 import { getSupabase } from "../../lib/supabase";
 
 const WA_NUMBER = "917975193033";
@@ -149,31 +150,7 @@ export default function BangalorePage({ colleges, faqs }) {
               </h2>
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
                 {displayColleges.map((college) => (
-                  <Link
-                    key={college.id}
-                    href={`/direct-admission/${college.slug}`}
-                    className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 hover:shadow-md hover:border-[#1a3c6e] transition-all group"
-                  >
-                    <div className="flex items-start justify-between mb-3">
-                      {college.naac_grade && (
-                        <span className="inline-block bg-blue-50 text-[#1a3c6e] text-xs font-bold px-2.5 py-1 rounded-full border border-blue-100">
-                          NAAC {college.naac_grade}
-                        </span>
-                      )}
-                      <span className="inline-block bg-green-50 text-green-700 text-xs font-medium px-2.5 py-1 rounded-full border border-green-100">
-                        Management Quota Available
-                      </span>
-                    </div>
-                    <h3 className="font-semibold text-gray-900 group-hover:text-[#1a3c6e] transition-colors leading-snug">
-                      {college.name}
-                    </h3>
-                    {college.city && (
-                      <p className="text-sm text-gray-400 mt-1">{college.city}</p>
-                    )}
-                    <p className="text-sm text-[#1a3c6e] font-medium mt-3 group-hover:underline">
-                      View Fees & Process →
-                    </p>
-                  </Link>
+                  <CollegeCard key={college.id} college={college} />
                 ))}
               </div>
             </section>
@@ -240,20 +217,39 @@ export async function getServerSideProps() {
   try {
     const supabase = getSupabase();
     if (supabase) {
-      const { data: collegeData } = await supabase
-        .from("colleges")
-        .select("id, slug, name, short_name, city, naac_grade, type")
-        .eq("is_active", true)
-        .order("name");
-      if (collegeData) colleges = collegeData;
+      const [{ data: collegeData }, { data: feesData }, { data: faqData }] = await Promise.all([
+        supabase
+          .from("colleges")
+          .select("id, slug, name, short_name, city, naac_grade, type")
+          .eq("is_active", true)
+          .order("name"),
+        supabase
+          .from("fees")
+          .select("college_id, course_id, tuition_fee, courses(name, short_name)")
+          .eq("quota", "management")
+          .order("tuition_fee", { ascending: false }),
+        supabase
+          .from("faqs")
+          .select("id, question, answer")
+          .is("college_id", null)
+          .eq("is_active", true)
+          .order("sort_order")
+          .limit(8),
+      ]);
 
-      const { data: faqData } = await supabase
-        .from("faqs")
-        .select("id, question, answer")
-        .is("college_id", null)
-        .eq("is_active", true)
-        .order("sort_order")
-        .limit(8);
+      if (collegeData) {
+        const feeMap = {};
+        (feesData || []).forEach((fee) => {
+          const cid = fee.college_id;
+          if (!feeMap[cid]) {
+            feeMap[cid] = { top_fee: fee.tuition_fee, top_course: fee.courses?.short_name || "CSE" };
+          } else if (fee.course_id === 1) {
+            feeMap[cid] = { top_fee: fee.tuition_fee, top_course: "CSE" };
+          }
+        });
+        colleges = collegeData.map((c) => ({ ...c, ...(feeMap[c.id] || {}) }));
+      }
+
       if (faqData) faqs = faqData;
     }
   } catch (err) {
