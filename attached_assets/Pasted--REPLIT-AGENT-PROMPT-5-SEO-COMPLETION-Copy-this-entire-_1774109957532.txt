@@ -1,0 +1,301 @@
+# REPLIT AGENT PROMPT 5 — SEO COMPLETION
+
+> **Copy this entire prompt and paste it into Replit Agent.**
+> Run AFTER Prompt 4 (college pages) is complete and pushed to GitHub.
+> This completes Phase 1: sitemaps, JSON-LD audit, homepage, 404 page, and final checklist.
+
+---
+
+## PASTE BELOW THIS LINE INTO REPLIT AGENT
+
+---
+
+We are completing Phase 1 of CollegeAndFees.com. The app is in `artifacts/collegeandfees/`. All 20 pages are built. This final session adds sitemaps, completes JSON-LD structured data on all pages, builds the homepage, and confirms every item on the Phase 1 done checklist.
+
+---
+
+### WHAT TO BUILD IN THIS SESSION
+
+1. Homepage — `pages/index.js`
+2. `/bangalore` city hub — `pages/bangalore.js`
+3. Sitemaps — `pages/sitemap.xml.js` (or `public/sitemap.xml` if static)
+4. `robots.txt` update
+5. JSON-LD audit and completion across all pages
+6. Phase 1 final verification
+
+---
+
+### 1. HOMEPAGE — `pages/index.js`
+
+**getServerSideProps:**
+```js
+// Featured active colleges (is_active = true, ordered by NIRF rank)
+const { data: featuredColleges } = await supabase
+  .from('colleges')
+  .select(`
+    id, slug, name, short_name, city, naac_grade, established, type,
+    rankings(rank, source, year),
+    placements(avg_package_lpa, highest_package_lpa, year),
+    fees(tuition_fee, quota, courses(short_name))
+  `)
+  .eq('is_active', true)
+  .limit(6)
+```
+
+**Meta:**
+- title: `Bangalore Engineering Admissions 2026 — Fees, Cutoffs and Direct Admission Guide`
+- description: `Management quota fees, KCET cutoffs, COMEDK cutoffs and direct admission guidance for Bangalore engineering colleges 2026. Counselled by an RVCE alumnus. Free WhatsApp guidance.`
+- canonical: `https://collegeandfees.com`
+
+**JSON-LD:**
+```json
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "CollegeAndFees.com",
+  "url": "https://collegeandfees.com",
+  "description": "Management quota fees and direct admission guidance for Bangalore engineering colleges",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "https://collegeandfees.com/engineering-colleges/bangalore?q={search_term}",
+    "query-input": "required name=search_term"
+  }
+}
+```
+
+**Homepage Structure (top to bottom):**
+
+**Hero Section** (no images — text only, fast load):
+- H1: `Bangalore Engineering Admissions 2026`
+- Subheadline: `Management Quota Fees · KCET Cutoffs · Direct Admission Guide`
+- Counsellor trust line: `Guidance by an RVCE alumnus — accurate fees, real process, free WhatsApp advice`
+- Three navigation cards in a row:
+  1. `Engineering Colleges Bangalore` → `/engineering-colleges/bangalore`
+  2. `Direct Admission Guide` → `/direct-admission/bangalore`
+  3. `Management Quota Fees` → `/management-quota/bangalore`
+- WhatsApp button: `Get Free Guidance — WhatsApp Now` (large, #25d366, below cards)
+  Message: `Hi, I need help with engineering college admission in Bangalore 2026. Can you guide me?`
+
+**Featured Colleges Section:**
+H2: `Top Engineering Colleges in Bangalore 2026`
+Cards grid (same style as other pages). Show only is_active=true colleges.
+Each card: College name, NAAC grade, NIRF rank, management quota indication, 3 links (Overview | Fees | Direct Admission).
+
+**WhatsApp CTA Block:**
+```
+Talk to Our Counsellor — Free Guidance
+Our counsellor is an RVCE alumnus with real insider knowledge of management quota fees
+and the admission process. Most questions answered in one conversation.
+[WhatsApp Now — Free and No Obligation]
+```
+Design: #f0f7ff background (light blue), centred text, large green button.
+
+**How It Works Section:**
+H2: `How CollegeAndFees.com Works`
+3 step cards:
+1. `Search your college` — Find fees, cutoffs and rankings for any Bangalore engineering college
+2. `See real fees` — Branch-wise management quota fees, verified from official sources
+3. `WhatsApp our counsellor` — Free guidance on which college fits your rank and budget
+
+Note below: "Our counsellor is an RVCE alumnus who has guided hundreds of students and families through the Bangalore engineering admission process."
+
+**Footer:**
+Quick links: Engineering Colleges | Direct Admission | Management Quota | About
+Contact: WhatsApp button
+Copyright: CollegeAndFees.com 2026
+
+---
+
+### 2. BANGALORE CITY HUB — `pages/bangalore.js`
+
+Simple page. No complex getServerSideProps needed (mostly static content).
+
+**getServerSideProps:** Fetch count of active colleges only.
+
+**Meta:**
+- title: `Engineering and MBA Colleges in Bangalore 2026 — Fees and Admission Guide`
+- description: `Complete guide to colleges in Bangalore 2026 — engineering, MBA, fees, cutoffs and direct admission. Free counsellor guidance on WhatsApp.`
+
+**Page content:**
+H1: `Colleges in Bangalore 2026 — Engineering and MBA Admission Guide`
+50-word intro: `Bangalore is home to India's highest concentration of top engineering colleges. From RVCE (NIRF #99) to newer institutions, every major stream and budget range is represented. This guide covers engineering colleges, MBA colleges, fees, cutoffs and direct admission options across Bangalore.`
+
+Three section cards:
+- Engineering Colleges in Bangalore → `/engineering-colleges/bangalore`
+- Direct Admission in Bangalore → `/direct-admission/bangalore`
+- Management Quota in Bangalore → `/management-quota/bangalore`
+
+This page exists for SEO on "colleges in Bangalore" broad keyword. Keep it minimal.
+
+---
+
+### 3. SITEMAPS
+
+Create `pages/sitemap.xml.js` as a Next.js API-style page that returns XML. This is the standard Next.js Pages Router approach for dynamic sitemaps.
+
+```js
+// pages/sitemap.xml.js
+const SITE_URL = 'https://collegeandfees.com'
+
+function generateSiteMap(activeColleges) {
+  return `<?xml version="1.0" encoding="UTF-8"?>
+   <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+     <!-- Static pages -->
+     <url><loc>${SITE_URL}/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+     <url><loc>${SITE_URL}/bangalore</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+     <url><loc>${SITE_URL}/engineering-colleges/bangalore</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+     <url><loc>${SITE_URL}/direct-admission/bangalore</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+     <url><loc>${SITE_URL}/management-quota/bangalore</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+
+     <!-- Dynamic pages — only is_active = true colleges -->
+     ${activeColleges.map(college => `
+       <url><loc>${SITE_URL}/colleges/${college.slug}</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+       <url><loc>${SITE_URL}/colleges/${college.slug}/fees</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+       <url><loc>${SITE_URL}/direct-admission/${college.slug}</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+       <url><loc>${SITE_URL}/management-quota/${college.slug}</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+     `).join('')}
+   </urlset>
+ `
+}
+
+export async function getServerSideProps({ res }) {
+  const { data: activeColleges } = await supabase
+    .from('colleges')
+    .select('slug')
+    .eq('is_active', true)
+
+  const sitemap = generateSiteMap(activeColleges || [])
+
+  res.setHeader('Content-Type', 'text/xml')
+  res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate')
+  res.write(sitemap)
+  res.end()
+
+  return { props: {} }
+}
+
+export default function Sitemap() {}
+```
+
+**robots.txt** — update `public/robots.txt`:
+```
+User-agent: *
+Allow: /
+
+Disallow: /api/
+
+Sitemap: https://collegeandfees.com/sitemap.xml
+```
+
+---
+
+### 4. JSON-LD AUDIT — VERIFY ALL PAGES
+
+Check each page template and confirm the following JSON-LD is present:
+
+| Page | Required JSON-LD |
+|------|-----------------|
+| `pages/index.js` | WebSite |
+| `pages/engineering-colleges/bangalore.js` | BreadcrumbList |
+| `pages/direct-admission/bangalore.js` | BreadcrumbList, FAQPage |
+| `pages/management-quota/bangalore.js` | BreadcrumbList, FAQPage |
+| `pages/direct-admission/[college-slug].js` | EducationalOrganization, BreadcrumbList, FAQPage |
+| `pages/management-quota/[college-slug].js` | EducationalOrganization, BreadcrumbList, FAQPage |
+| `pages/colleges/[college-slug].js` | EducationalOrganization, BreadcrumbList, FAQPage |
+| `pages/colleges/[college-slug]/fees.js` | BreadcrumbList |
+| `pages/404.js` | Nothing required |
+
+If any JSON-LD is missing, add it now. Use the patterns from Prompt 2.
+
+For `EducationalOrganization` on college pages:
+```json
+{
+  "@context": "https://schema.org",
+  "@type": "EducationalOrganization",
+  "name": "[college.name]",
+  "url": "https://collegeandfees.com/colleges/[slug]",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Bangalore",
+    "addressRegion": "Karnataka",
+    "addressCountry": "IN"
+  },
+  "foundingDate": "[college.established]",
+  "description": "[content.about or auto-generated]"
+}
+```
+
+---
+
+### 5. CUSTOM 404 PAGE AUDIT
+
+If `pages/404.js` exists from Prompt 1: verify it has:
+- Friendly message: "Page not found — but we can help you find the right college"
+- Inline WhatsApp CTA: `Hi, I was looking for college information on your website but couldn't find it. Can you help me?`
+- Three links: Engineering Colleges Bangalore | Direct Admission Bangalore | Management Quota Bangalore
+- Global floating WhatsApp button (same as all pages)
+- noindex meta (though 404 pages are not indexed by default)
+
+If `pages/404.js` is missing or incomplete: create/fix it now.
+
+---
+
+### 6. PHASE 1 FINAL VERIFICATION CHECKLIST
+
+After all files above are built and pushed, verify each item:
+
+**Technical:**
+- [ ] All 20 URLs return HTTP 200 (not 404, not 500)
+- [ ] View Source on `/colleges/rvce-bangalore` shows fully rendered HTML with actual fee data visible in the source — confirming SSR is working
+- [ ] `/sitemap.xml` returns valid XML with all Phase 1 URLs
+- [ ] `robots.txt` accessible at `/robots.txt` with sitemap reference
+- [ ] Build output has zero errors (`npm run build` completes cleanly)
+
+**SEO:**
+- [ ] Every page has a unique `<title>` tag (check by loading 3-4 pages and comparing)
+- [ ] Every page has a `<meta name="description">` tag
+- [ ] Every page has a `<link rel="canonical">` tag
+- [ ] Pages with `is_active=false` have `<meta name="robots" content="noindex, nofollow">`
+- [ ] EducationalOrganization JSON-LD present on `/colleges/rvce-bangalore`
+- [ ] FAQPage JSON-LD present on `/direct-admission/bangalore`
+- [ ] BreadcrumbList JSON-LD present on at least one non-homepage page
+
+**WhatsApp:**
+- [ ] Floating button visible on all pages (from global component)
+- [ ] Floating button on `/colleges/rvce-bangalore` has message: `Hi, I want guidance about admission to RV College of Engineering. Can you help me?`
+- [ ] Mid-content CTA after fees table on `/direct-admission/rvce-bangalore` has correct message
+- [ ] The 404 page has its own WhatsApp message
+
+**Data:**
+- [ ] `/colleges/rvce-bangalore/fees` shows management quota fees pulled from Supabase (not hardcoded)
+- [ ] `/colleges/christ-university-bangalore/fees` shows Engineering and MBA in separate tables
+- [ ] Inactive colleges (bms-college-of-engineering, msrit-bangalore, pes-university-bangalore) show placeholder content with noindex
+
+---
+
+### AFTER ALL ITEMS ARE VERIFIED
+
+Push to GitHub:
+```
+git add .
+git commit -m "Phase 1 complete — homepage, sitemaps, JSON-LD, SEO completion"
+git push
+```
+
+Verify Vercel auto-deploys successfully.
+
+**Phase 1 is complete when:**
+All 10 items in the Phase 1 Done Checklist above are confirmed ✓
+
+Report back which items passed and which (if any) need manual intervention.
+
+---
+
+### FINAL NOTE TO REPLIT AGENT
+
+This is the last session in Phase 1. After this push, the site is ready for:
+1. DNS cutover from old Lovable site to Vercel (owner action)
+2. Google Search Console sitemap submission (owner action)
+3. Phase 2 build (more colleges, blog, exam pages)
+
+Do not start any Phase 2 work in this session. Focus only on the items listed above.

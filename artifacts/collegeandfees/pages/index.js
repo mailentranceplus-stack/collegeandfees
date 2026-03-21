@@ -94,13 +94,27 @@ export default function Home({ colleges }) {
   return (
     <>
       <Head>
-        <title>Engineering Colleges in Bangalore — Fees, Direct Admission & Rankings 2026</title>
-        <meta name="description" content="Comprehensive guide to engineering colleges in Bangalore. Compare fees, direct admission process, rankings, and courses for top colleges in Bangalore 2026." />
+        <title>Bangalore Engineering Admissions 2026 — Fees, Cutoffs and Direct Admission Guide</title>
+        <meta name="description" content="Management quota fees, KCET cutoffs, COMEDK cutoffs and direct admission guidance for Bangalore engineering colleges 2026. Counselled by an RVCE alumnus. Free WhatsApp guidance." />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta property="og:title" content="Engineering Colleges in Bangalore — Fees & Direct Admission Guide" />
-        <meta property="og:description" content="Find the best engineering colleges in Bangalore. Compare fees, seats, and direct admission info." />
+        <meta name="robots" content="index, follow" />
+        <meta property="og:title" content="Bangalore Engineering Admissions 2026 — Fees, Cutoffs and Direct Admission Guide" />
+        <meta property="og:description" content="Management quota fees, KCET cutoffs, COMEDK cutoffs and direct admission guidance for Bangalore engineering colleges 2026." />
         <meta property="og:type" content="website" />
-        <link rel="canonical" href="https://collegeandfees.com/" />
+        <meta property="og:url" content="https://collegeandfees.com" />
+        <link rel="canonical" href="https://collegeandfees.com" />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "name": "CollegeAndFees.com",
+          "url": "https://collegeandfees.com",
+          "description": "Management quota fees and direct admission guidance for Bangalore engineering colleges",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://collegeandfees.com/engineering-colleges/bangalore?q={search_term}",
+            "query-input": "required name=search_term"
+          }
+        }) }} />
       </Head>
 
       <Header />
