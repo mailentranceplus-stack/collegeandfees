@@ -23,16 +23,6 @@ self.__BUILD_MANIFEST = {
       "static/chunks/webpack.js",
       "static/chunks/main.js",
       "static/chunks/pages/_error.js"
-    ],
-    "/direct-admission/[college-slug]": [
-      "static/chunks/webpack.js",
-      "static/chunks/main.js",
-      "static/chunks/pages/direct-admission/[college-slug].js"
-    ],
-    "/direct-admission/bangalore": [
-      "static/chunks/webpack.js",
-      "static/chunks/main.js",
-      "static/chunks/pages/direct-admission/bangalore.js"
     ]
   },
   "ampFirstPages": []
