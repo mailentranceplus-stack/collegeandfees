@@ -10,51 +10,73 @@ export default function CollegeCard({ college }) {
   const courseName = college.top_course || "CSE";
 
   return (
-    <Link
-      href={`/direct-admission/${college.slug}`}
-      className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 hover:shadow-md hover:border-[#1a3c6e] transition-all group flex flex-col"
-    >
-      <div className="flex items-start justify-between mb-3">
-        {college.naac_grade && (
-          <span className="inline-block bg-blue-50 text-[#1a3c6e] text-xs font-bold px-2.5 py-1 rounded-full border border-blue-100">
-            NAAC {college.naac_grade}
+    <Link href={`/direct-admission/${college.slug}`} className="college-card">
+      <div className="college-card-body">
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "12px" }}>
+          {college.naac_grade && (
+            <span style={{
+              display: "inline-block",
+              fontSize: "11px",
+              fontWeight: 700,
+              letterSpacing: "0.08em",
+              color: "var(--primary)",
+              border: "1px solid rgba(239,175,38,0.3)",
+              borderRadius: "999px",
+              padding: "3px 10px",
+            }}>
+              NAAC {college.naac_grade}
+            </span>
+          )}
+          {college.type && (
+            <span style={{ fontSize: "12px", color: "var(--muted-foreground)" }}>{college.type}</span>
+          )}
+        </div>
+
+        <h3 style={{ fontWeight: 700, fontSize: "16px", color: "var(--foreground)", lineHeight: "1.3", marginBottom: "4px" }}>
+          {college.name}
+        </h3>
+
+        {college.city && (
+          <p style={{ fontSize: "12px", color: "var(--muted-foreground)", marginBottom: "14px" }}>{college.city}</p>
+        )}
+
+        {feeDisplay ? (
+          <div style={{
+            background: "rgba(239,175,38,0.08)",
+            border: "1px solid rgba(239,175,38,0.2)",
+            borderRadius: "10px",
+            padding: "12px 16px",
+            marginBottom: "14px",
+          }}>
+            <p style={{ fontSize: "11px", color: "var(--muted-foreground)", marginBottom: "4px", fontWeight: 600, letterSpacing: "0.05em" }}>
+              {courseName} &middot; Management Quota
+            </p>
+            <p className="fees-highlight" style={{ fontSize: "22px", lineHeight: 1.2 }}>
+              {feeDisplay}
+              <span style={{ fontSize: "13px", fontWeight: 400, color: "var(--muted-foreground)" }}>/yr</span>
+            </p>
+          </div>
+        ) : (
+          <div style={{
+            background: "rgba(255,255,255,0.04)",
+            border: "1px solid var(--border)",
+            borderRadius: "10px",
+            padding: "12px 16px",
+            marginBottom: "14px",
+          }}>
+            <p style={{ fontSize: "11px", color: "var(--muted-foreground)", marginBottom: "4px" }}>Management Quota</p>
+            <p style={{ fontSize: "14px", fontWeight: 600, color: "var(--muted-foreground)" }}>Contact for fee details</p>
+          </div>
+        )}
+
+        <div style={{ marginTop: "auto", paddingTop: "12px", borderTop: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <span style={{ fontSize: "11px", color: "var(--accent-green)", fontWeight: 700, letterSpacing: "0.06em" }}>
+            SEATS AVAILABLE 2026
           </span>
-        )}
-        {college.type && (
-          <span className="text-xs text-gray-400">{college.type}</span>
-        )}
-      </div>
-
-      <h3 className="font-semibold text-gray-900 group-hover:text-[#1a3c6e] transition-colors leading-snug mb-1">
-        {college.name}
-      </h3>
-
-      {college.city && (
-        <p className="text-xs text-gray-400 mb-3">{college.city}</p>
-      )}
-
-      {feeDisplay ? (
-        <div className="bg-[#f0f7ff] rounded-lg px-4 py-3 mb-3 border border-blue-100">
-          <p className="text-xs text-gray-500 mb-0.5 font-medium">{courseName} &middot; Management Quota</p>
-          <p className="text-2xl font-extrabold text-[#1a3c6e] leading-tight">
-            {feeDisplay}
-            <span className="text-sm font-normal text-gray-500">/yr</span>
-          </p>
+          <span style={{ fontSize: "12px", color: "var(--primary)", fontWeight: 600 }}>
+            View Fees &rarr;
+          </span>
         </div>
-      ) : (
-        <div className="bg-gray-50 rounded-lg px-4 py-3 mb-3 border border-gray-100">
-          <p className="text-xs text-gray-500 mb-0.5">Management Quota</p>
-          <p className="text-sm font-semibold text-gray-600">Contact for fee details</p>
-        </div>
-      )}
-
-      <div className="mt-auto pt-3 border-t border-gray-100 flex items-center justify-between">
-        <span className="inline-block bg-green-50 text-green-700 text-xs font-medium px-2.5 py-1 rounded-full border border-green-100">
-          Seats Available 2026
-        </span>
-        <span className="text-xs text-[#1a3c6e] font-medium group-hover:underline">
-          View Fees &amp; Process &rarr;
-        </span>
       </div>
     </Link>
   );
