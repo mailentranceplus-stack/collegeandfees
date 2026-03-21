@@ -7,6 +7,14 @@ import { getSupabase } from "../../lib/supabase";
 
 const WA_NUMBER = "917975193033";
 
+const COLLEGE_IMAGES = {
+  "rvce-bangalore":              "https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=1200&q=80",
+  "christ-university-bangalore": "https://images.unsplash.com/photo-1592280771190-3e2e4d571952?w=1200&q=80",
+  "bms-college-of-engineering":  "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1200&q=80",
+  "pes-university-bangalore":    "https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=1200&q=80",
+  "msrit-bangalore":             "https://images.unsplash.com/photo-1571260899304-425eee4c7efc?w=1200&q=80",
+};
+
 function waLink(msg) {
   return `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`;
 }
@@ -254,6 +262,18 @@ export default function CollegeSlugPage({ college, fees, admissions, content, pl
           </div>
         </div>
       </div>
+
+      {/* ── Hero Banner Image ── */}
+      {COLLEGE_IMAGES[slug] && (
+        <div style={{ overflow: "hidden", background: "var(--card)", maxHeight: "260px" }}>
+          <img
+            src={COLLEGE_IMAGES[slug]}
+            alt={college.name}
+            className="college-hero-banner"
+            loading="eager"
+          />
+        </div>
+      )}
 
       {/* ── SECTION 2: Sticky Tab Bar ── */}
       <div className="tab-bar">

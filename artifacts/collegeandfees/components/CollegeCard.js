@@ -5,12 +5,31 @@ function formatINR(amount) {
   return "\u20B9" + Number(amount).toLocaleString("en-IN");
 }
 
+const COLLEGE_IMAGES = {
+  "rvce-bangalore":              "https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=600&q=80",
+  "christ-university-bangalore": "https://images.unsplash.com/photo-1592280771190-3e2e4d571952?w=600&q=80",
+  "bms-college-of-engineering":  "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=600&q=80",
+  "pes-university-bangalore":    "https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=600&q=80",
+  "msrit-bangalore":             "https://images.unsplash.com/photo-1571260899304-425eee4c7efc?w=600&q=80",
+};
+
+const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1562774053-701939374585?w=600&q=80";
+
 export default function CollegeCard({ college }) {
   const feeDisplay = college.top_fee ? formatINR(college.top_fee) : null;
   const courseName = college.top_course || "CSE";
+  const photo = COLLEGE_IMAGES[college.slug] || FALLBACK_IMAGE;
 
   return (
     <Link href={`/direct-admission/${college.slug}`} className="college-card">
+      <div style={{ overflow: "hidden", flexShrink: 0 }}>
+        <img
+          src={photo}
+          alt={college.name}
+          className="college-card-image"
+          loading="lazy"
+        />
+      </div>
       <div className="college-card-body">
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "12px" }}>
           {college.naac_grade && (

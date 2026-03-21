@@ -1,0 +1,40 @@
+I looked at the live HTML carefully. I know exactly what's wrong.
+
+**The CSS is correct. But there are zero images anywhere on the site.** No hero background photo. No college campus photos in the cards. Dark design without images = empty, baron, looks cheap. That's the entire problem.
+
+The Lovable prototype looked good because it had campus photos. Replit applied the CSS but never added any images.
+
+This is a one-shot fix. Tell Replit exactly this:
+
+---
+
+> The site has no images anywhere and looks empty. Add images throughout:
+>
+> **1. Hero background photo**
+> In `pages/index.js`, inside the `.hero` section, add this as the first child:
+> ```jsx
+> <img
+>   src="https://images.unsplash.com/photo-1562774053-701939374585?w=1600&q=80"
+>   alt=""
+>   className="hero-bg"
+>   aria-hidden="true"
+> />
+> ```
+>
+> **2. College card photos**
+> In `pages/index.js` and `pages/direct-admission/bangalore.js`, inside each college card, add a photo above the card body. Use these Unsplash images based on college:
+> - RVCE: `https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=600&q=80`
+> - Christ University: `https://images.unsplash.com/photo-1592280771190-3e2e4d571952?w=600&q=80`
+> - BMS College: `https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=600&q=80`
+> - PES University: `https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=600&q=80`
+> - MSRIT: `https://images.unsplash.com/photo-1571260899304-425eee4c7efc?w=600&q=80`
+>
+> Each image should use `className="college-card-image"` (already defined in globals.css — 192px height, object-cover, scales on hover).
+>
+> **3. Apply the same images to `pages/direct-admission/[college-slug].js`** — add a hero banner image at the top of each college detail page using the same Unsplash photo for that college.
+>
+> That's all. No other changes. Just add these images.
+
+---
+
+This single change will completely transform how the site looks. The dark theme needs photos to breathe — without them it's just a dark page of text.

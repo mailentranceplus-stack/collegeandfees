@@ -107,6 +107,12 @@ export default function Home({ colleges }) {
 
       {/* Hero */}
       <section className="hero">
+        <img
+          src="https://images.unsplash.com/photo-1562774053-701939374585?w=1600&q=80"
+          alt=""
+          className="hero-bg"
+          aria-hidden="true"
+        />
         <div className="hero-content">
           <div className="hero-trust">
             <span style={{ color: "var(--primary)" }}>★★★★★</span>
