@@ -1,9 +1,0 @@
-{
-  "/_app": "pages/_app.js",
-  "/_error": "pages/_error.js",
-  "/_document": "pages/_document.js",
-  "/direct-admission/bangalore": "pages/direct-admission/bangalore.js",
-  "/": "pages/index.js",
-  "/management-quota/[college-slug]": "pages/management-quota/[college-slug].js",
-  "/direct-admission/[college-slug]": "pages/direct-admission/[college-slug].js"
-}
