@@ -27,7 +27,7 @@ const FEES_DATA = [
 const HOME_FAQS = [
   { id: 1, question: "What is management quota / direct admission in Bangalore?", answer: "Management quota refers to seats that private engineering colleges fill directly without KCET or COMEDK counselling. Typically 30–35% of total intake is reserved under management quota, and colleges admit students directly on payment of a higher fee." },
   { id: 2, question: "What is the minimum eligibility for direct admission?", answer: "You need a minimum of 45% aggregate marks in PCM (Physics, Chemistry, Mathematics) in Class 12 / PUC. No minimum KCET or COMEDK rank is required for management quota seats." },
-  { id: 3, question: "How much does CSE direct admission cost at top Bangalore colleges?", answer: "CSE management quota fees range from ₹1,60,000/year at RVCE to ₹3,00,000–₹5,00,000/year at deemed universities such as PES and Christ. Contact our counsellor for confirmed 2026-27 fee figures." },
+  { id: 3, question: "How much does CSE direct admission cost at top Bangalore colleges?", answer: "CSE management quota fees vary by college. RVCE CSE is ₹36,00,000/year (₹75 lakh for 4 years total). PES University and Christ University range from ₹3,00,000–₹5,00,000/year. Contact our counsellor for confirmed 2026-27 figures for your target college." },
   { id: 4, question: "When does direct admission open for 2026?", answer: "Management quota applications typically open in June 2026 after KCET results are declared. The process continues through July 2026 until all management seats are filled. Apply early — seats go fast at top colleges." },
 ];
 
@@ -133,11 +133,11 @@ export default function Home({ colleges }) {
             Trusted by 500+ families for direct admission guidance
           </div>
           <h1 className="hero-title">
-            Engineering Colleges<br />
+            Management Quota Fees<br />
             in <span className="text-gold">Bangalore</span>
           </h1>
           <p className="hero-subtitle">
-            Your complete guide to direct admission, fees, and rankings for top engineering colleges in Bangalore 2026.
+            Expert counselling on management quota fees, seat availability, and admission process for top Bangalore engineering colleges 2026.
           </p>
           <div className="hero-actions">
             <a href={WA_GENERAL} target="_blank" rel="noopener noreferrer" className="btn-whatsapp">
@@ -156,10 +156,10 @@ export default function Home({ colleges }) {
         <div className="container">
           <div className="stats-bar">
             {[
-              { label: "Engineering Colleges", value: "200+" },
-              { label: "Branches Available", value: "50+" },
-              { label: "Total Seats", value: "80,000+" },
-              { label: "NAAC Accredited", value: "150+" },
+              { label: "Families Guided", value: "500+" },
+              { label: "Yrs in Admissions", value: "10+" },
+              { label: "Counselling Fee", value: "Free" },
+              { label: "WhatsApp Response", value: "< 5 min" },
             ].map((stat) => (
               <div key={stat.label}>
                 <p className="stat-number">{stat.value}</p>
