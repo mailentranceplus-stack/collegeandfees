@@ -7,7 +7,7 @@ import { getSupabase } from "../../lib/supabase";
 
 const WA_NUMBER = "917975193033";
 
-const COLLEGE_IMAGES = {
+const COLLEGE_IMAGES = {h
   "rvce-bangalore":              "https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=1200&q=80",
   "christ-university-bangalore": "https://images.unsplash.com/photo-1592280771190-3e2e4d571952?w=1200&q=80",
   "bms-college-of-engineering":  "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1200&q=80",
@@ -82,7 +82,7 @@ function FeesTable({ fees, slug }) {
                   ₹{fee.total_fee?.toLocaleString("en-IN")}
                 </td>
                 <td style={{ textAlign: "right", color: "var(--muted-foreground)" }}>
-                  ₹{(fee.tuition_fee * 4)?.toLocaleString("en-IN")}
+                  {fee.other_fees ? `₹${fee.other_fees.toLocaleString("en-IN")}` : `₹${(fee.tuition_fee * 4)?.toLocaleString("en-IN")}`}
                 </td>
               </tr>
             ))}
@@ -95,7 +95,7 @@ function FeesTable({ fees, slug }) {
         </p>
         {slug === "rvce-bangalore" && (
           <p style={{ fontSize: "12px", color: "var(--primary)", marginTop: "6px", fontWeight: 600 }}>
-            * For RVCE, Year 1 management quota fees are higher than subsequent years. The 4-year total above is an estimate. Contact our counsellor for the exact total.
+            * For RVCE, Year 1 management quota fees are higher than subsequent years. The 4-year total shown is confirmed for 2026-27. Year 1 fee is higher; Years 2–4 are lower.
           </p>
         )}
       </div>
