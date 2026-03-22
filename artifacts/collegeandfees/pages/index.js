@@ -102,8 +102,9 @@ export default function Home({ colleges }) {
         <meta property="og:description" content="Management quota fees, KCET cutoffs, COMEDK cutoffs and direct admission guidance for Bangalore engineering colleges 2026." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://collegeandfees.com" />
+            <meta property="og:image" content="https://images.unsplash.com/photo-1562774053-701939374585?w=1200&q=80" />
         <link rel="canonical" href="https://collegeandfees.com" />
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+        <script key="schema-website" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "WebSite",
           "name": "CollegeAndFees.com",
