@@ -29,7 +29,7 @@ const PLACEHOLDER_COLLEGES = [
 ];
 
 const PLACEHOLDER_FAQS = [
-  { id: 1, question: "Which are the top engineering colleges in Bangalore?", answer: "RVCE (NIRF #99), BMS College of Engineering, MS Ramaiah Institute of Technology, PES University, and Christ University are consistently ranked among the top engineering colleges in Bangalore. RVCE is considered the best overall for CSE placements and research output." },
+  { id: 1, question: "Which are the top engineering colleges in Bangalore?", answer: "RVCE (NIRF #82), BMS College of Engineering, MS Ramaiah Institute of Technology, PES University, and Christ University are consistently ranked among the top engineering colleges in Bangalore. RVCE is considered the best overall for CSE placements and research output." },
   { id: 2, question: "What is the fee range for engineering colleges in Bangalore?", answer: "Fees range from ₹50,000-2,00,000/year for KCET (government quota) seats to ₹1,50,000-3,60,000/year for management quota at top private colleges. Government engineering colleges charge ₹15,000-50,000/year." },
   { id: 3, question: "Can I get into RVCE without KCET rank?", answer: "Yes. RVCE offers management quota seats (about 30-35% of total intake) that do not require a KCET rank. You need minimum 45% in PCM in Class 12. Contact our counsellor for current management quota availability and fees." },
   { id: 4, question: "Which Bangalore engineering college has the best placements?", answer: "RVCE consistently has the highest placement rates and packages among Bangalore engineering colleges, with CSE students receiving offers from top MNCs. BMS and MSRIT also have strong placement records, particularly for CSE and ECE branches." },
@@ -128,7 +128,7 @@ export default function BangaloreEngineeringColleges({ colleges, faqs }) {
 
             {/* Intro */}
             <p style={{ color: "var(--muted-foreground)", fontSize: "16px", lineHeight: "1.8", marginBottom: "48px", maxWidth: "820px" }}>
-              Bangalore has over 60 engineering colleges affiliated to VTU Belagavi and several deemed universities. The range is wide — from RVCE (NIRF #99) to smaller colleges with single-digit rankings. This page lists every engineering college in Bangalore with verified fee information, NIRF rankings, and direct links to management quota and direct admission guidance.
+              Bangalore has over 60 engineering colleges affiliated to VTU Belagavi and several deemed universities. The range is wide — from RVCE (NIRF #82) to smaller colleges with single-digit rankings. This page lists every engineering college in Bangalore with verified fee information, NIRF rankings, and direct links to management quota and direct admission guidance.
             </p>
 
             {/* Featured Colleges */}
