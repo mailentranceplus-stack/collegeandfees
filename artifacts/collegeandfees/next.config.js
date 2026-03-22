@@ -14,7 +14,7 @@ const nextConfig = {
       // Blog redirects to best-match pages
       { source: '/blog/rvce-fees-explained', destination: '/colleges/rvce-bangalore', permanent: true },
       { source: '/blog/best-engineering-colleges-in-bangalore', destination: '/engineering-colleges/bangalore', permanent: true },
-      // Catch-all redirects for pages with no equivalent
+      // Catch-all redirects for old pages with no equivalent on new site
       { source: '/colleges/iimb', destination: '/', permanent: true },
       { source: '/colleges/dsce', destination: '/engineering-colleges/bangalore', permanent: true },
       { source: '/colleges/nmit', destination: '/engineering-colleges/bangalore', permanent: true },
@@ -37,8 +37,6 @@ const nextConfig = {
       { source: '/privacy-policy', destination: '/', permanent: true },
       { source: '/terms', destination: '/', permanent: true },
       { source: '/contact', destination: '/', permanent: true },
-      // Catch-all for unmapped old college pages (302 temporary - will add these later)
-      { source: '/colleges/:slug', destination: '/engineering-colleges/bangalore', permanent: false },
     ];
   },
 };
