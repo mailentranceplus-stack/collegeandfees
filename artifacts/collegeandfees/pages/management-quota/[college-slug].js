@@ -79,7 +79,7 @@ function FeesTable({ fees, slug }) {
                   {fee.hostel_fee ? `₹${fee.hostel_fee.toLocaleString("en-IN")}` : "—"}
                 </td>
                 <td style={{ textAlign: "right", fontWeight: 600 }}>
-                  ₹{fee.total_fee?.toLocaleString("en-IN")}
+                  ₹{(fee.tuition_fee + fee.hostel_fee)?.toLocaleString("en-IN")}
                 </td>
                 <td style={{ textAlign: "right", color: "var(--muted-foreground)" }}>
                   {fee.other_fees ? `₹${fee.other_fees.toLocaleString("en-IN")}` : `₹${(fee.tuition_fee * 4)?.toLocaleString("en-IN")}`}
