@@ -136,7 +136,7 @@ function InactivePage({ college, slug, similarColleges }) {
         <title>Management Quota {name} 2026 — Fees & Process</title>
         <meta name="description" content={`Management quota admission in ${name} 2026. Contact counsellor for fee and process details.`} />
         <meta name="robots" content="noindex, nofollow" />
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} key="schema-breadcrumb" />
       </Head>
       <Header />
 
@@ -291,11 +291,11 @@ export default function MgmtQuotaCollegePage({ college, fees, admissions, conten
         <link rel="canonical" href={canonicalUrl} />
         <meta property="og:title" content={metaTitle} />
         <meta property="og:description" content={metaDesc} />
-        <meta property="og:url" content={canonicalUrl} />
+        <meta property="og:url" content={canonicalUrl} /> <meta property="og:image" content={COLLEGE_IMAGES[slug] || "https://images.unsplash.com/photo-1562774053-701939374585?w=1200&q=80"} />
         <meta property="og:type" content="website" />
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }} />
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
-        {faqJsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />}
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }} key="schema-org" />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} key="schema-breadcrumb" />
+        {faqJsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} key="schema-faq" />}
       </Head>
 
       <Header />
