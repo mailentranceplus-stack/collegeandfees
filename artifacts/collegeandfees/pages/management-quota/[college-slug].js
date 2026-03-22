@@ -115,7 +115,7 @@ function InactivePage({ college, slug, similarColleges }) {
     { label: "Fees", href: `/colleges/${slug}/fees` },
     { label: "Placements", href: `/colleges/${slug}/placements` },
     { label: "Cutoff", href: `/colleges/${slug}/cutoff` },
-    { label: "Admission", href: `/management-quota/${slug}`, active: true },
+    { label: "MQ Fees", href: `/management-quota/${slug}`, active: true },
     { label: "Hostel", href: `/colleges/${slug}/hostel` },
     { label: "Courses", href: `/colleges/${slug}/courses` },
   ];
@@ -228,7 +228,7 @@ export default function MgmtQuotaCollegePage({ college, fees, admissions, conten
     { label: "Fees", href: `/colleges/${slug}/fees` },
     { label: "Placements", href: `/colleges/${slug}/placements` },
     { label: "Cutoff", href: `/colleges/${slug}/cutoff` },
-    { label: "Admission", href: `/management-quota/${slug}`, active: true },
+    { label: "MQ Fees", href: `/management-quota/${slug}`, active: true },
     { label: "Hostel", href: `/colleges/${slug}/hostel` },
     { label: "Courses", href: `/colleges/${slug}/courses` },
   ];
