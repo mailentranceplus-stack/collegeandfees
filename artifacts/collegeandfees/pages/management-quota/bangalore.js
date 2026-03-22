@@ -207,13 +207,14 @@ export default function MgmtQuotaBangalorePage({ colleges, faqs }) {
         <meta property="og:description" content="Complete guide to management quota admission in Bangalore engineering colleges 2026. College-wise fees, seats available, eligibility and process." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://collegeandfees.com/management-quota/bangalore" />
+                    <meta property="og:image" content="https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=1200&q=80" />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} key="schema-faq"
         />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} key="schema-breadcrumb"
         />
       </Head>
 
