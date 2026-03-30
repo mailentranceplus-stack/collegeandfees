@@ -1,6 +1,6 @@
 export async function getServerSideProps({ req, res }) {
   const host = req.headers.host || "";
-  const isProduction = host.includes("collegeandfees.com");
+  const isProduction = host === "collegeandfees.com" || host === "www.collegeandfees.com";
 
   const content = isProduction
     ? [

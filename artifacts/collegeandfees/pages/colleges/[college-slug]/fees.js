@@ -82,7 +82,57 @@ function FeesTableSection({ fees, slug, showRvceNote }) {
   );
 }
 
+function InactiveFeesPage({ college, slug }) {
+  const shortName = college.short_name || college.name;
+  const waMsg = `Hi, I want to know the fees at ${college.name}. Can you help?`;
+  const canonicalUrl = `https://collegeandfees.com/colleges/${slug}/fees`;
+  return (
+    <>
+      <Head>
+        <title>{college.name} Fees 2026-27 — Information Being Verified</title>
+        <meta name="description" content={`Fee details for ${shortName} are being verified. Contact our counsellor on WhatsApp for the latest confirmed figures.`} />
+        <meta name="robots" content="noindex, nofollow" />
+        <link rel="canonical" href={canonicalUrl} />
+      </Head>
+      <Header />
+      <div className="college-header-band">
+        <div className="container">
+          <div style={{ fontSize: "clamp(22px, 3vw, 32px)", fontWeight: 800, lineHeight: 1.2, color: "var(--foreground)" }}>{college.name}</div>
+          <p style={{ color: "var(--muted-foreground)", marginTop: "8px", fontSize: "14px" }}>{college.city}</p>
+        </div>
+      </div>
+      <main style={{ paddingBottom: "80px" }}>
+        <div className="container" style={{ paddingTop: "48px", maxWidth: "640px" }}>
+          <nav className="breadcrumb" style={{ marginBottom: "24px" }}>
+            <Link href="/">Home</Link>
+            <span className="breadcrumb-sep">›</span>
+            <Link href={`/colleges/${slug}`}>{shortName}</Link>
+            <span className="breadcrumb-sep">›</span>
+            <span style={{ color: "var(--foreground)", fontWeight: 600 }}>Fees</span>
+          </nav>
+          <div className="glass-card" style={{ padding: "32px", textAlign: "center" }}>
+            <p style={{ fontSize: "40px", marginBottom: "16px" }}>🔍</p>
+            <h1 style={{ fontSize: "22px", fontWeight: 800, marginBottom: "12px" }}>Fee Information Being Verified</h1>
+            <p style={{ color: "var(--muted-foreground)", marginBottom: "24px", lineHeight: 1.6 }}>
+              We are verifying the 2026-27 fee data for {college.name}. Our counsellor can share the latest confirmed figures on WhatsApp right now.
+            </p>
+            <WaButton href={waLink(waMsg)}>Get Confirmed Fees on WhatsApp</WaButton>
+            <p style={{ marginTop: "20px" }}>
+              <Link href={`/colleges/${slug}`} style={{ fontSize: "13px", color: "var(--muted-foreground)", textDecoration: "none" }}>
+                ← View College Profile
+              </Link>
+            </p>
+          </div>
+        </div>
+      </main>
+      <Footer />
+    </>
+  );
+}
+
 export default function CollegeFeesPage({ college, fees, content, ranking, slug }) {
+  if (!college.is_active) return <InactiveFeesPage college={college} slug={slug} />;
+
   const shortName = college.short_name || college.name;
   const waMsg = `Hi, I want to know the exact fees at ${college.name}. Can you help?`;
 
@@ -370,10 +420,6 @@ export async function getServerSideProps({ params }) {
       .single();
 
     if (collegeError || !college) return { notFound: true };
-
-    if (!college.is_active) {
-      return { redirect: { destination: `/colleges/${slug}`, permanent: false } };
-    }
 
     const [feesRes, contentRes, rankingRes] = await Promise.all([
       supabase
