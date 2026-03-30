@@ -1,0 +1,25 @@
+CONTEXT FIRST — READ BEFORE ACTING
+This is collegeandfees.com — a Next.js 14 Pages Router site (SSR via getServerSideProps throughout) deployed on Vercel, backed by Supabase PostgreSQL. The goal is SEO ranking for Bangalore engineering admission keywords.
+Current state: site is live at collegeandfees.vercel.app (commit b62ee1c). All pre-DNS technical fixes are done and verified. We are now cleaning up before DNS cutover and content push.
+Key architectural decisions to understand before you audit:
+
+lib/constants.js is the source of truth for ACTIVE_SLUGS — this is intentionally a hardcoded Set, NOT driven by the DB is_active flag. Do not remove or refactor this.
+components/WaButton.js is a shared component used by all page templates — do not remove.
+pages/robots.txt.js is a dynamic SSR robots.txt — the old public/robots.txt was deleted intentionally. Do not recreate it.
+middleware.js adds X-Robots-Tag: noindex on *.vercel.app — intentional, do not remove.
+All pages use getServerSideProps (no getStaticProps, no static generation) — this is by design for SEO freshness.
+
+AUDIT TASK — do a full codebase audit and report on each of the following. Report first, make no changes yet:
+
+Dead/unused files — Any .js/.jsx files in pages/, components/, lib/, styles/ that are no longer imported or routed to. List each file and whether it's safe to delete.
+Unused imports — Any import statements in active files that reference modules or components that aren't actually used in that file.
+Duplicate or redundant code — Now that constants and WaButton are extracted to lib/constants.js and components/WaButton.js, are there any files that still have their own local copies of COLLEGE_IMAGES, WaIcon, waLink, WA_NUMBER, or similar?
+Leftover placeholder text in code — Any hardcoded strings in JSX/JS that are clearly placeholder content from earlier iterations (e.g., "Lorem ipsum", "TODO", "FIXME", "placeholder", "test", "coming soon" text hardcoded in code rather than DB).
+Console.log statements — Any console.log / console.error / console.warn left in production code files.
+Footer links — Check what links are in the Footer component's Quick Links section. We know there are /direct-admission/ links to inactive colleges (BMSCE, MSRIT, PES). These show an inactive gate page which works, but is it the right UX? What would you suggest — remove those links, change them to /colleges/[slug], or keep as-is?
+package.json — Any dependencies listed that are not actually used anywhere in the codebase.
+Any other observations — Anything else you notice that looks like leftover iteration debris or that could cause issues at DNS cutover.
+
+Give me the full audit report. After I review, I'll tell you which items to actually fix.
+At the end of this prompt, provide a completion report with: files audited, any issues you couldn't assess, and your top 2-3 suggestions for things we should prioritize fixing.
+
