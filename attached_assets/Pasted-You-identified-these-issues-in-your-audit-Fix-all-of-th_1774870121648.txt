@@ -1,0 +1,65 @@
+You identified these issues in your audit. Fix all of them now in one build session. No discussion needed — just execute each fix and commit together.
+FIX 1 — MQ page NaN bug
+File: pages/management-quota/[college-slug].js
+The fee table does (fee.tuition_fee + fee.hostel_fee) which returns NaN when hostel_fee is null.
+Fix: change every arithmetic expression involving hostel_fee or other_fees to use (fee.hostel_fee || 0) and (fee.other_fees || 0). Check the same pattern in pages/colleges/[college-slug]/fees.js and pages/direct-admission/[college-slug].js — fix everywhere.
+FIX 2 — InactivePage 7-tab arrays in MQ and DA pages
+Files: pages/management-quota/[college-slug].js, pages/direct-admission/[college-slug].js
+Task #5 fixed the tabs in colleges/[college-slug].js and fees.js but missed these two files. The InactivePage component in both still has 7 tabs (Overview, Fees, Placements, Cutoff, Admission, Hostel, Courses). Remove the 5 broken tabs. Keep only Overview and Fees, same as the other two files.
+FIX 3 — is_active filter on engineering-colleges hub page
+File: pages/engineering-colleges/bangalore.js
+The Supabase query fetches all colleges without filtering by is_active. Add .eq('is_active', true) to the query so inactive colleges (BMSCE, MSRIT, PES) don't appear in this list. This should match the sitemap filter.
+FIX 4 — Fees page inactive college gate
+File: pages/colleges/[college-slug]/fees.js
+When college.is_active === false, this page currently renders the full fee tables with placeholder data (₹100 values) and just adds noindex. Instead, it should render an InactivePage-style component identical to what colleges/[college-slug].js shows — the "Information Being Verified" card with a WhatsApp CTA. Copy the same InactivePage pattern from the overview page. Keep the noindex meta and canonical tag.
+FIX 5 — WhatsApp float button hidden on mobile
+File: components/WhatsAppFloat.js or wherever the .whatsapp-float CSS is defined.
+Current: bottom: 28px. On iPhone Safari and Chrome Android, the browser bottom bar (50-83px) covers this button. The primary audience is parents on phones.
+Fix: change to bottom: 80px or use bottom: max(28px, calc(env(safe-area-inset-bottom, 28px) + 16px)). Test that it doesn't overlap the sticky tab bar on college pages.
+FIX 6 — Remove SearchAction from homepage JSON-LD
+File: pages/index.js
+The WebSite JSON-LD includes a potentialAction SearchAction pointing to /engineering-colleges/bangalore?q={search_term}. The site has no search feature. This URL ignores the q parameter entirely. Remove the potentialAction block from the WebSite schema. Keep the rest of the WebSite JSON-LD.
+FIX 7 — Dynamic robots.txt
+Currently public/robots.txt is a static file that serves the same content on both domains. Convert to a dynamic Next.js route at pages/robots.txt.js (delete the static file from public/).
+In getServerSideProps, read the Host header:
+
+If host is collegeandfees.com → serve: User-agent: *\nAllow: /\nDisallow: /api/\nSitemap: https://collegeandfees.com/sitemap.xml
+If host is anything else (including *.vercel.app) → serve: User-agent: *\nDisallow: /
+Set Content-Type: text/plain and return the text as the response body (same pattern as sitemap.xml.js).
+
+FIX 8 — CollegeCard links to /colleges/ instead of /direct-admission/
+File: components/CollegeCard.js
+The card currently links to /direct-admission/[slug]. Change to /colleges/[slug]. The overview page is the most content-rich page and should receive link equity from the homepage. The direct admission page is reachable from buttons inside the overview page.
+FIX 9 — Add back-links from MQ and DA pages to college overview
+Files: pages/management-quota/[college-slug].js, pages/direct-admission/[college-slug].js
+These pages have no link back to /colleges/[slug]. Add a visible link/button near the top of the page (near the breadcrumb or in the header band area) that says "View Full College Profile →" linking to /colleges/[slug]. This completes the internal link graph so Google can navigate between all page types for a college.
+FIX 10 — Replace img with next/image
+Files: all page files and CollegeCard.js that use <img> tags.
+Replace every <img> with next/image from next/image. For banner images in a fixed-height container, use fill + style={{ objectFit: 'cover' }} inside a position: relative parent. For CollegeCard images, use explicit width and height props. Add priority prop only to above-the-fold images (hero on homepage, banner on college pages). All others get lazy loading by default. Add sizes prop where appropriate for responsive images. The Unsplash URLs should work with next/image — add images.unsplash.com to the domains array in next.config.js under the images key.
+FIX 11 — Alt text on college banner images
+Files: pages/colleges/[college-slug].js, pages/colleges/[college-slug]/fees.js, pages/management-quota/[college-slug].js, pages/direct-admission/[college-slug].js
+Change alt={college.name} to alt={college.name + ' campus, Bangalore'} on college banner images. The homepage hero image is correctly alt="" (decorative) — leave that one alone.
+FIX 12 — Extract shared constants and components
+Move these duplicated items into shared files:
+
+COLLEGE_IMAGES map → lib/constants.js (currently duplicated in 4 page files)
+WaIcon SVG + WaButton component → components/WaButton.js (currently duplicated in every page file)
+waLink() function → lib/constants.js
+Import from the shared location in all files that currently have local copies. This prevents Phase 2 colleges from needing updates in 4 places.
+
+After all fixes:
+
+git diff --stat should show the changed files
+Commit all changes together with message: "Pre-DNS technical fixes: NaN bug, inactive gates, mobile WhatsApp, next/image, internal linking, shared components"
+Push to GitHub
+
+Acceptance criteria:
+
+Visit /management-quota/rvce-bangalore — no NaN values anywhere
+Visit /engineering-colleges/bangalore — only RVCE and Christ visible
+Visit /colleges/bms-college-of-engineering/fees — shows "Information Being Verified" card, not fee tables
+Homepage college cards link to /colleges/[slug]
+MQ and DA pages have a "View Full College Profile" link to /colleges/[slug]
+WhatsApp button visible on 375px mobile viewport without being behind browser chrome
+No SearchAction in homepage source
+/robots.txt returns Disallow: / on Vercel domain

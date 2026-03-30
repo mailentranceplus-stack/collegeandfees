@@ -1,0 +1,29 @@
+Got it. Here's a follow-up prompt to send to Replit — this pushes back on some things and asks it to go deeper:
+
+Good audit. Now I want to push back and go deeper on some points before we close out the pre-DNS checklist. Answer each of these.
+1. The fee display — I need a firm answer, not options
+You gave two options (year_number column vs other_fees workaround). The owner's position is: the site must show Year 1 = ₹36L and Years 2-4 = ₹13L clearly, in a table, for every RVCE branch. The footnote approach is not acceptable — it buries the most important number.
+Tell me specifically: if we add a year_number integer column (1, 2, 3, 4) to the fees table, exactly what changes are needed in fees.js and management-quota/[college-slug].js to display a year-wise table instead of a single annual row? Walk me through the rendering logic change. How many lines of code is this realistically?
+Also: for colleges that do NOT have year-wise fees (same fee all 4 years), how should the table render? Should it show 4 identical rows or collapse to one row?
+2. CollegeCard links to /direct-admission/[slug] — why?
+The homepage is the most authoritative page on the site for passing link equity. All college cards link to /direct-admission/[slug] instead of /colleges/[slug]. The overview page gets zero homepage link signal.
+What was the reasoning for this? Was it deliberate or an early assumption that got locked in? Should the college cards link to /colleges/[slug] instead, with the DA page being reachable via the tab/button inside the overview page?
+3. Mobile — this cannot be "untested"
+You said mobile hasn't been formally tested. The site is targeting parents searching at 11pm on their phones. Before DNS cutover, mobile must work. Can you do a CSS audit right now on these specific things:
+
+Does the sticky header + sticky tab bar stack correctly? What is the combined height and is it hardcoded or dynamic?
+Is the WhatsApp float button hidden behind the mobile browser bottom bar on any common viewport (iPhone SE 375px, standard Android 390px)?
+Does the fee table on /colleges/[slug]/fees scroll horizontally on mobile or does it break layout?
+
+4. robots.txt
+Does the project have a robots.txt file? If yes, what is in it? If no — on Vercel + Next.js, what gets served at /robots.txt by default? This needs to exist and be correct before DNS cutover. The robots.txt should allow all crawlers on collegeandfees.com and disallow all crawlers on collegeandfees.vercel.app (the middleware handles the X-Robots-Tag header, but robots.txt is an additional layer).
+5. The SearchAction JSON-LD on the homepage
+You listed WebSite + SearchAction as the JSON-LD on the homepage. Does the site actually have a search feature? If not, the SearchAction schema is misleading to Google. What URL does the SearchAction currently point to and is it functional?
+6. next/image — is this a pre-DNS fix or post-DNS?
+You identified this as the biggest PageSpeed issue. Replacing <img> with next/image across all page files — how much work is this realistically? Is it something that can be done in one focused task? The owner's position is that everything non-content should be done before DNS. If this is a 2-hour task, it should be done now.
+7. alt text on images
+You flagged alt="" on hero images. These are not decorative — they are campus photos and the alt text is a real SEO signal. What images currently have empty alt text and what should the alt text be? List them.
+8. The fees page for inactive colleges
+Right now /colleges/bms-college-of-engineering/fees renders the full fees page with noindex + ₹100 placeholder data. A user arriving via a direct link sees a table full of ₹1 fees. The overview page for inactive colleges shows an "Information Being Verified" gate — why doesn't the fees sub-page do the same?
+9. Complete pre-DNS checklist
+Given everything you now know about this project, give me a complete list of every non-content item that should be done before DNS cutover. Not suggestions — the actual list of things that are incomplete or broken right now. Order by priority.
