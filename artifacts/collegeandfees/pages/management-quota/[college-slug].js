@@ -136,6 +136,7 @@ function InactivePage({ college, slug, similarColleges }) {
         <title>Management Quota {name} 2026 — Fees & Process</title>
         <meta name="description" content={`Management quota admission in ${name} 2026. Contact counsellor for fee and process details.`} />
         <meta name="robots" content="noindex, nofollow" />
+        <link rel="canonical" href={`https://collegeandfees.com/management-quota/${slug}`} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} key="schema-breadcrumb" />
       </Head>
       <Header />

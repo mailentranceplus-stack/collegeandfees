@@ -93,7 +93,7 @@ export default function BangaloreEngineeringColleges({ colleges, faqs }) {
     <>
       <Head>
         <title>Engineering Colleges in Bangalore 2026 — Fees, Cutoffs and Rankings</title>
-        <meta name="description" content="Complete list of engineering colleges in Bangalore 2026 with fees, KCET cutoffs, NIRF rankings and management quota information. Free counsellor guidance on WhatsApp." />
+        <meta name="description" content="Complete list of engineering colleges in Bangalore 2026 — fees, KCET cutoffs, NIRF rankings and management quota info. Free counsellor guidance." />
         <meta name="robots" content="index, follow" />
         <link rel="canonical" href="https://collegeandfees.com/engineering-colleges/bangalore" />
         <meta property="og:title" content="Engineering Colleges in Bangalore 2026 — Fees, Cutoffs and Rankings" />

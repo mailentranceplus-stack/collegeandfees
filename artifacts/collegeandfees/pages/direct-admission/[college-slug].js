@@ -78,6 +78,7 @@ function InactivePage({ college, slug, similarColleges }) {
         <title>Direct Admission {name} 2026 — Fees & Process</title>
         <meta name="description" content={`Direct admission in ${name} 2026. Contact counsellor for fee and process details.`} />
         <meta name="robots" content="noindex, nofollow" />
+        <link rel="canonical" href={`https://collegeandfees.com/direct-admission/${slug}`} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       </Head>
       <Header />

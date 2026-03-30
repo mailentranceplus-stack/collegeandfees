@@ -95,7 +95,7 @@ export default function Home({ colleges }) {
     <>
       <Head>
         <title>Bangalore Engineering Admissions 2026 — Fees, Cutoffs and Direct Admission Guide</title>
-        <meta name="description" content="Management quota fees, KCET cutoffs, COMEDK cutoffs and direct admission guidance for Bangalore engineering colleges 2026. Counselled by an RVCE alumnus. Free WhatsApp guidance." />
+        <meta name="description" content="Expert guidance on management quota fees, KCET cutoffs and direct admission for Bangalore engineering colleges 2026. Free counsellor on WhatsApp." />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="robots" content="index, follow" />
         <meta property="og:title" content="Bangalore Engineering Admissions 2026 — Fees, Cutoffs and Direct Admission Guide" />
