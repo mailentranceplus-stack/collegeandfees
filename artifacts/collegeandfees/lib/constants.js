@@ -1,5 +1,10 @@
 export const WA_NUMBER = "917975193033";
 
+export const ACTIVE_SLUGS = new Set([
+  "rvce-bangalore",
+  "christ-university-bangalore",
+]);
+
 export const COLLEGE_IMAGES = {
   "rvce-bangalore":              "https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=1200&q=80",
   "christ-university-bangalore": "https://images.unsplash.com/photo-1592280771190-3e2e4d571952?w=1200&q=80",
