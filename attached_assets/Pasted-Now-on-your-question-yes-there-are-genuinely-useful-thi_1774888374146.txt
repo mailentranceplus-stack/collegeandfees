@@ -1,0 +1,25 @@
+Now on your question — yes, there are genuinely useful things to ask Replit before we move to content. I noticed in the deployment history that earlier commits mention a sitemap and 301 redirects from old URLs. I want to verify both are still correct after all our changes. Here's the prompt:
+
+
+SEO technical review — read-only audit, no changes. Share your honest assessment.
+Context: collegeandfees.com is a Next.js 14 SSR site targeting Google rankings for Bangalore engineering college admission keywords (management quota fees, direct admission). Currently live on Vercel (commit 792fa47). DNS cutover to collegeandfees.com is the next step after this review. Active colleges: RVCE and Christ University only (controlled by ACTIVE_SLUGS in lib/constants.js).
+Question 1 — Sitemap
+Read pages/sitemap.xml.js (or wherever the sitemap is generated). Tell me:
+
+What URLs are currently included in the sitemap?
+Are inactive college pages (BMSCE, MSRIT, PES) excluded?
+Are the canonical domains in the sitemap set to https://collegeandfees.com (not vercel.app)?
+Is this a dynamic SSR sitemap or a static file?
+
+Question 2 — 301 Redirects
+Read next.config.js redirects section. Tell me:
+
+What old URLs are being redirected, and where do they point now?
+After all the URL changes we've made (CollegeCard now points to /colleges/ instead of /direct-admission/, etc.), are there any redirects that now point to a wrong or non-existent destination?
+Any redirect chains (A → B → C) that should be collapsed to a single hop?
+
+Question 3 — Canonical tags
+Check the canonical tag implementation across page templates. Are canonicals hardcoded to collegeandfees.com or dynamically derived from the request host? On Vercel preview URLs, the canonical should still say collegeandfees.com — is that what's happening?
+Question 4 — Your honest SEO assessment
+Given that this site's only goal is to rank on Google for high-intent Bangalore engineering admission keywords and convert visitors to WhatsApp leads — from a purely technical SEO standpoint, is there anything you'd flag as a risk or gap before DNS cutover? Not content (we know fees/placements are placeholder). Technical only: structured data, crawlability, indexability, page structure, internal linking, anything else.
+At the end, give me a completion report: what you read, what's correct, what needs fixing, and your top recommendation.
