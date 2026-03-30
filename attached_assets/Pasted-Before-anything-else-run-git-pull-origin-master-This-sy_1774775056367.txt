@@ -1,0 +1,43 @@
+Before anything else, run: git pull origin master
+
+This syncs you with the latest GitHub state since some commits were made directly on GitHub. Confirm you are now on the latest commit.
+
+Then give me a status report:
+1. Run: ls pages/ and ls pages/colleges/ and ls pages/direct-admission/ and ls pages/management-quota/
+2. What issues or bugs do you currently know about in the codebase?
+3. Is there anything in the code that looks incomplete or that you flagged as a TODO?
+
+---
+
+IMPORTANT — RULES GOING FORWARD:
+
+1. All code changes happen here in Replit only. No one will edit GitHub directly anymore. You are the single source of truth for code. Replit → GitHub → Vercel is the only pipeline.
+
+2. You do NOT manage content. All text content — FAQ answers, about text, admission process descriptions, meta descriptions, fees data — is managed externally via Supabase. Do not hardcode any content. Always pull from the database. If something looks wrong in content, ignore it — it will be fixed from outside.
+
+3. Your job is technical excellence only: correct SSR, clean JSON-LD, fast page load, correct routing, correct sitemap, correct canonical tags, correct structured data. That is all you focus on.
+
+---
+
+OBJECTIVE — understand this clearly:
+
+The entire purpose of this site is to rank on Google for Bangalore engineering college keywords — "RVCE management quota fees 2026", "BMSCE direct admission", "PES University management quota seats" and similar. Every technical decision must serve this goal.
+
+For SEO to work:
+- Every page must render full HTML server-side (SSR via getServerSideProps) — Google must see complete content in View Source, not a JavaScript shell
+- JSON-LD structured data must be valid on every page (EducationalOrganization, FAQPage, BreadcrumbList, WebSite)
+- PageSpeed mobile score must be above 85
+- Sitemap must be correct and only include is_active=true colleges
+- Canonical tags must be on every page
+- Meta title under 60 chars, meta description under 160 chars, unique per page
+
+---
+
+Now do a technical audit and tell me:
+1. Are all pages returning 200 with full SSR HTML?
+2. Is JSON-LD present and valid on all page types?
+3. Is PageSpeed above 85 on mobile?
+4. Is the sitemap correct?
+5. Are canonical tags present on every page?
+6. Is the WhatsApp button visible on mobile on all pages?
+7. What would you fix first if you had to prioritise technical quality for SEO?
