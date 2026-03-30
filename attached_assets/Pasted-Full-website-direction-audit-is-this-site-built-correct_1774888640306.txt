@@ -1,0 +1,36 @@
+Full website direction audit — is this site built correctly for its goal?
+The only goal of this site: Rank on Google for high-intent Bangalore engineering college admission searches and convert those visitors into WhatsApp leads. That is it. Not branding, not awareness, not social media. Google rankings → WhatsApp conversions.
+Primary keywords we are targeting:
+
+"RVCE management quota fees 2026"
+"RVCE direct admission fees CSE"
+"management quota engineering colleges Bangalore"
+"direct admission engineering Bangalore 2026"
+"Christ University engineering management quota fees"
+"top engineering colleges Bangalore management quota"
+"RVCE management quota seats 2026"
+"engineering college fees Bangalore management quota"
+
+Current site structure:
+
+/ — homepage
+/engineering-colleges/bangalore — college listing (2 active: RVCE + Christ)
+/colleges/[slug] — college profile page
+/colleges/[slug]/fees — fees page
+/management-quota/bangalore — MQ hub
+/management-quota/[slug] — college MQ page
+/direct-admission/bangalore — DA hub
+/direct-admission/[slug] — college DA page
+All pages are SSR (getServerSideProps), data from Supabase
+
+What I want you to audit:
+
+URL and page structure — Is having 4 pages per college (/colleges/, /colleges/fees, /management-quota/, /direct-admission/) the right structure for our keywords? Or is this spreading thin content across too many URLs? Would a competitor analysis of what's actually ranking for these keywords suggest a different structure?
+Keyword-to-page mapping — For someone searching "RVCE management quota fees 2026", which page on our site should rank? Is that page actually optimised for that query right now (H1, title tag, meta description, content)?
+Page depth / content quality signals — For the 2 active colleges, are the pages substantial enough for Google to consider them high-quality results? Or are they thin pages that Google will likely ignore regardless of technical SEO?
+Internal linking — Given our URL structure, is internal link equity flowing correctly to the pages we most want to rank?
+Anything you'd call a red flag — Something that could actively prevent ranking or cause a manual penalty. Be direct.
+
+Skip basic suggestions. Only tell me things that are either a strong recommendation or a red flag. If it's a minor tweak or a "nice to have", skip it. I want signal, not noise.
+At the end, give one clear verdict: is this site pointed in the right direction for its goal, yes or no, and your single most important recommendation.
+
