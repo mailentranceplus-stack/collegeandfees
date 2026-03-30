@@ -43,11 +43,6 @@ function InactivePage({ college, slug, similarColleges }) {
   const tabs = [
     { label: "Overview", href: `/colleges/${slug}`, active: true },
     { label: "Fees", href: `/colleges/${slug}/fees` },
-    { label: "Placements", href: `/colleges/${slug}/placements` },
-    { label: "Cutoff", href: `/colleges/${slug}/cutoff` },
-    { label: "Admission", href: `/direct-admission/${slug}` },
-    { label: "Hostel", href: `/colleges/${slug}/hostel` },
-    { label: "Courses", href: `/colleges/${slug}/courses` },
   ];
 
   const waMsg = `Hi, I want guidance about admission to ${college.name}. Can you help me?`;
@@ -142,11 +137,6 @@ export default function CollegeOverviewPage({ college, content, placements, rank
   const tabs = [
     { label: "Overview", href: `/colleges/${slug}`, active: true },
     { label: "Fees", href: `/colleges/${slug}/fees` },
-    { label: "Placements", href: `/colleges/${slug}/placements` },
-    { label: "Cutoff", href: `/colleges/${slug}/cutoff` },
-    { label: "Admission", href: `/direct-admission/${slug}` },
-    { label: "Hostel", href: `/colleges/${slug}/hostel` },
-    { label: "Courses", href: `/colleges/${slug}/courses` },
   ];
 
   const orgJsonLd = {

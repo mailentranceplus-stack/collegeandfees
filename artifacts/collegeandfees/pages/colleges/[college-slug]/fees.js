@@ -130,11 +130,6 @@ export default function CollegeFeesPage({ college, fees, content, ranking, slug 
   const tabs = [
     { label: "Overview", href: `/colleges/${slug}` },
     { label: "Fees", href: `/colleges/${slug}/fees`, active: true },
-    { label: "Placements", href: `/colleges/${slug}/placements` },
-    { label: "Cutoff", href: `/colleges/${slug}/cutoff` },
-    { label: "Admission", href: `/direct-admission/${slug}` },
-    { label: "Hostel", href: `/colleges/${slug}/hostel` },
-    { label: "Courses", href: `/colleges/${slug}/courses` },
   ];
 
   /* Group fees by quota */
