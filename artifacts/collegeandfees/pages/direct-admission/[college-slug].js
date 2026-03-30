@@ -26,7 +26,6 @@ function InactivePage({ college, slug, similarColleges }) {
   const tabs = [
     { label: "Overview", href: `/colleges/${slug}` },
     { label: "Fees", href: `/colleges/${slug}/fees` },
-    { label: "Admission", href: `/direct-admission/${slug}`, active: true },
   ];
 
   const breadcrumbJsonLd = {
