@@ -322,7 +322,7 @@ export default function MgmtQuotaCollegePage({ college, fees, admissions, conten
           </nav>
           <p style={{ marginBottom: "16px" }}>
             <Link href={`/colleges/${slug}`} style={{ fontSize: "13px", color: "var(--muted-foreground)", textDecoration: "none" }}>
-              ← View Full College Profile
+              View Full College Profile →
             </Link>
           </p>
 

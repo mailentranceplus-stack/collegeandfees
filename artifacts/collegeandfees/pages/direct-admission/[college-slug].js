@@ -257,7 +257,7 @@ export default function CollegeSlugPage({ college, fees, admissions, content, pl
           </nav>
           <p style={{ marginBottom: "16px" }}>
             <Link href={`/colleges/${slug}`} style={{ fontSize: "13px", color: "var(--muted-foreground)", textDecoration: "none" }}>
-              ← View Full College Profile
+              View Full College Profile →
             </Link>
           </p>
 
