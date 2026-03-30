@@ -1,5 +1,6 @@
 import Head from "next/head";
 import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -110,11 +111,6 @@ export default function Home({ colleges }) {
           "name": "CollegeAndFees.com",
           "url": "https://collegeandfees.com",
           "description": "Management quota fees and direct admission guidance for Bangalore engineering colleges",
-          "potentialAction": {
-            "@type": "SearchAction",
-            "target": "https://collegeandfees.com/engineering-colleges/bangalore?q={search_term}",
-            "query-input": "required name=search_term"
-          }
         }) }} />
       </Head>
 
@@ -122,11 +118,13 @@ export default function Home({ colleges }) {
 
       {/* Hero */}
       <section className="hero">
-        <img
+        <Image
           src="https://images.unsplash.com/photo-1562774053-701939374585?w=1600&q=80"
           alt=""
-          className="hero-bg"
+          fill
+          style={{ objectFit: "cover", objectPosition: "center", opacity: 0.18, pointerEvents: "none", userSelect: "none", zIndex: 1 }}
           aria-hidden="true"
+          priority
         />
         <div className="hero-content">
           <div className="hero-trust">
