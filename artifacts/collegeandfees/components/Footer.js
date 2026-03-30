@@ -28,9 +28,6 @@ export default function Footer() {
               <li><Link href="/">Home</Link></li>
               <li><Link href="/direct-admission/bangalore">Direct Admission Bangalore</Link></li>
               <li><Link href="/direct-admission/rvce-bangalore">RVCE Direct Admission</Link></li>
-              <li><Link href="/direct-admission/bms-college-of-engineering">BMS College Admission</Link></li>
-              <li><Link href="/direct-admission/pes-university-bangalore">PES University Admission</Link></li>
-              <li><Link href="/direct-admission/msrit-bangalore">MSRIT Direct Admission</Link></li>
             </ul>
           </div>
 

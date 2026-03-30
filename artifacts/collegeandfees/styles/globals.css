@@ -382,20 +382,6 @@ img { max-width: 100%; display: block; }
 .mobile-menu a:last-child { border-bottom: none; }
 .mobile-menu a:hover { color: var(--foreground); }
 
-/* Hero background image */
-.hero-bg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-  opacity: 0.18;
-  z-index: 1;
-  pointer-events: none;
-  user-select: none;
-}
-
 /* College card image */
 .college-card-image {
   width: 100%;
@@ -408,16 +394,6 @@ img { max-width: 100%; display: block; }
 }
 .college-card:hover .college-card-image {
   transform: scale(1.04);
-}
-
-/* College detail hero banner */
-.college-hero-banner {
-  width: 100%;
-  height: 260px;
-  object-fit: cover;
-  object-position: center;
-  display: block;
-  opacity: 0.55;
 }
 
 /* Hero */

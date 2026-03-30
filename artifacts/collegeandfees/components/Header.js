@@ -23,8 +23,8 @@ export default function Header() {
 
         <nav className="nav">
           <Link href="/">Home</Link>
-          <Link href="/direct-admission/bangalore">Colleges</Link>
-          <Link href="/direct-admission/bangalore">Fees</Link>
+          <Link href="/engineering-colleges/bangalore">Colleges</Link>
+          <Link href="/management-quota/bangalore">Fees</Link>
           <Link href="/direct-admission/bangalore">Direct Admission</Link>
           <a href={WA_LINK} target="_blank" rel="noopener noreferrer" className="nav-cta">
             <WaIcon />
@@ -45,8 +45,8 @@ export default function Header() {
       {menuOpen && (
         <div className="mobile-menu">
           <Link href="/" onClick={() => setMenuOpen(false)}>Home</Link>
-          <Link href="/direct-admission/bangalore" onClick={() => setMenuOpen(false)}>Colleges</Link>
-          <Link href="/direct-admission/bangalore" onClick={() => setMenuOpen(false)}>Fees</Link>
+          <Link href="/engineering-colleges/bangalore" onClick={() => setMenuOpen(false)}>Colleges</Link>
+          <Link href="/management-quota/bangalore" onClick={() => setMenuOpen(false)}>Fees</Link>
           <Link href="/direct-admission/bangalore" onClick={() => setMenuOpen(false)}>Direct Admission</Link>
           <a
             href={WA_LINK}
