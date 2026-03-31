@@ -186,7 +186,7 @@ export default function MgmtQuotaCollegePage({ college, fees, admissions, conten
   const shortName = college.short_name || college.name;
   const waMsg = `Hi, I want to know about management quota seats at ${college.name}. Can you guide me?`;
 
-  const metaTitle = `Management Quota ${college.name} 2026 — Fees, Seats and Process`;
+  const metaTitle = `${college.short_name || college.name} Management Quota Fees 2026 — Seats and Admission Process`;
   const metaDesc = `Management quota admission in ${shortName} 2026. Branch-wise fees, seat availability, documents, and step-by-step process. Free counsellor on WhatsApp.`;
   const canonicalUrl = `https://collegeandfees.com/management-quota/${slug}`;
 
@@ -328,7 +328,7 @@ export default function MgmtQuotaCollegePage({ college, fees, admissions, conten
 
           {/* ── SECTION 3: H1 + Lead Capture Strip ── */}
           <h1 style={{ fontSize: "clamp(20px, 3vw, 28px)", fontWeight: 800, marginBottom: "20px" }}>
-            Management Quota Admission in {college.name} 2026 — Fees, Seats and Process
+            {college.short_name || college.name} Management Quota Fees 2026 — Seats and Admission Process
           </h1>
           <div className="cta-strip">
             <span className="cta-strip-text" style={{ fontWeight: 500, color: "var(--foreground)" }}>{shortName}</span>

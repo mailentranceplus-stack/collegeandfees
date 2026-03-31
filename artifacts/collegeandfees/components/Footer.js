@@ -28,6 +28,8 @@ export default function Footer() {
               <li><Link href="/">Home</Link></li>
               <li><Link href="/direct-admission/bangalore">Direct Admission Bangalore</Link></li>
               <li><Link href="/direct-admission/rvce-bangalore">RVCE Direct Admission</Link></li>
+              <li><Link href="/management-quota/bangalore">Management Quota Colleges</Link></li>
+              <li><Link href="/colleges/rvce-bangalore/fees">RVCE Fees 2026</Link></li>
             </ul>
           </div>
 

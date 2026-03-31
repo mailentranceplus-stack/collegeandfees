@@ -125,7 +125,7 @@ export default function CollegeSlugPage({ college, fees, admissions, content, pl
   const shortName = college.short_name || college.name;
   const waMsg = `Hi, I want to know about direct admission in ${college.name}. What are the fees and process for 2026?`;
 
-  const metaTitle = content?.meta_title || `Direct Admission in ${college.name} 2026 — Fees, Process and Seats`;
+  const metaTitle = content?.meta_title || `Direct Admission in ${shortName} 2026 — Fees, Process and Seats`;
   const metaDesc = content?.meta_desc || `Direct admission in ${shortName} 2026. Management quota fees, seat availability, documents, and step-by-step admission process. Free counsellor on WhatsApp.`;
   const canonicalUrl = `https://collegeandfees.com/direct-admission/${slug}`;
 
@@ -206,7 +206,7 @@ export default function CollegeSlugPage({ college, fees, admissions, content, pl
               <p style={{ color: "var(--primary)", fontSize: "12px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "6px" }}>
                 Direct Admission 2026
               </p>
-              <h1 style={{ fontSize: "clamp(22px, 3vw, 32px)", fontWeight: 800, lineHeight: 1.2 }}>{college.name}</h1>
+              <h1 style={{ fontSize: "clamp(22px, 3vw, 32px)", fontWeight: 800, lineHeight: 1.2 }}>Direct Admission in {shortName} 2026 — Fees, Process and Seats</h1>
               <p style={{ color: "var(--muted-foreground)", marginTop: "8px", fontSize: "14px" }}>
                 {[college.city, college.established && `Estd. ${college.established}`, college.affiliation, college.naac_grade && `NAAC ${college.naac_grade}`].filter(Boolean).join(" | ")}
               </p>

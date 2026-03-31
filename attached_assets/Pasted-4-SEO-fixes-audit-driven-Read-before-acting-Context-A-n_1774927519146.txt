@@ -1,0 +1,21 @@
+4 SEO fixes — audit-driven. Read before acting.
+Context: A new short_name column has been added to the colleges table in Supabase. Values: RVCE, Christ University, BMSCE, MSRIT, PES University. All getServerSideProps queries that fetch colleges.* will now automatically include short_name. Use college.short_name || college.name wherever a shortname is needed.
+Fix 1 — Title tags and H1s on MQ and DA pages
+In pages/management-quota/[college-slug].js and pages/direct-admission/[college-slug].js:
+
+The title tag currently reads "Management Quota RV College of Engineering 2026..." — replace college.name with college.short_name || college.name in the title construction so it reads "RVCE Management Quota Fees 2026..." instead.
+The H1 on the direct-admission page is currently just college.name (bare college name with no page context). Change it to match the title format: e.g. "Direct Admission in {college.short_name} 2026 — Fees, Process and Seats".
+Apply the same shortname substitution to the MQ page H1 as well for consistency.
+
+Fix 2 — Engineering colleges hub missing MQ link
+In pages/engineering-colleges/bangalore.js, each college card currently links to /colleges/{slug}, /colleges/{slug}/fees, and /direct-admission/{slug}. Add a link to /management-quota/{slug} — this is the highest-value page on the site for each college and the hub page currently doesn't link to it at all.
+Fix 3 — Homepage missing management quota CTA
+In pages/index.js, the homepage currently has CTAs pointing to /direct-admission/bangalore but zero links to /management-quota/bangalore. Add one clear CTA section or button to /management-quota/bangalore alongside or near the existing direct admission CTA. Keep it simple — match the existing CTA style.
+Fix 4 — Footer Quick Links
+In components/Footer.js, add two links to the Quick Links section:
+
+"Management Quota Colleges" → /management-quota/bangalore
+"RVCE Fees 2026" → /colleges/rvce-bangalore/fees
+
+After all fixes, push to GitHub and provide a completion report: files changed, specific lines modified, commit hash, any issues.
+

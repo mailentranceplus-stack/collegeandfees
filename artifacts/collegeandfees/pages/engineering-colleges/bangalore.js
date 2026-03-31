@@ -152,6 +152,7 @@ export default function BangaloreEngineeringColleges({ colleges, faqs }) {
                             <Link href={`/colleges/${college.slug}`} className="btn-outline-sm" style={{ fontSize: "12px", padding: "6px 12px" }}>Overview</Link>
                             <Link href={`/colleges/${college.slug}/fees`} className="btn-outline-sm" style={{ fontSize: "12px", padding: "6px 12px" }}>Fees</Link>
                             <Link href={`/direct-admission/${college.slug}`} className="btn-outline-sm" style={{ fontSize: "12px", padding: "6px 12px" }}>Direct Admission</Link>
+                            <Link href={`/management-quota/${college.slug}`} className="btn-outline-sm" style={{ fontSize: "12px", padding: "6px 12px" }}>Management Quota</Link>
                           </div>
                           <div style={{ marginTop: "10px" }}>
                             <a href={waLink(WA_MSG)} target="_blank" rel="noopener noreferrer" className="btn-whatsapp-sm" style={{ fontSize: "12px", padding: "7px 14px", width: "100%", justifyContent: "center" }}>

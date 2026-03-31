@@ -178,12 +178,37 @@ export default function Home({ colleges }) {
                 Looking for Direct Admission in Bangalore? 2026 seats are filling fast.
               </h2>
               <p style={{ color: "var(--muted-foreground)", fontSize: "14px" }}>
-                Management quota seats available at RVCE, BMS, MSRIT, PES, Christ and more. Free counsellor guidance.
+                Management quota seats available at RVCE and Christ University. Free counsellor guidance.
               </p>
             </div>
             <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
               <Link href="/direct-admission/bangalore" className="btn-outline-sm">
                 View All Colleges →
+              </Link>
+              <a href={WA_GENERAL} target="_blank" rel="noopener noreferrer" className="btn-whatsapp-sm">
+                <WaIcon />
+                WhatsApp Now
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Management Quota CTA Banner */}
+      <section style={{ padding: "40px 0", borderBottom: "1px solid var(--border)", background: "var(--navy-light)" }}>
+        <div className="container">
+          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "24px" }}>
+            <div style={{ flex: 1, minWidth: "280px" }}>
+              <h2 style={{ fontSize: "20px", fontWeight: 700, marginBottom: "6px" }}>
+                Management Quota Seats 2026 — No KCET rank required.
+              </h2>
+              <p style={{ color: "var(--muted-foreground)", fontSize: "14px" }}>
+                Branch-wise management quota fees, seat availability and admission process for RVCE and Christ University.
+              </p>
+            </div>
+            <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+              <Link href="/management-quota/bangalore" className="btn-outline-sm">
+                View MQ Colleges →
               </Link>
               <a href={WA_GENERAL} target="_blank" rel="noopener noreferrer" className="btn-whatsapp-sm">
                 <WaIcon />
