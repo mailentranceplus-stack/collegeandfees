@@ -1,0 +1,73 @@
+FINAL COMPREHENSIVE AUDIT — Read everything, report everything, change nothing.
+Context: This is the last technical review before we move to content and DNS cutover. collegeandfees.com is a Next.js 14 SSR site (Pages Router, getServerSideProps), deployed on Vercel, backed by Supabase PostgreSQL. The site exists for one reason: rank on Google for Bangalore engineering management quota and direct admission keywords, and convert visitors to WhatsApp leads. Active colleges: RVCE and Christ University only.
+This site has gone through 20+ commits and multiple rounds of fixes. Things may have been added, removed, patched, and re-patched. This audit should catch anything that fell through the cracks.
+Read every single file in the project — pages/, components/, lib/, styles/, public/, next.config.js, middleware.js, package.json — and report on each section below.
+
+SECTION 1 — FILE INVENTORY
+List every file in the project (pages/, components/, lib/, styles/, public/, root config files). For each file, state: its purpose, whether it is actively used, and whether it should exist. Flag anything that looks leftover or orphaned.
+SECTION 2 — EVERY PAGE ROUTE
+List every route the site can serve (including dynamic routes). For each route:
+
+What title tag does it render?
+What H1 does it render?
+Does it have a canonical tag? What value?
+Does it have meta robots (index/noindex)?
+Does it have JSON-LD structured data? What type?
+Does it have og:image?
+Is it in the sitemap?
+For dynamic routes: what happens when the slug is an active college vs inactive college vs non-existent slug?
+
+SECTION 3 — INTERNAL LINKING MAP
+For every page and component that contains links to other pages on the site, list the source page and every internal link it contains (href value and anchor text). I want a complete picture of how pages connect to each other.
+SECTION 4 — SUPABASE QUERIES
+For every getServerSideProps function, list:
+
+What tables it queries
+What columns it selects (or if it selects *)
+What filters it applies
+Whether it includes the new short_name column (recently added — some older pages might not be selecting it)
+
+SECTION 5 — IMPORTS AND DEPENDENCIES
+For every file, list its imports. Flag:
+
+Any import that references a file/module that doesn't exist
+Any import that is unused (imported but never referenced in the file)
+Any file that should be importing from lib/constants.js or components/WaButton.js but is still using its own local version
+
+SECTION 6 — HARDCODED STRINGS
+Search every JS file for:
+
+Any hardcoded college names, fees, phone numbers, URLs, or WhatsApp numbers that should be coming from Supabase or lib/constants.js instead
+Any string containing "2024" or "2025" that should say "2026"
+Any reference to inactive colleges (BMSCE, MSRIT, PES, BMS, Ramaiah) in visible text on active pages (not in ACTIVE_SLUGS or redirect configs — those are fine)
+Any placeholder text: "Lorem", "TODO", "FIXME", "placeholder", "coming soon", "sample", "test", "example"
+
+SECTION 7 — CSS AUDIT
+Read styles/globals.css completely. Flag:
+
+Any CSS class that is not used by any JS file
+Any CSS class that is duplicated
+Any obvious styling issues (z-index conflicts, overflow issues, mobile responsiveness gaps)
+
+SECTION 8 — next.config.js AUDIT
+Read the full config. Report:
+
+All redirects (source → destination, permanent or temporary)
+All image remote patterns
+Any other config options
+Flag any redirect that points to a page that no longer exists or that creates a chain
+
+SECTION 9 — middleware.js AUDIT
+Read the full middleware. Report what it does, what hosts it matches, and whether the logic is correct.
+SECTION 10 — SUGGESTIONS (optional, only important ones)
+If you see anything that is:
+
+A genuine bug or broken behavior
+A significant SEO risk (not minor — something that could actively hurt rankings)
+A security concern (exposed API keys, open endpoints, etc.)
+A performance issue that would affect Core Web Vitals
+
+Share it. Skip "nice to have" suggestions. Skip code style opinions. Skip minor optimizations. Only flag things that matter.
+
+OUTPUT FORMAT: Use the section numbers above. For each section, be exhaustive — I want to see every file, every route, every link, every query. This is the final audit before we close the technical phase.
+At the end, give a clear verdict: Is this codebase clean and ready for DNS cutover after content is pushed? Yes or no, with any blocking issues listed.
