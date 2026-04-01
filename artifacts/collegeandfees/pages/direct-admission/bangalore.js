@@ -100,6 +100,7 @@ export default function BangalorePage({ colleges, faqs }) {
         <meta property="og:description" content="Complete guide to direct admission in Bangalore engineering colleges 2026. Management quota fees, eligibility and process." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://collegeandfees.com/direct-admission/bangalore" />
+        <meta property="og:image" content="https://collegeandfees.com/opengraph.jpg" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
@@ -135,7 +136,7 @@ export default function BangalorePage({ colleges, faqs }) {
             {/* Counsellor block */}
             <div className="counsellor-block" style={{ marginBottom: "48px", marginTop: "20px" }}>
               <p>
-                &ldquo;Direct admission in Bangalore engineering colleges refers to admission through Management Quota seats — seats that colleges fill directly without KCET or COMEDK counselling. These seats are available at every private engineering college in Bangalore, typically 30–35% of total intake. As an RVCE alumnus who has counselled hundreds of students through this process, I can tell you: the fees vary wildly by branch and college. CSE at RVCE costs nearly ₹1.6 lakh/year; the same branch at a lesser-known college may cost ₹80,000/year. Getting the right seat at the right fee requires knowing which colleges have genuine vacancy — and that changes week to week. WhatsApp me and I&apos;ll give you an honest, unbiased picture within 24 hours.&rdquo;
+                &ldquo;Direct admission in Bangalore engineering colleges refers to admission through Management Quota seats — seats that colleges fill directly without KCET or COMEDK counselling. These seats are available at every private engineering college in Bangalore, typically 30–35% of total intake. As an RVCE alumnus who has counselled hundreds of students through this process, I can tell you: the fees vary wildly by branch and college. CSE at RVCE costs approximately ₹3.6 lakh/year; the same branch at a lesser-known college may cost ₹80,000/year. Getting the right seat at the right fee requires knowing which colleges have genuine vacancy — and that changes week to week. WhatsApp me and I&apos;ll give you an honest, unbiased picture within 24 hours.&rdquo;
               </p>
               <div style={{ marginTop: "20px" }}>
                 <a href={WA_GENERAL} target="_blank" rel="noopener noreferrer" className="btn-whatsapp-sm">

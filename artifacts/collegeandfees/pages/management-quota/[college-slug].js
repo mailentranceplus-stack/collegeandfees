@@ -247,7 +247,8 @@ export default function MgmtQuotaCollegePage({ college, fees, admissions, conten
         <link rel="canonical" href={canonicalUrl} />
         <meta property="og:title" content={metaTitle} />
         <meta property="og:description" content={metaDesc} />
-        <meta property="og:url" content={canonicalUrl} /> <meta property="og:image" content={COLLEGE_IMAGES[slug] || "https://images.unsplash.com/photo-1562774053-701939374585?w=1200&q=80"} />
+        <meta property="og:url" content={canonicalUrl} />
+        <meta property="og:image" content={COLLEGE_IMAGES[slug] || "https://collegeandfees.com/opengraph.jpg"} />
         <meta property="og:type" content="website" />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }} key="schema-org" />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} key="schema-breadcrumb" />

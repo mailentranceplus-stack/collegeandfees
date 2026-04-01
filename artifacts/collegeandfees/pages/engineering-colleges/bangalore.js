@@ -82,6 +82,7 @@ export default function BangaloreEngineeringColleges({ colleges, faqs }) {
         <meta property="og:description" content="Complete list of engineering colleges in Bangalore 2026 with fees, KCET cutoffs, NIRF rankings and management quota information." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://collegeandfees.com/engineering-colleges/bangalore" />
+        <meta property="og:image" content="https://collegeandfees.com/opengraph.jpg" />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       </Head>

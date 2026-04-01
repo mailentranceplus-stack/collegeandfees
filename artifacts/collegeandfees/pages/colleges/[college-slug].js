@@ -153,7 +153,8 @@ export default function CollegeOverviewPage({ college, content, placements, rank
         <meta property="og:title" content={metaTitle} />
         <meta property="og:description" content={metaDesc} />
         <meta property="og:url" content={canonicalUrl} />
-        <meta property="og:type" content="website" />        {COLLEGE_IMAGES[slug] && <meta property="og:image" content={COLLEGE_IMAGES[slug]} />}
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content={COLLEGE_IMAGES[slug] || "https://collegeandfees.com/opengraph.jpg"} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
         {faqJsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />}

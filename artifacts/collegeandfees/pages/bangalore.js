@@ -59,6 +59,7 @@ export default function BangalorePage({ activeCount }) {
         <meta property="og:description" content="Complete guide to colleges in Bangalore 2026 — engineering, MBA, fees, cutoffs and direct admission." />
         <meta property="og:url" content="https://collegeandfees.com/bangalore" />
         <meta property="og:type" content="website" />
+        <meta property="og:image" content="https://collegeandfees.com/opengraph.jpg" />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       </Head>
 

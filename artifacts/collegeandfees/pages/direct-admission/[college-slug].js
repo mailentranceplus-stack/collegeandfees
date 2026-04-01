@@ -331,7 +331,7 @@ export default function CollegeSlugPage({ college, fees, admissions, content, pl
                             ₹{fee.total_fee?.toLocaleString("en-IN")}
                           </td>
                           <td style={{ textAlign: "right", color: "var(--muted-foreground)" }}>
-                            ₹{(fee.tuition_fee * 4)?.toLocaleString("en-IN")}
+                            {fee.tuition_fee ? `₹${(fee.tuition_fee * 4).toLocaleString("en-IN")}` : "—"}
                           </td>
                         </tr>
                       ))}
