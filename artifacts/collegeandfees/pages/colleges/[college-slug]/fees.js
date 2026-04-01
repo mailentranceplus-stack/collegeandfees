@@ -88,12 +88,6 @@ function InactiveFeesPage({ college, slug }) {
   const canonicalUrl = `https://collegeandfees.com/colleges/${slug}/fees`;
   return (
     <>
-      <Head>
-        <title>{shortName} Fees 2026-27 — Information Being Verified</title>
-        <meta name="description" content={`Fee details for ${shortName} are being verified. Contact our counsellor on WhatsApp for the latest confirmed figures.`} />
-        <meta name="robots" content="noindex, nofollow" />
-        <link rel="canonical" href={canonicalUrl} />
-      </Head>
       <Header />
       <div className="college-header-band">
         <div className="container">
@@ -131,7 +125,19 @@ function InactiveFeesPage({ college, slug }) {
 }
 
 export default function CollegeFeesPage({ college, fees, content, ranking, slug }) {
-  if (!college.is_active || !ACTIVE_SLUGS.has(slug)) return <InactiveFeesPage college={college} slug={slug} />;
+  if (!college.is_active || !ACTIVE_SLUGS.has(slug)) {
+    return (
+      <>
+        <Head>
+          <title>{`${college.short_name || college.name} Fees 2026-27 — Fee Information Being Verified | CollegeAndFees`}</title>
+          <meta name="description" content={`Fee details for ${college.short_name || college.name} are being verified. Contact our counsellor on WhatsApp for the latest confirmed figures.`} />
+          <meta name="robots" content="noindex, nofollow" />
+          <link rel="canonical" href={`https://collegeandfees.com/colleges/${slug}/fees`} />
+        </Head>
+        <InactiveFeesPage college={college} slug={slug} />
+      </>
+    );
+  }
 
   const shortName = college.short_name || college.name;
   const waMsg = `Hi, I want to know the exact fees at ${college.name}. Can you help?`;

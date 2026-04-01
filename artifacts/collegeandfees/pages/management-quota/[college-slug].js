@@ -98,13 +98,6 @@ function InactivePage({ college, slug, similarColleges }) {
 
   return (
     <>
-      <Head>
-        <title>Management Quota {name} 2026 — Fees & Process</title>
-        <meta name="description" content={`Management quota admission in ${name} 2026. Contact counsellor for fee and process details.`} />
-        <meta name="robots" content="noindex, nofollow" />
-        <link rel="canonical" href={`https://collegeandfees.com/management-quota/${slug}`} />
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} key="schema-breadcrumb" />
-      </Head>
       <Header />
 
       {/* College Header Band */}
@@ -180,7 +173,17 @@ export default function MgmtQuotaCollegePage({ college, fees, admissions, conten
   const [openFaqId, setOpenFaqId] = useState(null);
 
   if (!college.is_active) {
-    return <InactivePage college={college} slug={slug} similarColleges={similarColleges} />;
+    return (
+      <>
+        <Head>
+          <title>{`Management Quota ${college.short_name || college.name} 2026 — Fees & Process | CollegeAndFees`}</title>
+          <meta name="description" content={`Management quota admission in ${college.short_name || college.name} 2026. Contact counsellor for fee and process details.`} />
+          <meta name="robots" content="noindex, nofollow" />
+          <link rel="canonical" href={`https://collegeandfees.com/management-quota/${slug}`} />
+        </Head>
+        <InactivePage college={college} slug={slug} similarColleges={similarColleges} />
+      </>
+    );
   }
 
   const shortName = college.short_name || college.name;

@@ -40,13 +40,6 @@ function InactivePage({ college, slug, similarColleges }) {
 
   return (
     <>
-      <Head>
-        <title>Direct Admission {name} 2026 — Fees & Process</title>
-        <meta name="description" content={`Direct admission in ${name} 2026. Contact counsellor for fee and process details.`} />
-        <meta name="robots" content="noindex, nofollow" />
-        <link rel="canonical" href={`https://collegeandfees.com/direct-admission/${slug}`} />
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
-      </Head>
       <Header />
 
       {/* College Header Band */}
@@ -119,7 +112,17 @@ export default function CollegeSlugPage({ college, fees, admissions, content, pl
   const [openFaqId, setOpenFaqId] = useState(null);
 
   if (!college.is_active) {
-    return <InactivePage college={college} slug={slug} similarColleges={similarColleges} />;
+    return (
+      <>
+        <Head>
+          <title>{`Direct Admission ${college.short_name || college.name} 2026 — Fees & Process | CollegeAndFees`}</title>
+          <meta name="description" content={`Direct admission in ${college.short_name || college.name} 2026. Contact counsellor for fee and process details.`} />
+          <meta name="robots" content="noindex, nofollow" />
+          <link rel="canonical" href={`https://collegeandfees.com/direct-admission/${slug}`} />
+        </Head>
+        <InactivePage college={college} slug={slug} similarColleges={similarColleges} />
+      </>
+    );
   }
 
   const shortName = college.short_name || college.name;
