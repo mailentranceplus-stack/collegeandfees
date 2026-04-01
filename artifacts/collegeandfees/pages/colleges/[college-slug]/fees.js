@@ -89,7 +89,7 @@ function InactiveFeesPage({ college, slug }) {
   return (
     <>
       <Head>
-        <title>{college.name} Fees 2026-27 — Information Being Verified</title>
+        <title>{shortName} Fees 2026-27 — Information Being Verified</title>
         <meta name="description" content={`Fee details for ${shortName} are being verified. Contact our counsellor on WhatsApp for the latest confirmed figures.`} />
         <meta name="robots" content="noindex, nofollow" />
         <link rel="canonical" href={canonicalUrl} />
@@ -136,7 +136,7 @@ export default function CollegeFeesPage({ college, fees, content, ranking, slug 
   const shortName = college.short_name || college.name;
   const waMsg = `Hi, I want to know the exact fees at ${college.name}. Can you help?`;
 
-  const metaTitle = `${college.name} Fees 2026-27 — KCET, COMEDK and Management Quota`;
+  const metaTitle = `${college.short_name || college.name} Fees 2026-27 — KCET, COMEDK and Management Quota`;
   const metaDesc = `${shortName} fees 2026-27. KCET quota, COMEDK quota and management quota fees for all branches. Verified figures from official sources.`;
   const canonicalUrl = `https://collegeandfees.com/colleges/${slug}/fees`;
 

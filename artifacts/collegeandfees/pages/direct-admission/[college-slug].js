@@ -20,8 +20,8 @@ const DEFAULT_DATES = [
    INACTIVE PLACEHOLDER PAGE
 ───────────────────────────────────────────── */
 function InactivePage({ college, slug, similarColleges }) {
-  const name = college.name;
-  const waMsg = `Hi, I want to know about direct admission in ${name}. Is it available?`;
+  const name = college.short_name || college.name;
+  const waMsg = `Hi, I want to know about direct admission in ${college.name}. Is it available?`;
 
   const tabs = [
     { label: "Overview", href: `/colleges/${slug}` },

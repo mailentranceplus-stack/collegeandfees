@@ -78,8 +78,8 @@ function FeesTable({ fees, slug }) {
    INACTIVE PLACEHOLDER PAGE
 ───────────────────────────────────────────── */
 function InactivePage({ college, slug, similarColleges }) {
-  const name = college.name;
-  const waMsg = `Hi, I want to know about management quota seats at ${name}. Can you guide me?`;
+  const name = college.short_name || college.name;
+  const waMsg = `Hi, I want to know about management quota seats at ${college.name}. Can you guide me?`;
 
   const tabs = [
     { label: "Overview", href: `/colleges/${slug}` },
