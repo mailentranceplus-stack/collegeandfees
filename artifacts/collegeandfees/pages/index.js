@@ -27,7 +27,7 @@ const FEES_DATA = [
 const HOME_FAQS = [
   { id: 1, question: "What is management quota / direct admission in Bangalore?", answer: "Management quota refers to seats that private engineering colleges fill directly without KCET or COMEDK counselling. Typically 30–35% of total intake is reserved under management quota, and colleges admit students directly on payment of a higher fee." },
   { id: 2, question: "What is the minimum eligibility for direct admission?", answer: "You need a minimum of 45% aggregate marks in PCM (Physics, Chemistry, Mathematics) in Class 12 / PUC. No minimum KCET or COMEDK rank is required for management quota seats." },
-  { id: 3, question: "How much does CSE direct admission cost at top Bangalore colleges?", answer: "CSE management quota fees vary by college. RVCE CSE is ₹36,00,000/year (₹75 lakh for 4 years total). PES University and Christ University range from ₹3,00,000–₹5,00,000/year. Contact our counsellor for confirmed 2026-27 figures for your target college." },
+  { id: 3, question: "How much does CSE direct admission cost at top Bangalore colleges?", answer: "CSE management quota fees vary by college. RVCE CSE is approximately ₹3,60,000/year (roughly ₹14-15 lakh total over 4 years). Christ University ranges from ₹3,00,000–₹5,00,000/year depending on branch. Contact our counsellor for confirmed 2026-27 figures for your target college." },
   { id: 4, question: "When does direct admission open for 2026?", answer: "Management quota applications typically open in June 2026 after KCET results are declared. The process continues through July 2026 until all management seats are filled. Apply early — seats go fast at top colleges." },
 ];
 
@@ -94,7 +94,7 @@ export default function Home({ colleges }) {
         <meta property="og:description" content="Management quota fees, KCET cutoffs, COMEDK cutoffs and direct admission guidance for Bangalore engineering colleges 2026." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://collegeandfees.com" />
-            <meta property="og:image" content="https://images.unsplash.com/photo-1562774053-701939374585?w=1200&q=80" />
+        <meta property="og:image" content="https://collegeandfees.com/opengraph.jpg" />
         <link rel="canonical" href="https://collegeandfees.com" />
         <script key="schema-website" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
           "@context": "https://schema.org",
@@ -102,6 +102,15 @@ export default function Home({ colleges }) {
           "name": "CollegeAndFees.com",
           "url": "https://collegeandfees.com",
           "description": "Management quota fees and direct admission guidance for Bangalore engineering colleges",
+        }) }} />
+        <script key="schema-faq" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: HOME_FAQS.map((f) => ({
+            "@type": "Question",
+            name: f.question,
+            acceptedAnswer: { "@type": "Answer", text: f.answer },
+          })),
         }) }} />
       </Head>
 

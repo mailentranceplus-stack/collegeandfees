@@ -28,16 +28,6 @@ function InactivePage({ college, slug, similarColleges }) {
     { label: "Fees", href: `/colleges/${slug}/fees` },
   ];
 
-  const breadcrumbJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: "https://collegeandfees.com" },
-      { "@type": "ListItem", position: 2, name: "Direct Admission Bangalore", item: "https://collegeandfees.com/direct-admission/bangalore" },
-      { "@type": "ListItem", position: 3, name, item: `https://collegeandfees.com/direct-admission/${slug}` },
-    ],
-  };
-
   return (
     <>
       <Header />
@@ -264,9 +254,9 @@ export default function CollegeSlugPage({ college, fees, admissions, content, pl
             </Link>
           </p>
 
-          {/* ── SECTION 3: H2 + Lead Capture Strip ── */}
+          {/* ── SECTION 3: Lead Capture Strip ── */}
           <h2 style={{ fontSize: "clamp(20px, 3vw, 28px)", fontWeight: 800, marginBottom: "20px" }}>
-            Direct Admission in {college.name} 2026 — Fees, Process and Seats
+            2026-27 Fee Structure, Seat Availability and Admission Process
           </h2>
           <div className="cta-strip">
             <span className="cta-strip-text" style={{ fontWeight: 500, color: "var(--foreground)" }}>{shortName}</span>

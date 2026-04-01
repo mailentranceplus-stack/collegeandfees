@@ -86,16 +86,6 @@ function InactivePage({ college, slug, similarColleges }) {
     { label: "Fees", href: `/colleges/${slug}/fees` },
   ];
 
-  const breadcrumbJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: "https://collegeandfees.com" },
-      { "@type": "ListItem", position: 2, name: "Management Quota Bangalore", item: "https://collegeandfees.com/management-quota/bangalore" },
-      { "@type": "ListItem", position: 3, name, item: `https://collegeandfees.com/management-quota/${slug}` },
-    ],
-  };
-
   return (
     <>
       <Header />
