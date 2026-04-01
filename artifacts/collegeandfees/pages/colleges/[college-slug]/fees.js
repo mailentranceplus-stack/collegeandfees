@@ -194,6 +194,7 @@ export default function CollegeFeesPage({ college, fees, content, ranking, slug 
         <meta property="og:description" content={metaDesc} />
         <meta property="og:url" content={canonicalUrl} />
         <meta property="og:type" content="website" />
+        <meta property="og:image" content={COLLEGE_IMAGES[slug] || "https://collegeandfees.com/opengraph.jpg"} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       </Head>
 

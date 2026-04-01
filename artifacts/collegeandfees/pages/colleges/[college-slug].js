@@ -291,7 +291,7 @@ export default function CollegeOverviewPage({ college, content, placements, rank
                         <tr key={i}>
                           <td style={{ fontWeight: 600 }}>{fee.courses?.name || `Branch ${i + 1}`}</td>
                           <td style={{ textAlign: "right" }} className="fees-highlight">
-                            ₹{fee.tuition_fee?.toLocaleString("en-IN")}
+                            {fee.tuition_fee ? `₹${fee.tuition_fee.toLocaleString("en-IN")}` : "—"}
                           </td>
                         </tr>
                       ))}
