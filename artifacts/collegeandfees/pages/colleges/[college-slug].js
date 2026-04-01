@@ -21,12 +21,6 @@ function InactivePage({ college, slug, similarColleges }) {
 
   return (
     <>
-      <Head>
-        <title>{`${college.short_name || college.name} — Fees, Cutoffs, Placements and Admission 2026`}</title>
-        <meta name="description" content={`${college.name} fees 2026, KCET cutoff, COMEDK cutoff, management quota fees, placements and direct admission process.`} />
-        <meta name="robots" content="noindex, nofollow" />
-        <link rel="canonical" href={`https://collegeandfees.com/colleges/${slug}`} />
-      </Head>
       <Header />
 
       <div className="college-header-band">
@@ -96,7 +90,17 @@ export default function CollegeOverviewPage({ college, content, placements, rank
   const [openFaqId, setOpenFaqId] = useState(null);
 
   if (!college.is_active) {
-    return <InactivePage college={college} slug={slug} similarColleges={similarColleges} />;
+    return (
+      <>
+        <Head>
+          <title>{`${college.short_name || college.name} — Fees, Cutoffs, Placements and Admission 2026`}</title>
+          <meta name="description" content={`${college.name} fees 2026, KCET cutoff, COMEDK cutoff, management quota fees, placements and direct admission process.`} />
+          <meta name="robots" content="noindex, nofollow" />
+          <link rel="canonical" href={`https://collegeandfees.com/colleges/${slug}`} />
+        </Head>
+        <InactivePage college={college} slug={slug} similarColleges={similarColleges} />
+      </>
+    );
   }
 
   const shortName = college.short_name || college.name;

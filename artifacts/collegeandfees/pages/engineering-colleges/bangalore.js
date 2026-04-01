@@ -11,7 +11,7 @@ import { WaIcon, WaButton } from "../../components/WaButton";
 const WA_MSG = "Hi, I need help choosing an engineering college in Bangalore. Can you guide me?";
 
 const PLACEHOLDER_COLLEGES = [
-  { id: 1, slug: "rvce-bangalore", name: "RV College of Engineering", short_name: "RVCE", city: "Bangalore", type: "Private Autonomous", established: 1963, naac_grade: "A+", is_active: true, rankings: [{ rank: 99, source: "NIRF", year: 2024 }] },
+  { id: 1, slug: "rvce-bangalore", name: "RV College of Engineering", short_name: "RVCE", city: "Bangalore", type: "Private Autonomous", established: 1963, naac_grade: "A+", is_active: true, rankings: [{ rank: 82, source: "NIRF", year: 2024 }] },
   { id: 2, slug: "bms-college-of-engineering", name: "BMS College of Engineering", short_name: "BMSCE", city: "Bangalore", type: "Private Autonomous", established: 1946, naac_grade: "A", is_active: false, rankings: [] },
   { id: 3, slug: "christ-university-bangalore", name: "Christ University – Faculty of Engineering", short_name: "Christ", city: "Bangalore", type: "Deemed University", established: 1969, naac_grade: "A+", is_active: true, rankings: [] },
   { id: 4, slug: "msrit-bangalore", name: "MS Ramaiah Institute of Technology", short_name: "MSRIT", city: "Bangalore", type: "Private Autonomous", established: 1962, naac_grade: "A+", is_active: false, rankings: [] },
