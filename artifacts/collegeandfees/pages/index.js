@@ -7,17 +7,14 @@ import Footer from "../components/Footer";
 import CollegeCard from "../components/CollegeCard";
 import Testimonials from "../components/Testimonials";
 import { getSupabase } from "../lib/supabase";
-import { waLink } from "../lib/constants";
+import { ACTIVE_SLUGS, waLink } from "../lib/constants";
 import { WaIcon } from "../components/WaButton";
 
 const WA_MSG_HOME = "Hi, I want to know about direct admission in Bangalore engineering colleges.";
 
 const PLACEHOLDER_COLLEGES = [
   { id: 1, slug: "rvce-bangalore", name: "RV College of Engineering", city: "Bangalore", naac_grade: "A+", established: 1963, type: "Private" },
-  { id: 2, slug: "bms-college-of-engineering", name: "BMS College of Engineering", city: "Bangalore", naac_grade: "A", established: 1946, type: "Private" },
   { id: 3, slug: "christ-university-bangalore", name: "Christ University – Faculty of Engineering", city: "Bangalore", naac_grade: "A+", established: 1969, type: "Deemed" },
-  { id: 4, slug: "msrit-bangalore", name: "MS Ramaiah Institute of Technology", city: "Bangalore", naac_grade: "A+", established: 1962, type: "Private" },
-  { id: 5, slug: "pes-university-bangalore", name: "PES University", city: "Bangalore", naac_grade: "A", established: 1988, type: "Deemed" },
 ];
 
 const FEES_DATA = [
@@ -345,7 +342,9 @@ export async function getServerSideProps() {
             feeMap[cid] = { top_fee: fee.tuition_fee, top_course: "CSE" };
           }
         });
-        colleges = collegeData.map((c) => ({ ...c, ...(feeMap[c.id] || {}) }));
+        colleges = collegeData
+          .filter((c) => ACTIVE_SLUGS.has(c.slug))
+          .map((c) => ({ ...c, ...(feeMap[c.id] || {}) }));
       }
     }
   } catch (err) {

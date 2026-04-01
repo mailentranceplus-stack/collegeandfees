@@ -6,15 +6,15 @@ const testimonials = [
     initials: "RK",
   },
   {
-    text: "I was worried about hidden fees and agents who mislead. CollegeAndFees showed us the exact fee structure upfront. My daughter is now at BMS College studying ECE.",
+    text: "I was worried about hidden fees and agents who mislead. CollegeAndFees showed us the exact fee structure upfront. My daughter is now at Christ University studying ECE.",
     name: "Sunitha Rao",
-    meta: "Parent of BMS College student, 2025",
+    meta: "Parent of Christ University student, 2025",
     initials: "SR",
   },
   {
     text: "The WhatsApp support was fast and honest. They told us exactly what documents to keep ready and guided us through the entire process step by step.",
     name: "Vikram S.",
-    meta: "Student, PES University CSE, 2025",
+    meta: "Student, RVCE CSE, 2025",
     initials: "VS",
   },
 ];

@@ -53,7 +53,7 @@ function FeesTable({ fees, slug }) {
                   ₹{((fee.tuition_fee || 0) + (fee.hostel_fee || 0)).toLocaleString("en-IN")}
                 </td>
                 <td style={{ textAlign: "right", color: "var(--muted-foreground)" }}>
-                  ₹{(fee.other_fees || (fee.tuition_fee || 0) * 4).toLocaleString("en-IN")}
+                  ₹{((fee.tuition_fee || 0) * 4).toLocaleString("en-IN")}
                 </td>
               </tr>
             ))}
