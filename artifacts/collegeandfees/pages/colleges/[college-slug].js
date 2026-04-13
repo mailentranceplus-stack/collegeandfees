@@ -240,7 +240,7 @@ export default function CollegeOverviewPage({ college, content, placements, rank
             {[
               { label: "NAAC Grade", value: college.naac_grade || "—" },
               { label: "NIRF Rank", value: ranking ? `#${ranking.rank}` : "Not Ranked" },
-              { label: "Highest Package", value: placements ? `${placements.highest_package_lpa} LPA` : "Data Awaited" },
+              { label: "Highest Package", value: placements?.highest_package_lpa ? `${placements.highest_package_lpa} LPA` : "Data Awaited" },
               { label: "Management Quota", value: "Available ✓" },
             ].map((stat) => (
               <div key={stat.label} className="key-stat">
@@ -363,14 +363,14 @@ export default function CollegeOverviewPage({ college, content, placements, rank
             <h2 style={{ fontSize: "20px", fontWeight: 700, marginBottom: "16px" }}>
               Placements at {shortName}{placements ? ` — ${placements.year}` : ""}
             </h2>
-            {placements ? (
+            {placements && (placements.avg_package_lpa || placements.highest_package_lpa || placements.placement_pct) ? (
               <>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: "16px", marginBottom: "20px" }}>
                   {[
-                    { label: "Avg Package", value: `${placements.avg_package_lpa} LPA` },
-                    { label: "Highest Package", value: `${placements.highest_package_lpa} LPA` },
-                    { label: "Placement %", value: `${placements.placement_pct}%` },
-                  ].map((s) => (
+                    placements.avg_package_lpa ? { label: "Avg Package", value: `${placements.avg_package_lpa} LPA` } : null,
+                    placements.highest_package_lpa ? { label: "Highest Package", value: `${placements.highest_package_lpa} LPA` } : null,
+                    placements.placement_pct ? { label: "Placement %", value: `${placements.placement_pct}%` } : null,
+                  ].filter(Boolean).map((s) => (
                     <div key={s.label} style={{ background: "rgba(239,175,38,0.08)", border: "1px solid rgba(239,175,38,0.2)", borderRadius: "10px", padding: "16px", textAlign: "center" }}>
                       <p style={{ fontSize: "20px", fontWeight: 800, color: "var(--primary)" }}>{s.value}</p>
                       <p style={{ fontSize: "12px", color: "var(--muted-foreground)", marginTop: "4px" }}>{s.label} ({placements.year})</p>

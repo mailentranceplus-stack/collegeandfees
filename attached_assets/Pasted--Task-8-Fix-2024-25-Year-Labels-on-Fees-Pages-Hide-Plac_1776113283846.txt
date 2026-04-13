@@ -1,0 +1,162 @@
+# Task #8 — Fix "2024-25" Year Labels on Fees Pages + Hide Placeholder Data
+
+> **Date:** 2026-04-14
+> **Priority:** CRITICAL — these issues are live on production and hurt credibility
+
+---
+
+## What & Why
+
+Three credibility-killing issues are live on production right now:
+
+### Issue 1: "2024-25" still showing on `/colleges/[slug]/fees` pages
+Prompt 7 was supposed to fix 4 hardcoded "2024-25" strings, but the fees page (`pages/colleges/[college-slug]/fees.js`) still renders "2024-25" in **two template locations** that produce **6+ visible instances** on any college with fee data:
+
+- **Per-quota section header:** "Academic year shown: 2024-25. 2026-27 figures may be higher." — This renders once per quota (KCET, COMEDK, Management, SNQ, Foreign), producing 5 instances on RVCE's page.
+- **Notes bullet:** "Fees shown are for the 2024-25 academic year. 2026-27 fees may be higher." — This renders once in the "Notes on the Fees Above" section at the bottom.
+
+**Verified live URLs with this bug:**
+- https://collegeandfees.vercel.app/colleges/rvce-bangalore/fees (6 occurrences)
+- https://collegeandfees.vercel.app/colleges/christ-university-bangalore/fees (4 occurrences)
+
+### Issue 2: "null LPA" and "null%" displaying on placement sections
+On direct-admission and management-quota pages, the placements section renders literal text like:
+- "null LPA" for Avg Package
+- "null LPA" for Highest Package  
+- "null%" for Placement %
+
+This happens because the `placements` table has 5 rows but all numeric stats are NULL. The code should NOT display "null" — it should either hide those stats entirely or show "Contact for details".
+
+**Verified live URL:** https://collegeandfees.vercel.app/direct-admission/rvce-bangalore (scroll to Placements section)
+
+### Issue 3: ₹100 / ₹50 placeholder fees showing as real data
+The original 5 colleges (RVCE, Christ, BMS, MSRIT, PES) have 237 placeholder fee rows for KCET, COMEDK, SNQ, and Foreign quotas where `tuition_fee = 100` and `hostel_fee = 50`. These display as real fee tables with ₹100 annual tuition — obviously fake and damages trust.
+
+**Only Management quota fees are real data.** All other quotas for the original 5 show placeholder ₹100/₹50 amounts.
+
+**Verified live URL:** https://collegeandfees.vercel.app/colleges/rvce-bangalore/fees — look at COMEDK, KCET, SNQ, Foreign sections showing ₹100/₹50.
+
+---
+
+## "Done" Looks Like
+
+1. ALL occurrences of "2024-25" on fees pages are replaced with "2026" (both the per-quota header and the notes bullet)
+2. No other page type (direct-admission, management-quota, college profile) shows "2024-25" either (verify with a grep for "2024-25" across the entire codebase)
+3. Placement stats that are `null` or `0` are NOT rendered — either hide the stat entirely or show "—" or "Contact for details" instead of "null LPA"
+4. Fee rows where `tuition_fee <= 100` (placeholder data) are either:
+   - **Option A (preferred):** Hidden entirely — don't render that quota's fee table if ALL rows in that quota have `tuition_fee <= 100`
+   - **Option B:** Show the table but replace ₹100 with "Contact for details" text
+5. Real Management quota fees (tuition_fee > 100) continue to display normally
+6. Audit script passes: `BASE_URL=http://localhost:PORT node scripts/audit.js` exits 0
+
+---
+
+## Out of Scope
+
+- No design changes (dark navy #0B1121, gold #EFAF26, Plus Jakarta Sans — LOCKED)
+- No database changes — this is purely frontend display logic
+- No new page templates
+- No changes to getServerSideProps data fetching
+
+---
+
+## Tasks
+
+### Task 1: Fix "2024-25" → "2026" in `pages/colleges/[college-slug]/fees.js`
+
+Search the ENTIRE file for every occurrence of the string "2024-25" and replace with "2026". There should be at least 2 locations:
+
+1. The per-quota section subtitle/header that reads: `Academic year shown: 2024-25. 2026-27 figures may be higher.`  
+   → Change to: `Academic year shown: 2026. 2026-27 figures may be higher.`  
+   (Or better: `Fee figures shown for 2026-27 academic year.`)
+
+2. The notes section bullet that reads: `Fees shown are for the 2024-25 academic year. 2026-27 fees may be higher.`  
+   → Change to: `Fees shown are for the 2026-27 academic year.`
+
+**Also do a project-wide search** for "2024-25" in ALL .js/.jsx files and fix any remaining occurrences. The `direct-admission/[college-slug].js` and `management-quota/[college-slug].js` files were already clean as of today's live check, but verify anyway.
+
+### Task 2: Fix "null" display in placement stats
+
+In the placement display components (likely in `direct-admission/[college-slug].js`, `management-quota/[college-slug].js`, and possibly `colleges/[college-slug]/index.js`), add null/falsy checks:
+
+```
+// Before rendering any placement stat:
+// If value is null, undefined, 0, or empty string → don't render that stat
+// Don't render "null LPA" or "null%" — either hide or show "—"
+```
+
+Find all places where placement data like `avg_package`, `highest_package`, `placement_percentage` is rendered and add guards. Example pattern:
+
+```jsx
+// BAD (current):
+{placement.highest_package} LPA
+
+// GOOD (fixed):
+{placement.highest_package ? `${placement.highest_package} LPA` : '—'}
+```
+
+Or better yet, if ALL placement stats are null for a college, hide the entire Placements section rather than showing a section full of dashes.
+
+### Task 3: Hide placeholder fee tables (tuition_fee ≤ 100)
+
+In `pages/colleges/[college-slug]/fees.js`, add logic to filter out or hide fee tables where the data is clearly placeholder:
+
+**Rule:** If ALL fee rows for a given quota have `tuition_fee <= 100`, treat that entire quota section as "no real data available" and either:
+- Don't render the fee table for that quota at all, OR
+- Show a message like "KCET quota fees for 2026-27 — Contact counsellor for confirmed figures"
+
+**Do NOT hide Management quota tables** — those have real data (tuition_fee values like ₹36,00,000 for RVCE CSE).
+
+The threshold of 100 is safe because the lowest real Management quota fee in the database is ₹1,50,000 (for GINED colleges). No real fee is anywhere near ₹100.
+
+### Task 4: Verify All Fixes
+
+Start the dev server and confirm:
+
+1. **RVCE fees page** (`/colleges/rvce-bangalore/fees`):
+   - Management quota table shows with real fees (₹36,00,000 for CSE, etc.)
+   - COMEDK, KCET, SNQ, Foreign tables are either hidden or show "Contact for details"
+   - NO "2024-25" text anywhere on the page
+   - Notes section updated
+
+2. **Christ fees page** (`/colleges/christ-university-bangalore/fees`):
+   - Same checks as RVCE
+
+3. **RVCE direct-admission** (`/direct-admission/rvce-bangalore`):
+   - Placements section does NOT show "null LPA" or "null%"
+
+4. **A newly-activated college** (e.g., `/colleges/dayananda-sagar-college-of-engineering`):
+   - Renders full profile page (not "Being Verified" placeholder on main profile)
+   - Fees page shows management quota fees if available, hides placeholder quotas
+
+5. **Codebase grep**: `grep -r "2024-25" pages/` returns zero results
+
+### Task 5: Run Audit Script
+
+Run `BASE_URL=http://localhost:PORT node scripts/audit.js` and confirm ALL checks pass (exit 0).
+
+---
+
+## Context
+
+- Database: Supabase project `safucmoasypfvnwhrovo` (Singapore)
+- **50 colleges**, all `is_active=true`
+- **609 fee rows**: 372 real Management quota + 237 placeholder (KCET/COMEDK/SNQ/Foreign for original 5)
+- **Placements table**: 5 rows, all numeric stats NULL
+- Next.js 14 (Pages Router), SSR via `getServerSideProps`, pulling from Supabase
+- Design is LOCKED: dark navy `#0B1121`, gold `#EFAF26`, Plus Jakarta Sans — do NOT change any styles
+- The only styling change allowed is hiding/showing elements based on data quality
+
+---
+
+## Report Back (MANDATORY)
+
+After completing all tasks, provide:
+
+1. **Files changed:** Every file with exact changes
+2. **"2024-25" grep result:** Output of `grep -r "2024-25" pages/` after fix (should be empty)
+3. **Placeholder fee handling:** Which approach did you use (hide table vs "Contact" message)?
+4. **Null placement handling:** How did you handle null stats?
+5. **Audit result:** Full `node scripts/audit.js` output
+6. **Page verification:** Screenshots or text output confirming RVCE fees, Christ fees, RVCE direct-admission placements are clean
+7. **Commit message:** What commit message did you use?

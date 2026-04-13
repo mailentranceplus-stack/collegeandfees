@@ -178,10 +178,13 @@ export default function CollegeFeesPage({ college, fees, content, ranking, slug 
   const mgmtFees = quotaGroups["management"] || [];
   const govtFees = quotaGroups["govt"] || [];
   const comedk = quotaGroups["comedk"] || [];
-  const cheapestMgmt = mgmtFees.length > 0 ? Math.min(...mgmtFees.map((f) => f.tuition_fee || 0)) : null;
-  const cheapestGovt = govtFees.length > 0 ? Math.min(...govtFees.map((f) => f.tuition_fee || 0)) : null;
-  const cheapestComedk = comedk.length > 0 ? Math.min(...comedk.map((f) => f.tuition_fee || 0)) : null;
-  const maxMgmt = mgmtFees.length > 0 ? Math.max(...mgmtFees.map((f) => f.tuition_fee || 0)) : null;
+  const realMgmt = mgmtFees.filter((f) => (f.tuition_fee || 0) > 100);
+  const realGovt = govtFees.filter((f) => (f.tuition_fee || 0) > 100);
+  const realComedk = comedk.filter((f) => (f.tuition_fee || 0) > 100);
+  const cheapestMgmt = realMgmt.length > 0 ? Math.min(...realMgmt.map((f) => f.tuition_fee)) : null;
+  const cheapestGovt = realGovt.length > 0 ? Math.min(...realGovt.map((f) => f.tuition_fee)) : null;
+  const cheapestComedk = realComedk.length > 0 ? Math.min(...realComedk.map((f) => f.tuition_fee)) : null;
+  const maxMgmt = realMgmt.length > 0 ? Math.max(...realMgmt.map((f) => f.tuition_fee)) : null;
 
   return (
     <>
@@ -257,6 +260,26 @@ export default function CollegeFeesPage({ college, fees, content, ranking, slug 
                 const label = QUOTA_LABELS[quota] || quota;
                 const isChrist = slug === "christ-university-bangalore";
 
+                const isPlaceholder = quotaFees.every((f) => (f.tuition_fee || 0) <= 100);
+
+                if (isPlaceholder) {
+                  return (
+                    <section key={quota} style={{ marginBottom: "40px" }} id={`fees-${quota}`}>
+                      <h2 style={{ fontSize: "18px", fontWeight: 700, marginBottom: "6px" }}>
+                        {label} — Branch-wise Fees
+                      </h2>
+                      <div className="info-box" style={{ padding: "20px" }}>
+                        <p style={{ color: "var(--muted-foreground)", fontSize: "14px", marginBottom: "12px" }}>
+                          {label} fees for 2026-27 — Contact counsellor for confirmed figures.
+                        </p>
+                        <WaButton href={waLink(`Hi, I want to know the ${label} fees at ${college.name}. Can you help?`)} size="sm">
+                          Get Fee Details on WhatsApp
+                        </WaButton>
+                      </div>
+                    </section>
+                  );
+                }
+
                 /* For Christ: split engineering vs MBA */
                 const engFees = isChrist ? quotaFees.filter((f) => !isMbaCourse(f)) : quotaFees;
                 const mbaFees = isChrist ? quotaFees.filter(isMbaCourse) : [];
@@ -272,7 +295,7 @@ export default function CollegeFeesPage({ college, fees, content, ranking, slug 
                       {label} — Branch-wise Fees
                     </h2>
                     <p style={{ fontSize: "13px", color: "var(--muted-foreground)", marginBottom: "14px" }}>
-                      Academic year shown: 2026. 2026-27 figures may be higher.
+                      Fee figures shown for 2026-27 academic year.
                     </p>
 
                     {isChrist ? (
@@ -328,7 +351,7 @@ export default function CollegeFeesPage({ college, fees, content, ranking, slug 
             <h2 style={{ fontSize: "17px", fontWeight: 700, marginBottom: "14px" }}>Notes on the Fees Above</h2>
             <ul style={{ listStyle: "none", padding: 0, display: "flex", flexDirection: "column", gap: "8px" }}>
               {[
-                "Fees shown are for the 2026 academic year. 2026-27 fees may be higher.",
+                "Fees shown are for the 2026-27 academic year.",
                 "Management quota fees for 2026-27 at RVCE have been officially announced. Contact our counsellor for confirmed 2026-27 figures at other colleges.",
                 "Hostel fees are optional and not included in all course fee calculations.",
                 "Other fees (lab, library, development) vary by college and are not always listed.",
