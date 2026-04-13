@@ -1,0 +1,92 @@
+# Replit Prompt — Activate 30 Colleges + Fix Year Label
+
+> **Purpose:** Update `lib/constants.js` to activate all 30 colleges now in Supabase with real fee data and content. Also fix hardcoded "2024-25" year references to show "2026" fees.
+> **Date:** 2026-04-13
+> **Priority:** CRITICAL — this is the bottleneck preventing 25 new college pages from rendering
+
+---
+
+## Task 1: Update ACTIVE_SLUGS in `lib/constants.js`
+
+Replace the current `ACTIVE_SLUGS` array with the complete list of 30 college slugs below. Keep the existing export format and variable name exactly as-is. Only change the array contents.
+
+```js
+export const ACTIVE_SLUGS = [
+  // Tier 1 — Original 5 colleges (already had pages)
+  'rvce-bangalore',
+  'christ-university-bangalore',
+  'bms-college-of-engineering',
+  'msrit-bangalore',
+  'pes-university-bangalore',
+
+  // Tier 2 — Bangalore colleges with search volume
+  'dayananda-sagar-college-of-engineering',
+  'rnsit-bangalore',
+  'new-horizon-college-of-engineering',
+  'jain-university-bangalore',
+  'alliance-college-of-engineering',
+  'presidency-university-bangalore',
+  'reva-university-bangalore',
+  'acharya-institute-of-technology',
+  'ramaiah-university-bangalore',
+  'bmsit-bangalore',
+  'rvitm-bangalore',
+  'nitte-meenakshi-bangalore',
+  'atria-institute-of-technology',
+  'dayananda-sagar-university',
+  'dsatm-bangalore',
+  'oxford-college-of-engineering',
+  'east-point-college-of-engineering',
+  'cmr-university-bangalore',
+  't-john-institute-bangalore',
+
+  // Tier 3 — Additional colleges with fee data
+  'srm-university-chennai',
+  'bnmit-bangalore',
+  'sapthagiri-nps-university',
+  'nmam-institute-of-technology',
+  'rv-university-bangalore',
+  'hkbk-college-of-engineering',
+];
+```
+
+**Important:** The existing code checks `ACTIVE_SLUGS.includes(slug)` to decide whether to render a full college page or show a gated/noindex page. By adding these slugs, all 30 colleges will get full public pages with fee tables, about sections, and FAQs. No other code changes are needed for this to work — the page templates already handle any active college dynamically from Supabase.
+
+---
+
+## Task 2: Fix Hardcoded "2024-25" Year Label
+
+Search the entire codebase for any hardcoded references to "2024-25" or "2024" in fee-related display text (headings, labels, table headers, meta descriptions). These should show "2026" instead since our `academic_year` in Supabase is "2026-27" and we want users to see "2026 fees".
+
+Likely locations:
+- Fee table page (`pages/colleges/[slug]/fees.js` or similar)
+- College profile page (`pages/colleges/[slug]/index.js`)
+- Hub pages (`pages/engineering-colleges/bangalore.js`, `pages/direct-admission/bangalore.js`, `pages/management-quota/bangalore.js`)
+- Any component that displays fee year text
+
+**Rule:** If the year comes from `academic_year` in the DB (format "2026-27"), extract just the first year "2026" and display as "2026 Fees" or "Fee Structure 2026". If it's hardcoded as "2024-25" or "2024", replace with "2026".
+
+Do NOT change:
+- The `academic_year` column value in the database (stays "2026-27")
+- Any date-related logic in `getServerSideProps`
+- The `robots.txt` or `sitemap.xml` generation
+
+---
+
+## Task 3: Verify After Changes
+
+After making both changes:
+1. Run `npm run build` to confirm no build errors
+2. Check that the college listing page (`/engineering-colleges/bangalore`) now shows all 30 colleges
+3. Check that individual college pages load correctly (e.g., `/colleges/dayananda-sagar-college-of-engineering`)
+4. Check that fee pages show "2026" not "2024-25" in headings
+
+---
+
+## Context
+
+- Database has 30 colleges, all `is_active=true`, with real management quota fees and college_content (about text, meta titles, admission process)
+- 489 fee rows total (252 real MQ fees across all 30 colleges)
+- All 30 colleges have college_content with 500-1600 char about text
+- The website is Next.js 14 (Pages Router), SSR via getServerSideProps, pulling from Supabase
+- Design is LOCKED: dark navy #0B1121, gold #EFAF26, Plus Jakarta Sans — do not change any styles

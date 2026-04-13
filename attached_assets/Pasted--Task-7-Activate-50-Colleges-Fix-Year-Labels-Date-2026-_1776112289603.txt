@@ -1,0 +1,164 @@
+# Task #7 — Activate 50 Colleges + Fix Year Labels
+
+> **Date:** 2026-04-14
+> **Priority:** CRITICAL — this is the bottleneck preventing 48 new college pages from rendering
+
+---
+
+## What & Why
+
+The database now has 50 colleges with verified fee data, about text, and admission process content. Currently only 2 colleges (RVCE, Christ) are active — the other 48 serve an inactive/noindex page. This task unlocks all 50 to show full fee tables, about sections, and FAQs, giving the site 48 additional indexable SEO pages. Alongside this, four places in the codebase show "2024-25" as the fee year — these should display "2026" since the DB stores fees under academic_year "2026-27" and users searching now expect current-year data.
+
+---
+
+## "Done" Looks Like
+
+- `ACTIVE_SLUGS` in `lib/constants.js` contains all 50 college slugs (kept as a `new Set([...])` — pages use `.has()` not `.includes()`)
+- `/colleges/dayananda-sagar-college-of-engineering` and other newly-activated college pages render full fee tables, not the "Information Being Verified" placeholder
+- All fee-related year labels across the site show "2026" not "2024-25"
+- `scripts/audit.js` is updated so its hard-coded inactive/sitemap exclusion checks no longer reference colleges that are now active (bms-college-of-engineering, msrit-bangalore, pes-university-bangalore were formerly inactive in the script — they are now active and the script must not assert noindex or sitemap exclusion for them)
+- The audit script still exits 0 with all checks passing
+
+---
+
+## Out of Scope
+
+- No design changes of any kind
+- No new page templates (existing templates handle any active slug dynamically)
+- No database changes — data is already in Supabase
+- No changes to robots.txt or sitemap generation logic (the sitemap already filters by `is_active` from the DB)
+
+---
+
+## Tasks
+
+### Task 1: Replace ACTIVE_SLUGS in `lib/constants.js`
+
+Replace the current 2-entry `ACTIVE_SLUGS` Set with the full 50-college Set below. **Keep `new Set([...])` format — never convert to array.** Pages use `.has()` not `.includes()`.
+
+```js
+export const ACTIVE_SLUGS = new Set([
+  // Original 5 colleges
+  'rvce-bangalore',
+  'christ-university-bangalore',
+  'bms-college-of-engineering',
+  'msrit-bangalore',
+  'pes-university-bangalore',
+
+  // Bangalore colleges with keyword search volume
+  'dayananda-sagar-college-of-engineering',
+  'rnsit-bangalore',
+  'new-horizon-college-of-engineering',
+  'jain-university-bangalore',
+  'alliance-college-of-engineering',
+  'presidency-university-bangalore',
+  'reva-university-bangalore',
+  'acharya-institute-of-technology',
+  'ramaiah-university-bangalore',
+  'bmsit-bangalore',
+  'rvitm-bangalore',
+  'nitte-meenakshi-bangalore',
+  'atria-institute-of-technology',
+  'dayananda-sagar-university',
+  'dsatm-bangalore',
+  'oxford-college-of-engineering',
+  'east-point-college-of-engineering',
+  'cmr-university-bangalore',
+  't-john-institute-bangalore',
+
+  // Additional colleges with fee data
+  'srm-university-chennai',
+  'bnmit-bangalore',
+  'sapthagiri-nps-university',
+  'nmam-institute-of-technology',
+  'rv-university-bangalore',
+  'hkbk-college-of-engineering',
+
+  // GINED network colleges
+  'east-west-institute-of-technology',
+  'amc-engineering-college',
+  'aditya-college-of-engineering',
+  'akash-institute-of-engineering',
+  'amruta-institute-of-engineering',
+  'bangalore-technological-institute',
+  'dhanwantari-college-of-engineering',
+  'harsha-institute-of-technology',
+  'impact-college-of-engineering',
+  'national-college-of-engineering',
+  'rajiv-gandhi-institute-of-technology',
+
+  // High search-demand Karnataka colleges
+  'jss-science-technology-university-mysore',
+  'sir-mvit-bangalore',
+  'bangalore-institute-of-technology',
+  'mvj-college-of-engineering',
+  'siddaganga-institute-of-technology-tumkur',
+  'sjbit-bangalore',
+  'kle-technological-university-hubli',
+  'sdm-college-of-engineering-dharwad',
+  'manipal-institute-of-technology',
+]);
+```
+
+### Task 2: Update `scripts/audit.js`
+
+Update `INACTIVE_SLUGS` to remove colleges that are now active, and update the sitemap "does NOT contain" assertions to remove slugs that will now appear in the sitemap. Specifically:
+
+- `bms-college-of-engineering`, `msrit-bangalore`, `pes-university-bangalore` were formerly inactive in the script — they are now active. Remove them from any inactive/noindex/sitemap-exclusion assertions.
+- Keep RVCE and Christ as the explicit active-page check anchors.
+- All 50 slugs should now be treated as active in the audit.
+
+### Task 3: Fix Hardcoded "2024-25" Year Strings
+
+Fix the **four** hardcoded "2024-25" year strings in fee display text. Exact locations:
+
+1. `artifacts/collegeandfees/pages/direct-admission/[college-slug].js` — line ~342, fee table footnote fallback
+2. `artifacts/collegeandfees/pages/management-quota/[college-slug].js` — line ~65
+3. `artifacts/collegeandfees/pages/colleges/[college-slug]/fees.js` — line ~275
+4. `artifacts/collegeandfees/pages/colleges/[college-slug]/fees.js` — line ~331
+
+**Rule:** Replace "2024-25" with "2026" in display text. If the year comes from `academic_year` in the DB (format "2026-27"), extract just the first year "2026". Do NOT change:
+- The `academic_year` column value in the database
+- Any date logic in `getServerSideProps`
+- The `robots.txt` or `sitemap.xml` generation
+
+### Task 4: Verify Pages Render Correctly
+
+Start the dev server and confirm:
+- A newly-activated page (e.g., `/colleges/dayananda-sagar-college-of-engineering`) renders a full page with fee tables — NOT the "Information Being Verified" placeholder
+- Fee year labels show "2026" not "2024-25"
+- Also check a GINED college: `/colleges/amc-engineering-college`
+- Also check a Karnataka college: `/colleges/jss-science-technology-university-mysore`
+
+### Task 5: Run Audit Script
+
+Run `BASE_URL=http://localhost:23705 node scripts/audit.js` and confirm ALL checks pass (exit 0).
+
+---
+
+## Context
+
+- Database: Supabase project `safucmoasypfvnwhrovo` (Singapore)
+- **50 colleges**, all `is_active=true`
+- **609 fee rows** (372 real Management quota fees, 237 old placeholders for KCET/COMEDK quotas on original 5 colleges)
+- All 50 colleges have `college_content` (about text, meta_title, meta_desc, admission_process)
+- **381 college_courses** links across **30 courses**
+- Next.js 14 (Pages Router), SSR via `getServerSideProps`, pulling from Supabase
+- Design is LOCKED: dark navy `#0B1121`, gold `#EFAF26`, Plus Jakarta Sans — do NOT change any styles
+
+---
+
+## Report Back (MANDATORY)
+
+After completing all tasks, you MUST provide a detailed report covering:
+
+1. **Files changed:** List every file modified with exact line numbers and what was added/removed/changed
+2. **Reasoning:** Why you made each specific change
+3. **Decisions:** Any judgment calls you made (e.g., how you extracted year from "2026-27", any additional "2024" references found beyond the 4 specified, how you handled the audit script updates)
+4. **ACTIVE_SLUGS format:** Confirm you used `new Set([...])` not an array, and pages use `.has()`
+5. **Audit script changes:** Which assertions were updated/removed, what was the old vs new logic
+6. **Build result:** Did `npm run build` pass? Copy any warnings or errors here
+7. **Audit result:** Full output of `node scripts/audit.js` — copy the entire output showing all checks passed
+8. **Page verification:** Confirm at least 3 newly-activated colleges render full content (one from each tier: original, GINED, Karnataka)
+9. **Issues or concerns:** Anything that looked wrong, edge cases, or suggestions for follow-up
+10. **Commit message:** What commit message did you use?
