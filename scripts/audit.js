@@ -6,8 +6,14 @@
 
 const BASE_URL = (process.env.BASE_URL || "https://collegeandfees.vercel.app").replace(/\/$/, "");
 
-const ACTIVE_SLUGS = ["rvce-bangalore", "christ-university-bangalore"];
-const INACTIVE_SLUGS = ["bms-college-of-engineering"];
+const ACTIVE_SLUGS = [
+  "rvce-bangalore",
+  "christ-university-bangalore",
+  "bms-college-of-engineering",
+  "msrit-bangalore",
+  "pes-university-bangalore",
+];
+const INACTIVE_SLUGS = [];
 
 const HTML_ROUTES = [
   "/",
@@ -244,25 +250,25 @@ async function auditSitemapXml() {
     fail("sitemap contains christ-university-bangalore");
   }
 
-  // Does NOT contain bms-college-of-engineering
-  if (!body.includes("bms-college-of-engineering")) {
-    pass("sitemap does NOT contain bms-college-of-engineering");
+  // Contains bms-college-of-engineering (now active)
+  if (body.includes("bms-college-of-engineering")) {
+    pass("sitemap contains bms-college-of-engineering");
   } else {
-    fail("sitemap does NOT contain bms-college-of-engineering", "slug found in sitemap");
+    fail("sitemap contains bms-college-of-engineering");
   }
 
-  // Does NOT contain msrit-bangalore
-  if (!body.includes("msrit-bangalore")) {
-    pass("sitemap does NOT contain msrit-bangalore");
+  // Contains msrit-bangalore (now active)
+  if (body.includes("msrit-bangalore")) {
+    pass("sitemap contains msrit-bangalore");
   } else {
-    fail("sitemap does NOT contain msrit-bangalore", "slug found in sitemap");
+    fail("sitemap contains msrit-bangalore");
   }
 
-  // Does NOT contain pes-university-bangalore
-  if (!body.includes("pes-university-bangalore")) {
-    pass("sitemap does NOT contain pes-university-bangalore");
+  // Contains pes-university-bangalore (now active)
+  if (body.includes("pes-university-bangalore")) {
+    pass("sitemap contains pes-university-bangalore");
   } else {
-    fail("sitemap does NOT contain pes-university-bangalore", "slug found in sitemap");
+    fail("sitemap contains pes-university-bangalore");
   }
 }
 

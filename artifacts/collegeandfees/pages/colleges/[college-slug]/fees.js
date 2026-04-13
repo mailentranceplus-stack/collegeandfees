@@ -272,7 +272,7 @@ export default function CollegeFeesPage({ college, fees, content, ranking, slug 
                       {label} — Branch-wise Fees
                     </h2>
                     <p style={{ fontSize: "13px", color: "var(--muted-foreground)", marginBottom: "14px" }}>
-                      Academic year shown: 2024-25. 2026-27 figures may be higher.
+                      Academic year shown: 2026. 2026-27 figures may be higher.
                     </p>
 
                     {isChrist ? (
@@ -328,7 +328,7 @@ export default function CollegeFeesPage({ college, fees, content, ranking, slug 
             <h2 style={{ fontSize: "17px", fontWeight: 700, marginBottom: "14px" }}>Notes on the Fees Above</h2>
             <ul style={{ listStyle: "none", padding: 0, display: "flex", flexDirection: "column", gap: "8px" }}>
               {[
-                "Fees shown are for the 2024-25 academic year. 2026-27 fees may be higher.",
+                "Fees shown are for the 2026 academic year. 2026-27 fees may be higher.",
                 "Management quota fees for 2026-27 at RVCE have been officially announced. Contact our counsellor for confirmed 2026-27 figures at other colleges.",
                 "Hostel fees are optional and not included in all course fee calculations.",
                 "Other fees (lab, library, development) vary by college and are not always listed.",

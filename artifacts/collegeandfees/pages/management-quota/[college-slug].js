@@ -62,7 +62,7 @@ function FeesTable({ fees, slug }) {
       </div>
       <div style={{ padding: "12px 16px", borderTop: "1px solid var(--border)" }}>
         <p style={{ fontSize: "12px", color: "var(--muted-foreground)" }}>
-          * Fees shown are for academic year {fees[0]?.academic_year || "2024-25"}. 2026-27 fees may vary by 5–10%. Contact counsellor for confirmed figures.
+          * Fees shown are for academic year {fees[0]?.academic_year?.split("-")[0] || "2026"}. 2026-27 fees may vary by 5–10%. Contact counsellor for confirmed figures.
         </p>
         {slug === "rvce-bangalore" && (
           <p style={{ fontSize: "12px", color: "var(--primary)", marginTop: "6px", fontWeight: 600 }}>

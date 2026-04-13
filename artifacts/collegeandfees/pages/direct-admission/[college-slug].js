@@ -339,7 +339,7 @@ export default function CollegeSlugPage({ college, fees, admissions, content, pl
                   </table>
                 </div>
                 <p style={{ fontSize: "12px", color: "var(--muted-foreground)", padding: "12px 16px", borderTop: "1px solid var(--border)" }}>
-                  * Fees shown are for academic year {fees[0]?.academic_year || "2024-25"}. 2026-27 fees may vary by 5–10%. Contact counsellor for confirmed figures.
+                  * Fees shown are for academic year {fees[0]?.academic_year?.split("-")[0] || "2026"}. 2026-27 fees may vary by 5–10%. Contact counsellor for confirmed figures.
                 </p>
               </div>
             ) : (
