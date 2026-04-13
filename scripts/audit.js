@@ -12,6 +12,8 @@ const ACTIVE_SLUGS = [
   "bms-college-of-engineering",
   "msrit-bangalore",
   "pes-university-bangalore",
+  "amc-engineering-college",
+  "jss-science-technology-university-mysore",
 ];
 const INACTIVE_SLUGS = [];
 
@@ -29,6 +31,8 @@ const HTML_ROUTES = [
   "/colleges/christ-university-bangalore/fees",
   "/colleges/bms-college-of-engineering",
   "/colleges/bms-college-of-engineering/fees",
+  "/colleges/amc-engineering-college",
+  "/colleges/jss-science-technology-university-mysore",
 ];
 
 let passCount = 0;
