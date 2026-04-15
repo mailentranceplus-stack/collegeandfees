@@ -129,12 +129,15 @@ export default function CollegeOverviewPage({ college, content, placements, rank
     url: canonicalUrl,
   };
 
+  const citySlug = (college.city || "Bangalore").toLowerCase().replace(/\s+/g, "-");
+  const cityLabel = college.city || "Bangalore";
+
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
       { "@type": "ListItem", position: 1, name: "Home", item: "https://collegeandfees.com" },
-      { "@type": "ListItem", position: 2, name: "Engineering Colleges Bangalore", item: "https://collegeandfees.com/engineering-colleges/bangalore" },
+      { "@type": "ListItem", position: 2, name: `Engineering Colleges ${cityLabel}`, item: `https://collegeandfees.com/engineering-colleges/${citySlug}` },
       { "@type": "ListItem", position: 3, name: college.name, item: canonicalUrl },
     ],
   };
@@ -212,7 +215,7 @@ export default function CollegeOverviewPage({ college, content, placements, rank
           <nav className="breadcrumb">
             <Link href="/">Home</Link>
             <span className="breadcrumb-sep">›</span>
-            <Link href="/engineering-colleges/bangalore">Engineering Colleges Bangalore</Link>
+            <Link href={`/engineering-colleges/${citySlug}`}>{`Engineering Colleges ${cityLabel}`}</Link>
             <span className="breadcrumb-sep">›</span>
             <span style={{ color: "var(--foreground)", fontWeight: 600 }}>{shortName}</span>
           </nav>
@@ -247,7 +250,7 @@ export default function CollegeOverviewPage({ college, content, placements, rank
               { label: "NAAC Grade", value: college.naac_grade || "—" },
               { label: "NIRF Rank", value: ranking ? `#${ranking.rank}` : "Not Ranked" },
               { label: "Highest Package", value: placements?.highest_package_lpa ? `${placements.highest_package_lpa} LPA` : "Data Awaited" },
-              { label: "Management Quota", value: fees.some((f) => (f.quota || "").toLowerCase() === "management") ? "Available ✓" : "Not Available" },
+              { label: "Management Quota", value: fees.some((f) => (f.quota || "").toLowerCase() === "management") ? "Available ✓" : (college.type ? college.type : "Not Available") },
             ].map((stat) => (
               <div key={stat.label} className="key-stat">
                 <div className="key-stat-value">{stat.value}</div>
