@@ -1,0 +1,110 @@
+# Task #10 — Fix Display Bugs Found During Verification
+
+> **Date:** 2026-04-15
+> **Priority:** HIGH — these are visible data/display errors on live pages
+> **Prerequisite:** Deploy REPLIT_PROMPT_9 first (activate 358 colleges), then apply these fixes
+
+---
+
+## What & Why
+
+After verifying the Vercel site (`collegeandfees.vercel.app`), several display bugs were found across college pages. These need fixing before DNS cutover to `collegeandfees.com`.
+
+---
+
+## Bug 1: "RVCE" hardcoded in fee notes on ALL college pages
+
+**Where:** `/colleges/[slug]/fees` — the "Notes on the Fees Above" section
+**Problem:** On EVERY college's fee page (including BMS, MSRIT, etc.), the notes say:
+> "Management quota fees for 2026-27 at **RVCE** have been officially announced."
+
+**Fix:** Replace the hardcoded "RVCE" with the college's actual short_name. The college data is already available in the page's props — use `college.short_name` or `college.name` instead of the literal string "RVCE".
+
+---
+
+## Bug 2: Footer "Quick Links" are hardcoded to RVCE
+
+**Where:** Footer component on every page
+**Problem:** The footer always shows:
+- "RVCE Direct Admission" → `/direct-admission/rvce-bangalore`
+- "RVCE Fees 2026" → `/colleges/rvce-bangalore/fees`
+
+**Fix:** Either make these dynamic based on the current college, or change them to generic links like:
+- "Direct Admission Bangalore" → `/direct-admission/bangalore`
+- "Compare College Fees" → `/management-quota/bangalore`
+
+---
+
+## Bug 3: Overview page says "Fee data being verified" despite real fees in DB
+
+**Where:** `/colleges/[slug]` overview page — the "Management Quota Fees" section
+**Problem:** The overview page shows "Fee data for [college] is being verified" with a WhatsApp CTA — even when the college has complete, verified fee data in Supabase. For example, RVCE has all 15 branches with real MQ fees, but the overview page doesn't show them.
+
+**Fix:** Query the fees table for the college's Management quota fees. If rows exist with `tuition_fee > 100`, show a summary table (top 3-5 branches by fee, like CSE, ECE, Mech). Only show "being verified" if NO Management fee rows exist.
+
+Example summary for RVCE overview:
+| Branch | Management Quota Fee |
+|--------|---------------------|
+| CSE | ₹36,00,000/yr |
+| CSE (AI&ML) | ₹28,00,000/yr |
+| ECE | ₹19,00,000/yr |
+| [See all →](/colleges/rvce-bangalore/fees) | |
+
+---
+
+## Bug 4: SNQ and NRI quotas not displayed on fees page
+
+**Where:** `/colleges/[slug]/fees`
+**Problem:** The fees page only shows KCET, COMEDK, and Management quotas. But the database has 6 quotas: KCET, COMEDK, Management, SNQ, NRI, JEE. Colleges with SNQ/NRI/JEE fee data don't show those sections.
+
+**Fix:** The fees page should render a section for EVERY quota that has fee data for that college. Query: `SELECT DISTINCT quota FROM fees WHERE college_id = ? ORDER BY quota` and render a table section for each. Use these section titles:
+- KCET → "KCET — Branch-wise Fees"
+- COMEDK → "COMEDK — Branch-wise Fees"
+- Management → "Management Quota — Branch-wise Fees"
+- SNQ → "SNQ (Supernumerary) — Branch-wise Fees"
+- NRI → "NRI Quota — Branch-wise Fees"
+- JEE → "JEE Main — Branch-wise Fees"
+
+---
+
+## Bug 5: "How [College] Fees Compare" section shows "Contact for details"
+
+**Where:** `/colleges/[slug]/fees` — the comparison cards at bottom
+**Problem:** The three comparison cards (KCET, COMEDK, Management) all show "Contact for details" instead of actual fee ranges. The data IS in the DB — just needs to be queried.
+
+**Fix:** For each quota, show the actual fee range. Example for RVCE:
+- KCET Quota: "₹44,311/yr (all branches)"
+- COMEDK Quota: "₹2.81L/yr (all branches)"
+- Management Quota: "₹4.5L – ₹36L/yr"
+
+Query: `SELECT quota, MIN(tuition_fee), MAX(tuition_fee) FROM fees WHERE college_id = ? GROUP BY quota`
+
+---
+
+## Bug 6 (Minor): 4-year estimate is misleading for variable-fee colleges
+
+**Where:** `/colleges/[slug]/fees` — "4-yr Estimate" column
+**Problem:** The column shows `tuition × 4`, but some colleges (especially top private ones) have different Y1 vs Y2-4 fees. Example: RVCE CSE MQ is ₹36L in Y1 but ₹13L in Y2-4 (total ₹75L), not ₹1.44Cr.
+
+**Fix (minimal):** Change the column header from "4-yr Estimate" to "If Fee Unchanged*" and update the asterisk note to: "* This column assumes the same fee every year. Actual totals may differ — first-year fees at some colleges are higher than subsequent years. Contact counsellor for exact 4-year total."
+
+---
+
+## Out of Scope
+
+- No design changes
+- No new page templates
+- No database changes (all data is already correct in Supabase)
+- Don't change the fee table structure or layout — just fix the data being displayed
+
+---
+
+## "Done" Looks Like
+
+1. BMS fees page notes say "BMSCE" not "RVCE"
+2. Footer links are generic or dynamic (no hardcoded RVCE)
+3. RVCE overview page shows top MQ fees instead of "being verified"
+4. Fees page renders ALL quotas from DB (not just KCET/COMEDK/Management)
+5. Fee comparison cards show actual ranges, not "Contact for details"
+6. 4-year estimate column clarified with better header/disclaimer
+7. No design changes whatsoever

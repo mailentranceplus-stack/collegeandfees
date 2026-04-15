@@ -27,9 +27,9 @@ export default function Footer() {
             <ul className="footer-links">
               <li><Link href="/">Home</Link></li>
               <li><Link href="/direct-admission/bangalore">Direct Admission Bangalore</Link></li>
-              <li><Link href="/direct-admission/rvce-bangalore">RVCE Direct Admission</Link></li>
+              <li><Link href="/engineering-colleges/bangalore">Engineering Colleges Bangalore</Link></li>
               <li><Link href="/management-quota/bangalore">Management Quota Colleges</Link></li>
-              <li><Link href="/colleges/rvce-bangalore/fees">RVCE Fees 2026</Link></li>
+              <li><Link href="/direct-admission/bangalore">Compare College Fees</Link></li>
             </ul>
           </div>
 

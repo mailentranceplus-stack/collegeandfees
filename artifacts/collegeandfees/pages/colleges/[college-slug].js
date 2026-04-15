@@ -276,45 +276,51 @@ export default function CollegeOverviewPage({ college, content, placements, rank
             <h2 style={{ fontSize: "20px", fontWeight: 700, marginBottom: "16px" }}>
               Management Quota Fees at {shortName} 2026-27
             </h2>
-            {fees.length > 0 ? (
-              <div className="info-box" style={{ padding: 0, overflow: "hidden" }}>
-                <div style={{ overflowX: "auto" }}>
-                  <table className="fees-table">
-                    <thead>
-                      <tr>
-                        <th>Branch</th>
-                        <th style={{ textAlign: "right" }}>Annual Fee</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {fees.map((fee, i) => (
-                        <tr key={i}>
-                          <td style={{ fontWeight: 600 }}>{fee.courses?.name || `Branch ${i + 1}`}</td>
-                          <td style={{ textAlign: "right" }} className="fees-highlight">
-                            {fee.tuition_fee ? `₹${fee.tuition_fee.toLocaleString("en-IN")}` : "—"}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+            {(() => {
+              const realFees = fees.filter((f) => (f.tuition_fee || 0) > 100);
+              if (realFees.length > 0) {
+                return (
+                  <div className="info-box" style={{ padding: 0, overflow: "hidden" }}>
+                    <div style={{ overflowX: "auto" }}>
+                      <table className="fees-table">
+                        <thead>
+                          <tr>
+                            <th>Branch</th>
+                            <th style={{ textAlign: "right" }}>Annual Fee</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {realFees.map((fee, i) => (
+                            <tr key={i}>
+                              <td style={{ fontWeight: 600 }}>{fee.courses?.name || `Branch ${i + 1}`}</td>
+                              <td style={{ textAlign: "right" }} className="fees-highlight">
+                                {`₹${fee.tuition_fee.toLocaleString("en-IN")}`}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    <div style={{ padding: "12px 16px", borderTop: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "8px" }}>
+                      <p style={{ fontSize: "12px", color: "var(--muted-foreground)" }}>* Top 5 branches shown. 2026-27 fees may vary.</p>
+                      <Link href={`/colleges/${slug}/fees`} style={{ fontSize: "13px", color: "var(--primary)", fontWeight: 600, textDecoration: "none" }}>
+                        See all branch-wise fees →
+                      </Link>
+                    </div>
+                  </div>
+                );
+              }
+              return (
+                <div className="info-box">
+                  <p style={{ color: "var(--muted-foreground)", marginBottom: "16px", fontSize: "15px" }}>
+                    Fee data for {college.name} is being verified. Contact counsellor for accurate 2026-27 figures.
+                  </p>
+                  <WaButton href={waLink(`Hi, what is the management quota fee for ${college.name} in 2026?`)} size="sm">
+                    Get Fee Details on WhatsApp
+                  </WaButton>
                 </div>
-                <div style={{ padding: "12px 16px", borderTop: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "8px" }}>
-                  <p style={{ fontSize: "12px", color: "var(--muted-foreground)" }}>* Top 5 branches shown. 2026-27 fees may vary.</p>
-                  <Link href={`/colleges/${slug}/fees`} style={{ fontSize: "13px", color: "var(--primary)", fontWeight: 600, textDecoration: "none" }}>
-                    See all branch-wise fees →
-                  </Link>
-                </div>
-              </div>
-            ) : (
-              <div className="info-box">
-                <p style={{ color: "var(--muted-foreground)", marginBottom: "16px", fontSize: "15px" }}>
-                  Fee data for {college.name} is being verified. Contact counsellor for accurate 2026-27 figures.
-                </p>
-                <WaButton href={waLink(`Hi, what is the management quota fee for ${college.name} in 2026?`)} size="sm">
-                  Get Fee Details on WhatsApp
-                </WaButton>
-              </div>
-            )}
+              );
+            })()}
           </section>
 
           {/* Mid-content CTA */}
@@ -537,7 +543,7 @@ export async function getServerSideProps({ params }) {
       supabase.from("college_content").select("*").eq("college_id", college.id).maybeSingle(),
       supabase.from("placements").select("*").eq("college_id", college.id).order("year", { ascending: false }).limit(1).maybeSingle(),
       supabase.from("rankings").select("rank, year").eq("college_id", college.id).eq("source", "NIRF").order("year", { ascending: false }).limit(1).maybeSingle(),
-      supabase.from("fees").select("tuition_fee, quota, courses(name, short_name)").eq("college_id", college.id).eq("quota", "management").order("tuition_fee", { ascending: false }).limit(5),
+      supabase.from("fees").select("tuition_fee, quota, courses(name, short_name)").eq("college_id", college.id).ilike("quota", "management").order("tuition_fee", { ascending: false }).limit(5),
       supabase.from("college_courses").select("total_seats, mgmt_quota_seats, govt_quota_seats, courses(name, short_name, degree)").eq("college_id", college.id),
       supabase.from("college_facilities").select("facilities(name, icon)").eq("college_id", college.id),
       supabase.from("faqs").select("id, question, answer").eq("college_id", college.id).eq("is_active", true).order("sort_order").limit(6),

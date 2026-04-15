@@ -8,12 +8,15 @@ import { getSupabase } from "../../../lib/supabase";
 import { COLLEGE_IMAGES, waLink } from "../../../lib/constants";
 import { WaIcon, WaButton } from "../../../components/WaButton";
 
-const QUOTA_ORDER = ["management", "govt", "comedk", "nri"];
+const QUOTA_ORDER = ["management", "kcet", "govt", "comedk", "snq", "nri", "jee"];
 const QUOTA_LABELS = {
   management: "Management Quota",
+  kcet: "Government Quota (KCET)",
   govt: "Government Quota (KCET)",
   comedk: "COMEDK Quota",
+  snq: "SNQ (Supernumerary)",
   nri: "NRI Quota",
+  jee: "JEE Main",
 };
 
 function isMbaCourse(fee) {
@@ -23,7 +26,7 @@ function isMbaCourse(fee) {
   return degree.includes("mba") || name.includes("mba") || short.includes("mba");
 }
 
-function FeesTableSection({ fees, slug, showRvceNote }) {
+function FeesTableSection({ fees, slug }) {
   if (fees.length === 0) return null;
   return (
     <div className="info-box" style={{ padding: 0, overflow: "hidden", marginBottom: "8px" }}>
@@ -36,7 +39,7 @@ function FeesTableSection({ fees, slug, showRvceNote }) {
               <th style={{ textAlign: "right" }}>Annual Tuition</th>
               <th style={{ textAlign: "right" }}>Hostel (Annual)</th>
               <th style={{ textAlign: "right" }}>Total Annual</th>
-              <th style={{ textAlign: "right" }}>4-yr Estimate</th>
+              <th style={{ textAlign: "right" }}>If Fee Unchanged*</th>
             </tr>
           </thead>
           <tbody>
@@ -69,14 +72,8 @@ function FeesTableSection({ fees, slug, showRvceNote }) {
       </div>
       <div style={{ padding: "10px 16px", borderTop: "1px solid var(--border)" }}>
         <p style={{ fontSize: "12px", color: "var(--muted-foreground)" }}>
-          * 4-year estimate = annual tuition × 4. Actual total may vary.
+          * This column assumes the same fee every year. Actual totals may differ — first-year fees at some colleges are higher than subsequent years. Contact counsellor for exact 4-year total.
         </p>
-        {showRvceNote && slug === "rvce-bangalore" && (
-          <p style={{ fontSize: "12px", color: "var(--primary)", fontWeight: 600, marginTop: "4px" }}>
-            * For RVCE, Year 1 management quota fees differ from Years 2-4. The 4-year total above is an estimate.
-            Contact our counsellor for the exact 2026-27 total.
-          </p>
-        )}
       </div>
     </div>
   );
@@ -161,9 +158,9 @@ export default function CollegeFeesPage({ college, fees, content, ranking, slug 
     { label: "Fees", href: `/colleges/${slug}/fees`, active: true },
   ];
 
-  /* Group fees by quota */
+  /* Group fees by quota (normalize to lowercase) */
   const quotaGroups = fees.reduce((acc, fee) => {
-    const q = fee.quota || "other";
+    const q = (fee.quota || "other").toLowerCase();
     if (!acc[q]) acc[q] = [];
     acc[q].push(fee);
     return acc;
@@ -174,17 +171,18 @@ export default function CollegeFeesPage({ college, fees, content, ranking, slug 
     ...Object.keys(quotaGroups).filter((q) => !QUOTA_ORDER.includes(q)),
   ];
 
-  /* For comparison stats */
-  const mgmtFees = quotaGroups["management"] || [];
-  const govtFees = quotaGroups["govt"] || [];
-  const comedk = quotaGroups["comedk"] || [];
-  const realMgmt = mgmtFees.filter((f) => (f.tuition_fee || 0) > 100);
-  const realGovt = govtFees.filter((f) => (f.tuition_fee || 0) > 100);
-  const realComedk = comedk.filter((f) => (f.tuition_fee || 0) > 100);
-  const cheapestMgmt = realMgmt.length > 0 ? Math.min(...realMgmt.map((f) => f.tuition_fee)) : null;
-  const cheapestGovt = realGovt.length > 0 ? Math.min(...realGovt.map((f) => f.tuition_fee)) : null;
-  const cheapestComedk = realComedk.length > 0 ? Math.min(...realComedk.map((f) => f.tuition_fee)) : null;
-  const maxMgmt = realMgmt.length > 0 ? Math.max(...realMgmt.map((f) => f.tuition_fee)) : null;
+  function feeRange(feeList) {
+    const real = feeList.filter((f) => (f.tuition_fee || 0) > 100);
+    if (real.length === 0) return null;
+    const min = Math.min(...real.map((f) => f.tuition_fee));
+    const max = Math.max(...real.map((f) => f.tuition_fee));
+    if (min === max) return `₹${min.toLocaleString("en-IN")}/yr`;
+    return `₹${min.toLocaleString("en-IN")} – ₹${max.toLocaleString("en-IN")}/yr`;
+  }
+
+  const govtRange = feeRange(quotaGroups["kcet"] || quotaGroups["govt"] || []);
+  const comedkRange = feeRange(quotaGroups["comedk"] || []);
+  const mgmtRange = feeRange(quotaGroups["management"] || []);
 
   return (
     <>
@@ -305,7 +303,7 @@ export default function CollegeFeesPage({ college, fees, content, ranking, slug 
                             <h3 style={{ fontSize: "15px", fontWeight: 700, marginBottom: "10px", color: "var(--muted-foreground)" }}>
                               B.Tech / B.E. Courses
                             </h3>
-                            <FeesTableSection fees={engFees} slug={slug} showRvceNote={quota === "management"} />
+                            <FeesTableSection fees={engFees} slug={slug} />
                           </div>
                         )}
                         {mbaFees.length > 0 && (
@@ -313,12 +311,12 @@ export default function CollegeFeesPage({ college, fees, content, ranking, slug 
                             <h3 style={{ fontSize: "15px", fontWeight: 700, marginBottom: "10px", color: "var(--muted-foreground)" }}>
                               MBA / Postgraduate Fees
                             </h3>
-                            <FeesTableSection fees={mbaFees} slug={slug} showRvceNote={false} />
+                            <FeesTableSection fees={mbaFees} slug={slug} />
                           </div>
                         )}
                       </>
                     ) : (
-                      <FeesTableSection fees={quotaFees} slug={slug} showRvceNote={quota === "management"} />
+                      <FeesTableSection fees={quotaFees} slug={slug} />
                     )}
 
                     {/* Mid-content CTA after management quota */}
@@ -352,7 +350,7 @@ export default function CollegeFeesPage({ college, fees, content, ranking, slug 
             <ul style={{ listStyle: "none", padding: 0, display: "flex", flexDirection: "column", gap: "8px" }}>
               {[
                 "Fees shown are for the 2026-27 academic year.",
-                "Management quota fees for 2026-27 at RVCE have been officially announced. Contact our counsellor for confirmed 2026-27 figures at other colleges.",
+                `Management quota fees for 2026-27 at ${shortName} are shown above. Contact our counsellor for confirmed figures.`,
                 "Hostel fees are optional and not included in all course fee calculations.",
                 "Other fees (lab, library, development) vary by college and are not always listed.",
                 "Government quota (KCET) fees are regulated by the Karnataka Examinations Authority.",
@@ -376,7 +374,7 @@ export default function CollegeFeesPage({ college, fees, content, ranking, slug 
                 {
                   label: "KCET Quota",
                   sublabel: "Government regulated",
-                  value: cheapestGovt ? `₹${cheapestGovt.toLocaleString("en-IN")}/yr` : "Contact for details",
+                  value: govtRange || "Contact for details",
                   color: "var(--accent-green)",
                   borderColor: "rgba(34,195,94,0.2)",
                   bg: "rgba(34,195,94,0.06)",
@@ -384,20 +382,20 @@ export default function CollegeFeesPage({ college, fees, content, ranking, slug 
                 {
                   label: "COMEDK Quota",
                   sublabel: "Open to all India",
-                  value: cheapestComedk ? `₹${cheapestComedk.toLocaleString("en-IN")}/yr` : "Contact for details",
+                  value: comedkRange || "Contact for details",
                   color: "var(--primary)",
                   borderColor: "rgba(239,175,38,0.2)",
                   bg: "rgba(239,175,38,0.06)",
                 },
                 {
                   label: "Management Quota",
-                  sublabel: "CSE, highest fee",
-                  value: maxMgmt ? `₹${maxMgmt.toLocaleString("en-IN")}/yr` : "Contact for details",
+                  sublabel: "Fee range across branches",
+                  value: mgmtRange || "Contact for details",
                   color: "#F87171",
                   borderColor: "rgba(248,113,113,0.2)",
                   bg: "rgba(248,113,113,0.06)",
                 },
-              ].map((box) => (
+              ].filter((box) => box.value !== "Contact for details").map((box) => (
                 <div key={box.label} style={{ background: box.bg, border: `1px solid ${box.borderColor}`, borderRadius: "12px", padding: "20px", textAlign: "center" }}>
                   <p style={{ fontSize: "12px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: box.color, marginBottom: "4px" }}>{box.label}</p>
                   <p style={{ fontSize: "11px", color: "var(--muted-foreground)", marginBottom: "12px" }}>{box.sublabel}</p>
