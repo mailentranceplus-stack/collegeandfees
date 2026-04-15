@@ -352,7 +352,6 @@ export async function getServerSideProps() {
           }
         });
         colleges = collegeData
-          .filter((c) => c.is_active)
           .map((c) => ({ ...c, ...(feeMap[c.id] || {}) }));
       }
     }

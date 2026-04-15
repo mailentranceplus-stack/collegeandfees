@@ -139,8 +139,12 @@ export default function CollegeFeesPage({ college, fees, content, ranking, slug 
   const shortName = college.short_name || college.name;
   const waMsg = `Hi, I want to know the exact fees at ${college.name}. Can you help?`;
 
-  const metaTitle = `${college.short_name || college.name} Fees 2026-27 — KCET, COMEDK and Management Quota`;
-  const metaDesc = `${shortName} fees 2026-27. KCET quota, COMEDK quota and management quota fees for all branches. Verified figures from official sources.`;
+  const quotaNames = [...new Set(fees.map((f) => (f.quota || "").toLowerCase()))].filter(Boolean);
+  const quotaLabelList = QUOTA_ORDER.filter((q) => quotaNames.includes(q)).map((q) => QUOTA_LABELS[q] || q);
+  const quotaSuffix = quotaLabelList.length > 0 ? ` — ${quotaLabelList.join(", ")}` : "";
+  const metaTitle = `${shortName} Fees 2026-27${quotaSuffix}`;
+  const quotaDescList = quotaLabelList.length > 0 ? `${quotaLabelList.join(", ")} fees` : "fees";
+  const metaDesc = `${shortName} fees 2026-27. ${quotaDescList} for all branches. Verified figures from official sources.`;
   const canonicalUrl = `https://collegeandfees.com/colleges/${slug}/fees`;
 
   const breadcrumbJsonLd = {

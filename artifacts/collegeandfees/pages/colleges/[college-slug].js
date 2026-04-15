@@ -27,7 +27,7 @@ function InactivePage({ college, slug, similarColleges }) {
         <div className="container">
           <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "16px" }}>
             <div>
-              <p style={{ color: "var(--primary)", fontSize: "12px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "6px" }}>Engineering College · Bangalore</p>
+              <p style={{ color: "var(--primary)", fontSize: "12px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "6px" }}>Engineering College · {college.city || "Bangalore"}</p>
               <h1 style={{ fontSize: "clamp(22px, 3vw, 28px)", fontWeight: 800 }}>{college.name}</h1>
               <p style={{ color: "var(--muted-foreground)", marginTop: "6px", fontSize: "14px" }}>
                 {[college.city, college.established && `Estd. ${college.established}`, college.affiliation, college.naac_grade && `NAAC ${college.naac_grade}`].filter(Boolean).join(" | ")}
@@ -59,7 +59,7 @@ function InactivePage({ college, slug, similarColleges }) {
 
           {similarColleges.length > 0 && (
             <section style={{ marginTop: "56px" }}>
-              <h2 style={{ fontSize: "20px", fontWeight: 700, marginBottom: "20px" }}>Similar Engineering Colleges in Bangalore</h2>
+              <h2 style={{ fontSize: "20px", fontWeight: 700, marginBottom: "20px" }}>Similar Engineering Colleges in {college.city || "Bangalore"}</h2>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "16px" }}>
                 {similarColleges.map((c) => (
                   <Link key={c.id} href={`/colleges/${c.slug}`} className="mini-card">
@@ -106,8 +106,14 @@ export default function CollegeOverviewPage({ college, content, placements, rank
   const shortName = college.short_name || college.name;
   const waMsg = `Hi, I want guidance about admission to ${college.name}. Can you help me?`;
 
-  const metaTitle = content?.meta_title || `${college.name} — Fees, Cutoffs, Placements and Admission 2026`;
-  const metaDesc = content?.meta_desc || `${college.name} fees 2026, KCET cutoff, COMEDK cutoff, management quota fees, placements and direct admission process. Free counsellor guidance on WhatsApp.`;
+  function dedup(text) {
+    if (!text || !college.city) return text;
+    const city = college.city;
+    return text.replace(new RegExp(`(${city})\\s+\\1`, "gi"), "$1");
+  }
+
+  const metaTitle = dedup(content?.meta_title) || `${college.name} — Fees, Cutoffs, Placements and Admission 2026`;
+  const metaDesc = dedup(content?.meta_desc) || `${college.name} fees 2026, KCET cutoff, COMEDK cutoff, management quota fees, placements and direct admission process. Free counsellor guidance on WhatsApp.`;
   const canonicalUrl = `https://collegeandfees.com/colleges/${slug}`;
 
   const tabs = [
@@ -168,7 +174,7 @@ export default function CollegeOverviewPage({ college, content, placements, rank
           <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "16px" }}>
             <div>
               <p style={{ color: "var(--primary)", fontSize: "12px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "6px" }}>
-                Engineering College · Bangalore
+                Engineering College · {college.city || "Bangalore"}
               </p>
               <div style={{ fontSize: "clamp(22px, 3vw, 32px)", fontWeight: 800, lineHeight: 1.2, color: "var(--foreground)" }}>{college.name}</div>
               <p style={{ color: "var(--muted-foreground)", marginTop: "8px", fontSize: "14px" }}>
@@ -186,7 +192,7 @@ export default function CollegeOverviewPage({ college, content, placements, rank
       {/* Hero Banner */}
       {COLLEGE_IMAGES[slug] && (
         <div style={{ overflow: "hidden", background: "var(--card)", height: "260px", position: "relative" }}>
-          <Image src={COLLEGE_IMAGES[slug]} alt={`${college.name} campus, Bangalore`} fill style={{ objectFit: "cover", objectPosition: "center", opacity: 0.55 }} priority />
+          <Image src={COLLEGE_IMAGES[slug]} alt={`${college.name} campus, ${college.city || "Bangalore"}`} fill style={{ objectFit: "cover", objectPosition: "center", opacity: 0.55 }} priority />
         </div>
       )}
 
@@ -241,7 +247,7 @@ export default function CollegeOverviewPage({ college, content, placements, rank
               { label: "NAAC Grade", value: college.naac_grade || "—" },
               { label: "NIRF Rank", value: ranking ? `#${ranking.rank}` : "Not Ranked" },
               { label: "Highest Package", value: placements?.highest_package_lpa ? `${placements.highest_package_lpa} LPA` : "Data Awaited" },
-              { label: "Management Quota", value: "Available ✓" },
+              { label: "Management Quota", value: fees.some((f) => (f.quota || "").toLowerCase() === "management") ? "Available ✓" : "Not Available" },
             ].map((stat) => (
               <div key={stat.label} className="key-stat">
                 <div className="key-stat-value">{stat.value}</div>
@@ -465,7 +471,7 @@ export default function CollegeOverviewPage({ college, content, placements, rank
           {similarColleges.length > 0 && (
             <section style={{ marginBottom: "32px" }} id="similar">
               <h2 style={{ fontSize: "20px", fontWeight: 700, marginBottom: "20px" }}>
-                Other Engineering Colleges in Bangalore
+                Other Engineering Colleges in {college.city || "Bangalore"}
               </h2>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "16px" }}>
                 {similarColleges.map((c) => (
