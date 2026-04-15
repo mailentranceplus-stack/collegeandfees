@@ -5,7 +5,7 @@ import { useState } from "react";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import { getSupabase } from "../../lib/supabase";
-import { COLLEGE_IMAGES, FALLBACK_IMAGE, waLink, ACTIVE_SLUGS } from "../../lib/constants";
+import { COLLEGE_IMAGES, FALLBACK_IMAGE, waLink } from "../../lib/constants";
 import { WaIcon, WaButton } from "../../components/WaButton";
 
 const WA_MSG = "Hi, I need help choosing an engineering college in Bangalore. Can you guide me?";
@@ -49,7 +49,7 @@ function FaqAccordion({ faqs }) {
 export default function BangaloreEngineeringColleges({ colleges, faqs }) {
   const displayColleges = colleges.length > 0 ? colleges : PLACEHOLDER_COLLEGES;
   const displayFaqs = faqs.length > 0 ? faqs : PLACEHOLDER_FAQS;
-  const activeColleges = displayColleges.filter((c) => ACTIVE_SLUGS.has(c.slug));
+  const activeColleges = displayColleges.filter((c) => c.is_active);
 
   const faqJsonLd = {
     "@context": "https://schema.org",

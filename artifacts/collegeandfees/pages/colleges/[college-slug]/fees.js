@@ -5,7 +5,7 @@ import { useState } from "react";
 import Header from "../../../components/Header";
 import Footer from "../../../components/Footer";
 import { getSupabase } from "../../../lib/supabase";
-import { COLLEGE_IMAGES, waLink, ACTIVE_SLUGS } from "../../../lib/constants";
+import { COLLEGE_IMAGES, waLink } from "../../../lib/constants";
 import { WaIcon, WaButton } from "../../../components/WaButton";
 
 const QUOTA_ORDER = ["management", "govt", "comedk", "nri"];
@@ -125,7 +125,7 @@ function InactiveFeesPage({ college, slug }) {
 }
 
 export default function CollegeFeesPage({ college, fees, content, ranking, slug }) {
-  if (!college.is_active || !ACTIVE_SLUGS.has(slug)) {
+  if (!college.is_active) {
     return (
       <>
         <Head>

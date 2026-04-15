@@ -5,7 +5,7 @@ import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import CollegeCard from "../../components/CollegeCard";
 import { getSupabase } from "../../lib/supabase";
-import { ACTIVE_SLUGS, waLink } from "../../lib/constants";
+import { waLink } from "../../lib/constants";
 import { WaIcon } from "../../components/WaButton";
 
 const WA_GENERAL = waLink("Hi, I want to know about direct admission in Bangalore engineering colleges. Can you guide me?");
@@ -248,7 +248,7 @@ export async function getServerSideProps() {
           }
         });
         colleges = collegeData
-          .filter((c) => ACTIVE_SLUGS.has(c.slug))
+          .filter((c) => c.is_active)
           .map((c) => ({ ...c, ...(feeMap[c.id] || {}) }));
       }
 

@@ -69,7 +69,12 @@ Next.js 14 web application using the **Pages Router** (NOT App Router). SEO-focu
 - **Environment variables needed**: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - **Supabase URL**: `https://safucmoasypfvnwhrovo.supabase.co`
 - **WhatsApp number**: `917975193033`
-- **Brand colors**: navy `#1a3c6e`, wa-green `#25d366`
+- **Brand colors**: dark navy `#0B1121`, gold `#EFAF26`, font: Plus Jakarta Sans
+- **Active colleges**: 358 (driven by DB `is_active` flag — no hardcoded slug list)
+- **Sitemap**: 1,437 URLs (358 colleges × 4 page types + hub pages)
+- **Fee data**: 9,025 fee rows, 28 branches, 7 quotas. Placeholder fees (tuition_fee ≤ 100) are hidden in UI.
+- **Placements**: Null stats are filtered — shows "Data being updated" fallback instead of "null LPA"
+- **Audit script**: `scripts/audit.js` — run with `BASE_URL=http://localhost:PORT node scripts/audit.js`
 
 #### Pages built
 - `pages/index.js` — Homepage with hero, college cards, fees table, admissions steps

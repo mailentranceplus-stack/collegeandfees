@@ -6,16 +6,16 @@
 
 const BASE_URL = (process.env.BASE_URL || "https://collegeandfees.vercel.app").replace(/\/$/, "");
 
-const ACTIVE_SLUGS = [
+const SAMPLE_ACTIVE_SLUGS = [
   "rvce-bangalore",
   "christ-university-bangalore",
   "bms-college-of-engineering",
-  "msrit-bangalore",
-  "pes-university-bangalore",
   "amc-engineering-college",
   "jss-science-technology-university-mysore",
+  "iit-bombay",
+  "bits-pilani",
+  "vit-vellore",
 ];
-const INACTIVE_SLUGS = [];
 
 const HTML_ROUTES = [
   "/",
@@ -33,6 +33,11 @@ const HTML_ROUTES = [
   "/colleges/bms-college-of-engineering/fees",
   "/colleges/amc-engineering-college",
   "/colleges/jss-science-technology-university-mysore",
+  "/colleges/iit-bombay",
+  "/colleges/bits-pilani",
+  "/colleges/vit-vellore",
+  "/colleges/kiit-bhubaneswar",
+  "/colleges/cmrit-cmr-institute-of-technology",
 ];
 
 let passCount = 0;
@@ -113,14 +118,12 @@ async function auditHtmlRoute(route) {
     return;
   }
 
-  // ── 1. HTTP 200 ──────────────────────────────────────────────────────────
   if (status === 200) {
     pass("HTTP 200");
   } else {
     fail("HTTP 200", status);
   }
 
-  // ── 2. <title> non-empty ─────────────────────────────────────────────────
   const title = extractTitle(html);
   if (title && title.length > 0) {
     pass(`<title> non-empty ("${title.slice(0, 70)}${title.length > 70 ? "…" : ""}")`);
@@ -128,7 +131,6 @@ async function auditHtmlRoute(route) {
     fail("<title> non-empty", title === null ? "tag not found" : "empty string");
   }
 
-  // ── 3. canonical starts with https://collegeandfees.com ──────────────────
   const canonical = extractCanonical(html);
   if (canonical && canonical.startsWith("https://collegeandfees.com")) {
     pass(`canonical OK ("${canonical}")`);
@@ -136,7 +138,6 @@ async function auditHtmlRoute(route) {
     fail("canonical starts with https://collegeandfees.com", canonical ?? "not found");
   }
 
-  // ── 4. meta description non-empty ────────────────────────────────────────
   const desc = extractMeta(html, "description");
   if (desc && desc.length > 0) {
     pass(`meta description non-empty ("${desc.slice(0, 60)}…")`);
@@ -144,7 +145,6 @@ async function auditHtmlRoute(route) {
     fail("meta description non-empty", desc === null ? "tag not found" : "empty string");
   }
 
-  // ── 5. No literal "undefined" or "null" in HTML ──────────────────────────
   const undefinedPatterns = [">undefined<", '="undefined"', ">undefined ", " undefined<"];
   const nullPatterns = [">null<", '="null"'];
   const foundUndefined = undefinedPatterns.find((p) => html.includes(p));
@@ -157,7 +157,6 @@ async function auditHtmlRoute(route) {
     pass('no literal "undefined" or "null" in HTML');
   }
 
-  // ── 6. No placeholder fee amounts ₹100 or ₹175 ──────────────────────────
   const hasRs100 = html.includes("₹100");
   const hasRs175 = html.includes("₹175");
   if (!hasRs100 && !hasRs175) {
@@ -166,34 +165,19 @@ async function auditHtmlRoute(route) {
     fail("no placeholder fees (₹100, ₹175)", hasRs100 ? "₹100 found in HTML" : "₹175 found in HTML");
   }
 
-  // ── Active-college-only checks ───────────────────────────────────────────
-  if (pathContainsSlug(route, ACTIVE_SLUGS)) {
+  if (pathContainsSlug(route, SAMPLE_ACTIVE_SLUGS)) {
     const robots = extractMeta(html, "robots");
 
-    // 7. robots does NOT contain noindex
     if (robots && !robots.toLowerCase().includes("noindex")) {
       pass(`robots does not contain noindex ("${robots}")`);
     } else {
       fail("robots does not contain noindex", robots ?? "tag not found");
     }
 
-    // 8. Title contains "2026"
     if (title && title.includes("2026")) {
       pass('title contains "2026"');
     } else {
       fail('title contains "2026"', title ?? "title not found");
-    }
-  }
-
-  // ── Inactive-college-only checks ─────────────────────────────────────────
-  if (pathContainsSlug(route, INACTIVE_SLUGS)) {
-    const robots = extractMeta(html, "robots");
-
-    // 9. robots contains noindex
-    if (robots && robots.toLowerCase().includes("noindex")) {
-      pass(`robots contains noindex ("${robots}")`);
-    } else {
-      fail("robots contains noindex", robots ?? "tag not found");
     }
   }
 }
@@ -208,14 +192,12 @@ async function auditRobotsTxt() {
     return;
   }
 
-  // HTTP 200
   if (status === 200) {
     pass("HTTP 200");
   } else {
     fail("HTTP 200", status);
   }
 
-  // Contains "Disallow: /"
   if (body.includes("Disallow: /")) {
     pass('body contains "Disallow: /"');
   } else {
@@ -233,46 +215,25 @@ async function auditSitemapXml() {
     return;
   }
 
-  // HTTP 200
   if (status === 200) {
     pass("HTTP 200");
   } else {
     fail("HTTP 200", status);
   }
 
-  // Contains rvce-bangalore
-  if (body.includes("rvce-bangalore")) {
-    pass("sitemap contains rvce-bangalore");
-  } else {
-    fail("sitemap contains rvce-bangalore");
+  for (const slug of SAMPLE_ACTIVE_SLUGS) {
+    if (body.includes(slug)) {
+      pass(`sitemap contains ${slug}`);
+    } else {
+      fail(`sitemap contains ${slug}`);
+    }
   }
 
-  // Contains christ-university-bangalore
-  if (body.includes("christ-university-bangalore")) {
-    pass("sitemap contains christ-university-bangalore");
+  const urlCount = (body.match(/<loc>/g) || []).length;
+  if (urlCount >= 100) {
+    pass(`sitemap has ${urlCount} URLs (>= 100 expected for 358 colleges)`);
   } else {
-    fail("sitemap contains christ-university-bangalore");
-  }
-
-  // Contains bms-college-of-engineering (now active)
-  if (body.includes("bms-college-of-engineering")) {
-    pass("sitemap contains bms-college-of-engineering");
-  } else {
-    fail("sitemap contains bms-college-of-engineering");
-  }
-
-  // Contains msrit-bangalore (now active)
-  if (body.includes("msrit-bangalore")) {
-    pass("sitemap contains msrit-bangalore");
-  } else {
-    fail("sitemap contains msrit-bangalore");
-  }
-
-  // Contains pes-university-bangalore (now active)
-  if (body.includes("pes-university-bangalore")) {
-    pass("sitemap contains pes-university-bangalore");
-  } else {
-    fail("sitemap contains pes-university-bangalore");
+    fail(`sitemap has >= 100 URLs`, `found ${urlCount}`);
   }
 }
 

@@ -1,5 +1,4 @@
 import { getSupabase } from "../lib/supabase";
-import { ACTIVE_SLUGS } from "../lib/constants";
 
 const SITE_URL = "https://collegeandfees.com";
 
@@ -33,7 +32,7 @@ export async function getServerSideProps({ res }) {
         .from("colleges")
         .select("slug")
         .eq("is_active", true);
-      if (data) activeColleges = data.filter((c) => ACTIVE_SLUGS.has(c.slug));
+      if (data) activeColleges = data;
     }
   } catch (err) {
     console.error("[sitemap.xml] error:", err.message);

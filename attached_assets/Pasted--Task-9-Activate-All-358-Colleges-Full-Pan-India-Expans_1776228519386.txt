@@ -1,0 +1,484 @@
+# Task #9 — Activate All 358 Colleges (Full Pan-India Expansion)
+
+> **Date:** 2026-04-15
+> **Priority:** CRITICAL — 308 college pages are returning 404 despite having complete fee data + content in DB
+
+---
+
+## What & Why
+
+The Supabase database now has **358 colleges** with:
+- Complete fee data (9,025 fee rows across 28 branches and 7 quotas)
+- `college_content` entries for ALL 358 (about, highlights, admission_process, meta_title, meta_desc)
+- `is_active = true` on all 358
+
+But the website only shows 50 colleges because `ACTIVE_SLUGS` in `lib/constants.js` is hardcoded to 50 slugs. The remaining 308 colleges — including IITs, NITs, IIITs, BITS Pilani, VIT, and 150+ Karnataka colleges — all return 404.
+
+**SEO impact:** 308 colleges × 4 pages each = **1,232 missing indexable URLs**. These are high-value pages (e.g., "BITS Pilani fees", "IIT Bombay fees", "VIT Vellore fees") that would rank and drive traffic.
+
+---
+
+## "Done" Looks Like
+
+1. `ACTIVE_SLUGS` in `lib/constants.js` contains all 358 college slugs
+2. `/colleges/bits-pilani`, `/colleges/iit-bombay`, `/colleges/vit-vellore` and all other newly-added college URLs render full pages with fee tables (not 404)
+3. `/sitemap.xml` includes all 358 colleges (the sitemap already filters by `is_active` from DB — just confirm it picks up the new pages)
+4. The college listing page at `/colleges` shows all 358 colleges
+5. `scripts/audit.js` passes (update any hardcoded slug checks if needed)
+6. No design changes whatsoever
+
+---
+
+## IMPORTANT: Better Architecture (Recommended)
+
+Instead of hardcoding 358 slugs (which will grow), **consider replacing the hardcoded `ACTIVE_SLUGS` Set with a DB query.** The `colleges` table already has `is_active = true` for all active colleges. The recommended approach:
+
+**Option A (Preferred):** In `getServerSideProps` for college pages, query Supabase for the college by slug where `is_active = true`. If found, render. If not, 404. Remove the `ACTIVE_SLUGS` check entirely.
+
+**Option B (If Option A is too risky):** Replace `ACTIVE_SLUGS` with the full 358-slug Set below.
+
+If you go with Option A, also update:
+- The sitemap generation to query all `is_active = true` colleges from DB
+- The listing page to query all active colleges from DB
+- Any other place that references `ACTIVE_SLUGS`
+- Remove or comment out the `ACTIVE_SLUGS` export
+
+---
+
+## Out of Scope
+
+- No design changes of any kind
+- No database changes — all data is already in Supabase
+- No new page templates — existing templates handle any active slug dynamically
+- No changes to the fee display logic (the existing "Contact counsellor" fallback for placeholder fees should still work)
+
+---
+
+## If Using Option B: Full ACTIVE_SLUGS Set (358 entries)
+
+Replace the current ACTIVE_SLUGS in `lib/constants.js` with:
+
+```js
+export const ACTIVE_SLUGS = new Set([
+  // === ORIGINAL 50 COLLEGES (Karnataka core) ===
+  "rvce-bangalore",
+  "christ-university-bangalore",
+  "bms-college-of-engineering",
+  "msrit-bangalore",
+  "pes-university-bangalore",
+  "dayananda-sagar-college-of-engineering",
+  "rnsit-bangalore",
+  "new-horizon-college-of-engineering",
+  "jain-university-bangalore",
+  "alliance-college-of-engineering",
+  "presidency-university-bangalore",
+  "reva-university-bangalore",
+  "acharya-institute-of-technology",
+  "ramaiah-university-bangalore",
+  "bmsit-bangalore",
+  "rvitm-bangalore",
+  "nitte-meenakshi-bangalore",
+  "atria-institute-of-technology",
+  "dayananda-sagar-university",
+  "dsatm-bangalore",
+  "oxford-college-of-engineering",
+  "east-point-college-of-engineering",
+  "cmr-university-bangalore",
+  "t-john-institute-bangalore",
+  "srm-university-chennai",
+  "bnmit-bangalore",
+  "sapthagiri-nps-university",
+  "nmam-institute-of-technology",
+  "rv-university-bangalore",
+  "hkbk-college-of-engineering",
+  "east-west-institute-of-technology",
+  "amc-engineering-college",
+  "aditya-college-of-engineering",
+  "akash-institute-of-engineering",
+  "amruta-institute-of-engineering",
+  "bangalore-technological-institute",
+  "dhanwantari-college-of-engineering",
+  "harsha-institute-of-technology",
+  "impact-college-of-engineering",
+  "national-college-of-engineering",
+  "rajiv-gandhi-institute-of-technology",
+  "jss-science-technology-university-mysore",
+  "sir-mvit-bangalore",
+  "bangalore-institute-of-technology",
+  "mvj-college-of-engineering",
+  "siddaganga-institute-of-technology-tumkur",
+  "sjbit-bangalore",
+  "kle-technological-university-hubli",
+  "sdm-college-of-engineering-dharwad",
+  "manipal-institute-of-technology",
+
+  // === KARNATAKA EXPANSION (colleges 51-196) ===
+  "cmrit-cmr-institute-of-technology",
+  "global-academy-of-technology",
+  "cambridge-institute-of-technology",
+  "rajarajeswari-college-of-engineering",
+  "dr-ambedkar-institute-of-technology",
+  "don-bosco-institute-of-technology",
+  "sai-vidya-institute-of-technology",
+  "ms-engineering-college",
+  "vemana-institute-of-technology",
+  "acs-college-of-engineering",
+  "sambhram-institute-of-technology",
+  "city-engineering-college",
+  "brindavan-college-of-engineering",
+  "sri-krishna-institute-of-technology",
+  "nie-national-institute-of-engineering",
+  "sahyadri-college-of-engineering",
+  "st-joseph-engineering-college",
+  "canara-engineering-college",
+  "vvce-vidyavardhaka-college-of-engineering",
+  "bgsce-bg-shirke-college-of-engineering",
+  "iisc-bangalore",
+  "iiit-bangalore",
+  "iit-dharwad",
+  "nitk-surathkal",
+  "sjce-mysore",
+  "jss-academy-of-technical-education-bangalore",
+  "uvce-bangalore",
+  "bheemanna-khandre-institute-of-technology-bhalki",
+  "hirasugar-institute-of-technology-nidasoshi",
+  "navodaya-institute-of-technology-raichur",
+  "akshaya-institute-of-technology-tumkur",
+  "pes-college-of-engineering-mandya",
+  "rajeev-institute-of-technology-hassan",
+  "gm-institute-of-technology-davangere",
+  "malnad-college-of-engineering-hassan",
+  "vivekananda-institute-of-technology-bangalore",
+  "government-engineering-college-hassan",
+  "guru-nanak-dev-engineering-college-bidar",
+  "karavali-institute-of-technology-mangalore",
+  "sjc-institute-of-technology-chickballapur",
+  "atme-college-of-engineering-mysore",
+  "pa-college-of-engineering-mangalore",
+  "alpha-college-of-engineering-bangalore",
+  "basaveshwar-engineering-college-bagalkot",
+  "gogte-institute-of-technology-belgaum",
+  "government-engineering-college-chamarajanagar",
+  "government-engineering-college-karwar",
+  "srinivas-institute-of-technology-mangalore",
+  "government-engineering-college-haveri",
+  "government-engineering-college-raichur",
+  "kle-institute-of-technology-hubli",
+  "bearys-institute-of-technology-mangalore",
+  "kct-engineering-college-gulbarga",
+  "mangalore-marine-college-and-technology",
+  "pes-institute-of-technology-and-management-shimoga",
+  "jyothi-institute-of-technology-bangalore",
+  "vijaya-vittala-institute-of-technology-bangalore",
+  "government-engineering-college-kushalnagar",
+  "sri-basaveshwara-institute-of-technology-tiptur",
+  "gss-institute-of-technology-bangalore",
+  "sea-college-of-engineering-bangalore",
+  "sri-siddhartha-institute-of-technology-tumkur",
+  "east-west-college-of-engineering-bangalore",
+  "government-engineering-college-ramanagaram",
+  "proudadevaraya-institute-of-technology-hospet",
+  "gopalan-college-of-engineering-bangalore",
+  "aps-college-of-engineering-bangalore",
+  "sdm-institute-of-technology-ujire",
+  "angadi-institute-of-technology-belgaum",
+  "channabasaveshwara-institute-of-technology-gubbi",
+  "dr-t-thimmaiah-institute-of-technology-kolar",
+  "maratha-mandal-engineering-college-belgaum",
+  "sri-revana-siddeshwara-institute-of-technology-bangalore",
+  "coorg-institute-of-technology-ponnampet",
+  "kvg-college-of-engineering-sullia",
+  "tontadarya-college-of-engineering-gadag",
+  "bgs-college-of-engineering-bangalore",
+  "yellamma-dasappa-institute-of-technology-bangalore",
+  "adarsha-institute-of-technology-bangalore",
+  "ekalavya-institute-of-technology-chamarajanagar",
+  "shaikh-college-of-engineering-belgaum",
+  "canara-engineering-college-bantwal",
+  "yagachi-institute-of-technology-hassan",
+  "islamia-institute-of-technology-bangalore",
+  "adichunchanagiri-institute-of-technology-chikkamagaluru",
+  "basava-academy-of-engineering-bangalore",
+  "btl-institute-of-technology-bangalore",
+  "sct-institute-of-technology-bangalore",
+  "shri-pillappa-college-of-engineering-bangalore",
+  "bahubali-college-of-engineering-shravanabelagola",
+  "dr-mv-shetty-institute-of-technology-mangalore",
+  "east-point-college-of-engineering-for-women-bangalore",
+  "jawaharlal-nehru-national-college-of-engineering-shimoga",
+  "khaja-banda-nawaz-college-of-engineering-gulbarga",
+  "moodlakatte-institute-of-technology-kundapura",
+  "srinivas-school-of-engineering-mangalore",
+  "university-bdt-college-of-engineering-davangere",
+  "veerappa-nisty-engineering-college-yadgir",
+  "vidya-vikas-institute-of-engineering-mysore",
+  "vivekananda-college-of-engineering-puttur",
+  "pda-college-of-engineering-kalaburagi",
+  "jnanavikasa-institute-of-technology-bangalore",
+  "pns-womens-institute-of-technology-bangalore",
+  "sg-balekundri-institute-of-technology-belgaum",
+  "sri-vidya-vinayaka-institute-of-technology-bangalore",
+  "sjm-institute-of-technology-chitradurga",
+  "bapuji-institute-of-engineering-davangere",
+  "kammavari-sangha-institute-of-technology-bangalore",
+  "auden-technology-management-academy-bangalore",
+  "dr-hn-national-college-of-engineering-bangalore",
+  "shivakumara-mahaswamiji-college-of-engineering-bangalore",
+  "ghousia-institute-of-technology-for-women-bangalore",
+  "nadgir-institute-of-engineering-bangalore",
+  "bharatesh-institute-of-technology-belgaum",
+  "kle-society-college-of-engineering-belgaum",
+  "ballari-institute-of-technology-bellary",
+  "government-engineering-college-hoovina-hadagali",
+  "rao-bahadur-y-mahabaleswarappa-engineering-college-bellary",
+  "anjuman-institute-of-technology-bhatkal",
+  "bldea-halakatti-college-of-engineering-bijapur",
+  "secab-institute-of-engineering-bijapur",
+  "sampoorna-group-of-institutions-channapatna",
+  "sha-shib-college-of-engineering-chikballapur",
+  "kle-college-of-engineering-chikkodi",
+  "rte-society-rural-engineering-college-hulkoti",
+  "appa-institute-of-engineering-gulbarga",
+  "godutai-engineering-college-for-women-gulbarga",
+  "agm-rural-engineering-college-hubli",
+  "c-byre-gowda-institute-of-technology-kolar",
+  "shreedevi-institute-of-technology-mangalore",
+  "alvas-institute-of-engineering-moodbidri",
+  "hke-sln-college-of-engineering-raichur",
+  "ghousia-college-of-engineering-ramanagara",
+  "sri-taralabalu-jagadguru-institute-of-technology-ranebennur",
+  "kalpatharu-institute-of-technology-tiptur",
+  "shridevi-institute-of-engineering-tumkur",
+  "sri-siddhartha-school-of-engineering-tumkur",
+  "gsss-institute-of-engineering-for-women-mysore",
+  "kls-viswanathrao-deshpande-rural-institute-of-technology-haliyal",
+  "smt-kamala-magadi-engineering-college-gadag",
+  "bangalore-college-of-engineering-and-technology",
+  "jain-college-of-engineering-belgaum",
+  "rl-jalappa-institute-of-technology-doddaballapur",
+
+  // === PAN-INDIA: IITs (22) ===
+  "iit-bombay",
+  "iit-delhi",
+  "iit-madras",
+  "iit-kanpur",
+  "iit-kharagpur",
+  "iit-roorkee",
+  "iit-guwahati",
+  "iit-hyderabad",
+  "iit-indore",
+  "iit-bhu-varanasi",
+  "iit-dhanbad",
+  "iit-ropar",
+  "iit-patna",
+  "iit-gandhinagar",
+  "iit-bhubaneswar",
+  "iit-jodhpur",
+  "iit-mandi",
+  "iit-tirupati",
+  "iit-palakkad",
+  "iit-bhilai",
+  "iit-goa",
+  "iit-jammu",
+
+  // === PAN-INDIA: NITs (31) ===
+  "nit-trichy",
+  "nit-warangal",
+  "nit-rourkela",
+  "nit-calicut",
+  "mnnit-allahabad",
+  "mnit-jaipur",
+  "manit-bhopal",
+  "vnit-nagpur",
+  "nit-srinagar",
+  "nit-durgapur",
+  "nit-hamirpur",
+  "nit-kurukshetra",
+  "nit-jalandhar",
+  "nit-jamshedpur",
+  "nit-patna",
+  "nit-raipur",
+  "nit-silchar",
+  "svnit-surat",
+  "nit-agartala",
+  "nit-arunachal-pradesh",
+  "nit-delhi",
+  "nit-goa",
+  "nit-manipur",
+  "nit-meghalaya",
+  "nit-mizoram",
+  "nit-nagaland",
+  "nit-puducherry",
+  "nit-sikkim",
+  "nit-uttarakhand",
+  "nit-andhra-pradesh",
+
+  // === PAN-INDIA: IIITs (25) ===
+  "iiit-allahabad",
+  "iiit-gwalior",
+  "iiitdm-jabalpur",
+  "iiitdm-kancheepuram",
+  "iiit-kurnool",
+  "iiit-hyderabad",
+  "iiit-delhi",
+  "iiit-sri-city",
+  "iiit-pune",
+  "iiit-guwahati",
+  "iiit-vadodara",
+  "iiit-kota",
+  "iiit-lucknow",
+  "iiit-trichy",
+  "iiit-nagpur",
+  "iiit-ranchi",
+  "iiit-surat",
+  "iiit-bhopal",
+  "iiit-sonepat",
+  "iiit-kalyani",
+  "iiit-una",
+  "iiit-manipur",
+  "iiit-bhagalpur",
+  "iiit-agartala",
+  "iiit-bhubaneswar",
+
+  // === PAN-INDIA: Major Private/Deemed Universities ===
+  "bits-pilani",
+  "bits-pilani-hyderabad",
+  "bits-pilani-goa",
+  "vit-vellore",
+  "vit-chennai",
+  "vit-bhopal",
+  "vit-ap",
+  "srm-university-ap",
+  "manipal-university-jaipur",
+  "amity-university-noida",
+  "lpu-punjab",
+  "chandigarh-university",
+  "thapar-university-patiala",
+  "shiv-nadar-university",
+  "bennett-university",
+  "sharda-university",
+  "galgotias-university",
+  "chitkara-university",
+  "amrita-university",
+  "sathyabama-university",
+  "nirma-university",
+  "kl-university",
+  "gitam-university",
+
+  // === PAN-INDIA: State Universities & Major Colleges ===
+  "anna-university-chennai",
+  "jadavpur-university",
+  "jamia-millia-islamia",
+  "dtu-delhi",
+  "nsut-delhi",
+  "igdtuw-delhi",
+  "iiest-shibpur",
+  "hbtu-kanpur",
+  "ict-mumbai",
+  "vjti-mumbai",
+  "spit-mumbai",
+  "kj-somaiya-mumbai",
+  "dj-sanghvi-mumbai",
+  "coep-pune",
+  "vishwakarma-institute-of-technology-pune",
+  "symbiosis-institute-of-technology-pune",
+  "mit-wpu-pune",
+  "bharati-vidyapeeth-pune",
+  "psg-college-of-technology-coimbatore",
+  "coimbatore-institute-of-technology",
+  "kumaraguru-college-of-technology-coimbatore",
+  "thiagarajar-college-of-engineering-madurai",
+  "ssn-college-of-engineering-chennai",
+  "rajalakshmi-engineering-college-chennai",
+  "saveetha-university-chennai",
+  "vel-tech-university-chennai",
+  "hindustan-institute-of-technology-chennai",
+  "jntu-hyderabad",
+  "osmania-university",
+  "cbit-hyderabad",
+  "vnr-vjiet-hyderabad",
+  "vasavi-college-of-engineering-hyderabad",
+  "mahindra-university-hyderabad",
+  "woxsen-university-hyderabad",
+  "sr-university-warangal",
+  "kiit-bhubaneswar",
+  "heritage-institute-of-technology-kolkata",
+  "iem-kolkata",
+  "jiit-noida",
+  "galgotias-college-of-engineering",
+  "amity-university-jaipur",
+  "amity-university-lucknow",
+  "lnmiit-jaipur",
+  "da-iict-gandhinagar",
+  "pdeu-gandhinagar",
+  "gla-university-mathura",
+  "dit-university-dehradun",
+  "graphic-era-university-dehradun",
+  "upes-dehradun",
+  "mmmut-gorakhpur",
+
+  // === KARNATAKA TAIL (recently added) ===
+  "government-engineering-college-challakere",
+  "government-engineering-college-krishnarajpet",
+  "basavakalyana-engineering-college",
+  "anuvartik-mirji-bharatesh-institute-of-technology-belgaum",
+  "mangalore-institute-of-technology-moodbidri",
+  "sri-sairam-college-of-engineering-bangalore",
+  "sri-venkateshwara-college-of-engineering-bangalore",
+  "garden-city-university-bangalore",
+  "vidyashilp-university-bangalore",
+  "rai-technology-university-bangalore",
+  "chanakya-university-bangalore",
+  "gitam-off-campus-bengaluru",
+  "nagarjuna-college-of-engineering-bangalore",
+  "reva-institute-of-technology-bangalore",
+  "nie-institute-of-technology-mysore",
+]);
+```
+
+---
+
+## Tasks for Replit Agent
+
+### Task 1: Update ACTIVE_SLUGS or remove the gate
+
+**Option A (Recommended):** Remove the `ACTIVE_SLUGS` check from page rendering. Instead, in `getServerSideProps` for `/colleges/[slug]`, query the college by slug + `is_active = true`. If found, render normally. If not found, return 404. Do the same for `/colleges/[slug]/fees` and any other slug-dependent pages.
+
+**Option B:** Replace the `ACTIVE_SLUGS` Set in `lib/constants.js` with the full 358-slug Set provided above.
+
+### Task 2: Update sitemap
+
+Ensure `/sitemap.xml` includes URLs for all active colleges. If it already queries `is_active = true` from DB, no change needed. If it references `ACTIVE_SLUGS`, update it.
+
+### Task 3: Update listing page
+
+Ensure `/colleges` listing page shows all active colleges. If it already queries from DB, no change needed.
+
+### Task 4: Update audit script
+
+Update `scripts/audit.js` to handle 358 colleges. At minimum:
+- Don't hardcode expected counts — query from DB or use a reasonable range
+- Confirm sitemap has >= 1400 URLs (358 colleges × 4 pages + hubs)
+
+### Task 5: Test
+
+Verify these URLs render (not 404):
+- `/colleges/bits-pilani`
+- `/colleges/iit-bombay`
+- `/colleges/vit-vellore`
+- `/colleges/cmrit-cmr-institute-of-technology`
+- `/colleges/kiit-bhubaneswar`
+- `/colleges/rvce-bangalore` (existing — should still work)
+
+---
+
+## DB Summary for Reference
+
+| Metric | Count |
+|---|---|
+| Total colleges (is_active=true) | 358 |
+| Total fee rows | 9,025 |
+| Branches | 28 |
+| Quotas | 7 (KCET, COMEDK, Management, SNQ, NRI, JEE, JOSAA) |
+| college_content rows | 358 |
+| Colleges with 0 fees | 0 |
