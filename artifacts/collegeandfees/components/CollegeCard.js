@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { COLLEGE_IMAGES, FALLBACK_IMAGE } from "../lib/constants";
+import { getCollegeImage } from "../lib/constants";
 
 function formatINR(amount) {
   if (!amount && amount !== 0) return null;
@@ -10,7 +10,7 @@ function formatINR(amount) {
 export default function CollegeCard({ college }) {
   const feeDisplay = college.top_fee ? formatINR(college.top_fee) : null;
   const courseName = college.top_course || "CSE";
-  const photo = COLLEGE_IMAGES[college.slug] || FALLBACK_IMAGE;
+  const photo = getCollegeImage(college);
 
   return (
     <Link href={`/colleges/${college.slug}`} className="college-card">

@@ -1,0 +1,174 @@
+# MASTER FIX PROMPT — CollegeAndFees.com
+
+> **IMPORTANT:** This is a ONE-TIME comprehensive fix. Read the ENTIRE prompt before starting. Every issue listed here is a confirmed bug found by manually reviewing the live site (collegeandfees.com) on April 15, 2026. The site is LIVE and Google is crawling it — these fixes are urgent.
+
+---
+
+## CONTEXT
+
+- **Repo:** `mailentranceplus-stack/collegeandfees` (master branch)
+- **Stack:** Next.js 14 (Pages Router), Supabase PostgreSQL, Vercel auto-deploy
+- **Supabase project:** `safucmoasypfvnwhrovo` (Singapore)
+- **Design:** LOCKED — Dark navy `#0B1121`, gold `#EFAF26`, Plus Jakarta Sans. Do NOT change any design.
+- **Env vars:** `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_WHATSAPP_NUMBER=917975193033`
+
+---
+
+## BUG 1: FAQs NOT RENDERING on college pages
+
+**Problem:** We have 1,790 FAQs in the `faqs` table in Supabase (every college has 5+ FAQs). But when you visit ANY college page (e.g., `/colleges/rvce-bangalore`), NO FAQ section appears. The page goes from courses table → massive blank space → end. No FAQ accordion, nothing.
+
+**Expected:** Every college page should show an FAQ section with expandable accordion items below the courses table. The FAQs exist in Supabase — the page just isn't fetching or rendering them.
+
+**Fix:** In the college profile page (`pages/colleges/[slug].js` or similar):
+1. Fetch FAQs from `faqs` table WHERE `college_id` matches
+2. Render an FAQ accordion section below courses
+3. Also add FAQPage JSON-LD schema using the FAQ data
+
+---
+
+## BUG 2: Admission Process NOT RENDERING
+
+**Problem:** The `college_content` table has an `admission_process` column with rich text for many colleges (e.g., RVCE has ~1500 chars of detailed admission process). But this section is invisible on the page.
+
+**Expected:** An "Admission Process" section should appear on each college page, showing the step-by-step process from the `admission_process` field.
+
+**Fix:** Add rendering for `admission_process` from college_content. Place it between the about/highlights section and the fees table.
+
+---
+
+## BUG 3: Why Choose section NOT RENDERING
+
+**Problem:** The `college_content` table has a `why_choose` column. Currently null for most colleges but we're filling it in. The frontend has no section to render it.
+
+**Expected:** When `why_choose` is not null, show a "Why Choose [College Name]?" section.
+
+**Fix:** Add conditional rendering for `why_choose` field.
+
+---
+
+## BUG 4: Management Quota pages show "Fee data being verified" EVEN WHEN FEES EXIST
+
+**Problem:** Visit `/management-quota/rvce-bangalore`. It says "Fee data for RV College of Engineering is being verified. Contact counsellor for accurate 2026-27 figures." But the `fees` table HAS real RVCE management quota fees (CSE ₹36L, AI&ML ₹36L, etc.) and the Overview page `/colleges/rvce-bangalore` correctly shows them.
+
+**Expected:** The management-quota page should show the same MQ fee table as the overview page when fees exist.
+
+**Fix:** The management-quota page template likely has a condition checking for fees that's failing. Check the query — it must filter by `quota_type = 'Management'` (capital M, not lowercase). Verify the query matches the actual DB values. The DB uses capitalized quota names: `Management`, `KCET`, `COMEDK`, `SNQ`, `Foreign`, `NRI`, `JEE`, `JOSAA`.
+
+---
+
+## BUG 5: Homepage shows alphabetical colleges instead of TOP colleges
+
+**Problem:** The "Top Engineering Colleges in Bangalore" section on the homepage shows Acharya Institute, ACS College, ADARSHA Institute — alphabetically sorted unknown colleges. RVCE, BMS, PES, MSRIT don't appear.
+
+**Expected:** Show top colleges first — prioritize by NAAC grade, then NIRF rank, then established year. Or use a manual priority/sort_order field.
+
+**Fix:** Either:
+- Add a `sort_priority` column to colleges table and set it for top colleges (RVCE=1, BMS=2, PES=3, etc.)
+- OR sort by: NAAC grade DESC (A+ first), then established year ASC (older first)
+- Show at least 12-15 colleges on homepage, not just 6
+
+---
+
+## BUG 6: Homepage college cards show "Contact for fee details" instead of actual fees
+
+**Problem:** Every college card on the homepage says "Management Quota: Contact for fee details" even for colleges that have real fees in the DB.
+
+**Expected:** Cards should show the actual starting MQ fee like "Management Quota: From ₹7,50,000/yr" pulled from the fees table.
+
+**Fix:** In the homepage college card component, query the minimum management quota annual fee for each college and display it. Only show "Contact for fee details" when no MQ fees exist in the DB.
+
+---
+
+## BUG 7: Engineering colleges listing page shows ONLY 6 colleges
+
+**Problem:** `/engineering-colleges/bangalore` shows exactly 6 colleges (Jain, RVCE, Christ, Dayananda Sagar, RNSIT, New Horizon). We have 196 Karnataka colleges in the DB.
+
+**Expected:** Show ALL Bangalore engineering colleges, with pagination or "Load More" button. At minimum show 20-30 with a "View All" option.
+
+**Fix:** Remove the LIMIT 6 (or similar cap) on the query. Add pagination — show 20 per page with "Load More" or numbered pagination.
+
+---
+
+## BUG 8: Stats bar shows "Data Awaited" for fields that now exist in DB
+
+**Problem:** College pages show stat cards: NAAC Grade, NIRF Rank, Highest Package, Management Quota. "NIRF Rank" and "Highest Package" show "Data Awaited" or "Not Ranked" because the code doesn't read from the right columns.
+
+**New DB columns added (2026-04-15):** The `colleges` table now has these NEW columns:
+- `nirf_rank` (INTEGER)
+- `highest_package` (TEXT — e.g., "67 LPA")
+- `average_package` (TEXT — e.g., "15.24 LPA")
+- `placement_rate` (TEXT — e.g., "85%")
+- `campus_area` (TEXT — e.g., "16.85 acres")
+- `total_students` (INTEGER)
+
+**Fix:** Update the stats bar component to read from these new columns. Show:
+- NAAC Grade → from `naac_grade` (already works)
+- NIRF Rank → from `nirf_rank` (new column). Show "#82" format. If null, show "Not Ranked"
+- Highest Package → from `highest_package` (new column). If null, show "Data Awaited"
+- Management Quota → keep existing logic (Available ✓ / Government)
+
+---
+
+## BUG 9: Footer MISSING on college profile pages
+
+**Problem:** The homepage has a footer (CollegeAndFees logo, Quick Links, Entrance Exams, Get In Touch, WhatsApp). But individual college pages (`/colleges/rvce-bangalore`) have NO footer — the page just ends with blank space.
+
+**Expected:** Every page should have the same footer.
+
+**Fix:** Ensure the Footer component is included in the college profile page layout. It's likely already in `_app.js` or a layout wrapper but the college page might be overriding the layout.
+
+---
+
+## BUG 10: Massive blank space at bottom of college pages
+
+**Problem:** After the courses table on college pages, there are hundreds of pixels of blank dark navy space before the page ends. This is because sections (FAQs, admission process, why choose) have empty containers rendered but no visible content.
+
+**Expected:** No excessive blank space. Sections should only render their containers when they have content.
+
+**Fix:** After fixing Bugs 1-3 (FAQs, admission process, why choose), the blank space should largely resolve. Also add conditional rendering — don't render section containers if data is null/empty.
+
+---
+
+## BUG 11: Same stock photo on ALL college cards
+
+**Problem:** Almost every college card (homepage, listing pages) shows the same stock building photo. Colleges like RVCE and Christ show NO image at all on the listing page.
+
+**Expected:** Use college-specific images when available (from `cover_url` in colleges table), fall back to a varied set of stock images (not one single image).
+
+**Fix:** 
+1. Check if `cover_url` is set for the college → use it
+2. If null, use a deterministic selection from 5-6 different stock college images based on the college ID (e.g., `stockImages[college.id % 6]`) so cards look varied
+3. Ensure the image component handles null/missing images gracefully
+
+---
+
+## BUG 12: Direct-admission individual college pages need fee data
+
+**Problem:** Similar to Bug 4 — `/direct-admission/[slug]` pages should show management quota fees since direct admission = management quota admission. They likely have the same "being verified" issue.
+
+**Fix:** Apply the same fix as Bug 4 to direct-admission pages.
+
+---
+
+## TESTING CHECKLIST — Verify ALL of these before pushing:
+
+1. `/` — Homepage shows top colleges (RVCE first, not alphabetical), cards show actual fees
+2. `/engineering-colleges/bangalore` — Shows 20+ colleges with pagination
+3. `/colleges/rvce-bangalore` — Shows: About ✓, Highlights ✓, Admission Process ✓, Fees table ✓, Courses ✓, FAQs ✓, Footer ✓, no blank space
+4. `/colleges/rvce-bangalore/fees` — Full fee table by quota
+5. `/management-quota/rvce-bangalore` — Shows actual MQ fees (not "being verified")
+6. `/direct-admission/rvce-bangalore` — Shows MQ fees
+7. `/management-quota/bangalore` — Hub page with college cards showing fees
+8. Stats bar shows real NIRF rank and Highest Package when DB columns are populated
+9. No console errors on any page
+
+---
+
+## COMPLETION REPORT
+
+When done, provide:
+- List of every file changed and what was modified in each
+- The commit hash
+- Confirm each bug fix with the test from the checklist above
+- Flag anything you couldn't complete

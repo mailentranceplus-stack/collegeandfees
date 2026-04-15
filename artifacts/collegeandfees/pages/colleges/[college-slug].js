@@ -249,8 +249,8 @@ export default function CollegeOverviewPage({ college, content, placements, rank
           <div className="key-stats" style={{ marginBottom: "32px" }}>
             {[
               { label: "NAAC Grade", value: college.naac_grade || "—" },
-              { label: "NIRF Rank", value: ranking ? `#${ranking.rank}` : "Not Ranked" },
-              { label: "Highest Package", value: placements?.highest_package_lpa ? `${placements.highest_package_lpa} LPA` : "Data Awaited" },
+              { label: "NIRF Rank", value: college.nirf_rank ? `#${college.nirf_rank}` : (ranking ? `#${ranking.rank}` : "Not Ranked") },
+              { label: "Highest Package", value: college.highest_package || (placements?.highest_package_lpa ? `${placements.highest_package_lpa} LPA` : "Data Awaited") },
               { label: "Management Quota", value: fees.some((f) => (f.quota || "").toLowerCase() === "management") ? "Available ✓" : (college.type ? college.type : "Not Available") },
             ].map((stat) => (
               <div key={stat.label} className="key-stat">
@@ -280,6 +280,14 @@ export default function CollegeOverviewPage({ college, content, placements, rank
               </div>
             )}
           </section>
+
+          {/* Section 5b: Why Choose */}
+          {content?.why_choose && (
+            <section className="info-box" style={{ marginBottom: "32px" }} id="why-choose">
+              <h2 style={{ fontSize: "20px", fontWeight: 700, marginBottom: "16px" }}>Why Choose {shortName}?</h2>
+              <p style={{ color: "var(--muted-foreground)", lineHeight: "1.8", fontSize: "15px", whiteSpace: "pre-wrap" }}>{content.why_choose}</p>
+            </section>
+          )}
 
           {/* Section 6: Fees Summary */}
           <section style={{ marginBottom: "32px" }} id="fees">
@@ -549,14 +557,15 @@ export async function getServerSideProps({ params }) {
 
     if (collegeError || !college) return { notFound: true };
 
-    const [contentRes, placementsRes, rankingRes, feesRes, coursesRes, facilitiesRes, faqsRes, similarRes] = await Promise.all([
+    const [contentRes, placementsRes, rankingRes, feesRes, coursesRes, facilitiesRes, faqsRes, generalFaqsRes, similarRes] = await Promise.all([
       supabase.from("college_content").select("*").eq("college_id", college.id).maybeSingle(),
       supabase.from("placements").select("*").eq("college_id", college.id).order("year", { ascending: false }).limit(1).maybeSingle(),
       supabase.from("rankings").select("rank, year").eq("college_id", college.id).eq("source", "NIRF").order("year", { ascending: false }).limit(1).maybeSingle(),
       supabase.from("fees").select("tuition_fee, quota, courses(name, short_name)").eq("college_id", college.id).ilike("quota", "management").order("tuition_fee", { ascending: false }).limit(5),
       supabase.from("college_courses").select("total_seats, mgmt_quota_seats, govt_quota_seats, courses(name, short_name, degree)").eq("college_id", college.id),
       supabase.from("college_facilities").select("facilities(name, icon)").eq("college_id", college.id),
-      supabase.from("faqs").select("id, question, answer").eq("college_id", college.id).eq("is_active", true).order("sort_order").limit(6),
+      supabase.from("faqs").select("id, question, answer").eq("college_id", college.id).neq("is_active", false).order("sort_order").limit(8),
+      supabase.from("faqs").select("id, question, answer").is("college_id", null).neq("is_active", false).order("sort_order").limit(3),
       supabase.from("colleges").select("id, slug, name, short_name, naac_grade").eq("city", college.city).eq("is_active", true).neq("id", college.id).limit(4),
     ]);
 
@@ -570,7 +579,7 @@ export async function getServerSideProps({ params }) {
         fees: feesRes.data || [],
         courses: coursesRes.data || [],
         facilities: facilitiesRes.data || [],
-        faqs: faqsRes.data || [],
+        faqs: [...(faqsRes.data || []), ...(generalFaqsRes.data || [])].slice(0, 8),
         similarColleges: similarRes.data || [],
       },
     };

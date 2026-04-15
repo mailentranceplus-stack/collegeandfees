@@ -606,14 +606,14 @@ export async function getServerSideProps({ params }) {
         .from("fees")
         .select("course_id, academic_year, quota, tuition_fee, hostel_fee, other_fees, total_fee, courses(name, short_name)")
         .eq("college_id", college.id)
-        .eq("quota", "management")
+        .ilike("quota", "management")
         .order("tuition_fee", { ascending: false }),
       supabase.from("admissions").select("mgmt_quota_process, documents_required, important_dates, contact_phone, contact_email").eq("college_id", college.id).maybeSingle(),
       supabase.from("college_content").select("about, highlights, meta_title, meta_desc").eq("college_id", college.id).maybeSingle(),
       supabase.from("placements").select("year, avg_package_lpa, highest_package_lpa, placement_pct, top_recruiters").eq("college_id", college.id).order("year", { ascending: false }).limit(1).maybeSingle(),
       supabase.from("rankings").select("source, year, rank").eq("college_id", college.id).eq("source", "NIRF").order("year", { ascending: false }).limit(1).maybeSingle(),
-      supabase.from("faqs").select("id, question, answer").eq("college_id", college.id).eq("is_active", true).order("sort_order").limit(6),
-      supabase.from("faqs").select("id, question, answer").is("college_id", null).eq("is_active", true).order("sort_order").limit(3),
+      supabase.from("faqs").select("id, question, answer").eq("college_id", college.id).neq("is_active", false).order("sort_order").limit(6),
+      supabase.from("faqs").select("id, question, answer").is("college_id", null).neq("is_active", false).order("sort_order").limit(3),
       supabase.from("colleges").select("id, slug, name, naac_grade").eq("city", college.city).eq("is_active", true).neq("id", college.id).limit(4),
     ]);
 

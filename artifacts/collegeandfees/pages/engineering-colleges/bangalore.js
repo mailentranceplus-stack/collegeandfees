@@ -5,7 +5,7 @@ import { useState } from "react";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import { getSupabase } from "../../lib/supabase";
-import { COLLEGE_IMAGES, FALLBACK_IMAGE, waLink } from "../../lib/constants";
+import { getCollegeImage, waLink } from "../../lib/constants";
 import { WaIcon, WaButton } from "../../components/WaButton";
 
 const WA_MSG = "Hi, I need help choosing an engineering college in Bangalore. Can you guide me?";
@@ -123,7 +123,7 @@ export default function BangaloreEngineeringColleges({ colleges, faqs }) {
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "24px" }}>
                   {activeColleges.map((college) => {
                     const nirf = college.rankings?.find?.((r) => r.source === "NIRF");
-                    const photo = COLLEGE_IMAGES[college.slug] || FALLBACK_IMAGE;
+                    const photo = getCollegeImage(college);
                     return (
                       <div key={college.id} className="glass-card" style={{ overflow: "hidden", display: "flex", flexDirection: "column" }}>
                         <div style={{ overflow: "hidden", height: "160px", position: "relative" }}>
@@ -275,10 +275,10 @@ export async function getServerSideProps() {
       const [{ data: collegeData }, { data: faqData }] = await Promise.all([
         supabase
           .from("colleges")
-          .select("id, slug, name, short_name, city, established, type, naac_grade, is_active, rankings(rank, source, year), placements(avg_package_lpa, highest_package_lpa, year), college_courses(mgmt_quota_seats, govt_quota_seats, total_seats)")
-          .eq("city", "Bangalore")
+          .select("id, slug, name, short_name, city, established, type, naac_grade, is_active, cover_url, nirf_rank, rankings(rank, source, year), placements(avg_package_lpa, highest_package_lpa, year), college_courses(mgmt_quota_seats, govt_quota_seats, total_seats)")
+          .ilike("city", "bangal%")
           .eq("is_active", true)
-          .order("is_active", { ascending: false }),
+          .order("name"),
         supabase
           .from("faqs")
           .select("id, question, answer")

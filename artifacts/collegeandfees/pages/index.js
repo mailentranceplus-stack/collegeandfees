@@ -322,6 +322,8 @@ export default function Home({ colleges }) {
   );
 }
 
+const NAAC_ORDER = { "A+": 1, "A": 2, "B++": 3, "B+": 4, "B": 5, "C": 6 };
+
 export async function getServerSideProps() {
   let colleges = [];
   try {
@@ -330,14 +332,13 @@ export async function getServerSideProps() {
       const [{ data: collegeData }, { data: feesData }] = await Promise.all([
         supabase
           .from("colleges")
-          .select("id, slug, name, short_name, city, established, type, naac_grade")
+          .select("id, slug, name, short_name, city, established, type, naac_grade, cover_url, nirf_rank")
           .eq("is_active", true)
-          .order("name")
-          .limit(6),
+          .limit(50),
         supabase
           .from("fees")
           .select("college_id, course_id, tuition_fee, courses(name, short_name)")
-          .eq("quota", "management")
+          .ilike("quota", "management")
           .order("tuition_fee", { ascending: false }),
       ]);
 
@@ -352,7 +353,17 @@ export async function getServerSideProps() {
           }
         });
         colleges = collegeData
-          .map((c) => ({ ...c, ...(feeMap[c.id] || {}) }));
+          .map((c) => ({ ...c, ...(feeMap[c.id] || {}) }))
+          .sort((a, b) => {
+            const ao = NAAC_ORDER[a.naac_grade] || 7;
+            const bo = NAAC_ORDER[b.naac_grade] || 7;
+            if (ao !== bo) return ao - bo;
+            const ar = a.nirf_rank || 9999;
+            const br = b.nirf_rank || 9999;
+            if (ar !== br) return ar - br;
+            return (a.established || 9999) - (b.established || 9999);
+          })
+          .slice(0, 12);
       }
     }
   } catch (err) {
