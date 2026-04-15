@@ -1,0 +1,235 @@
+# Task #11 — Full Site Audit After 358-College Activation + Bug Fixes
+
+> **Date:** 2026-04-15
+> **Priority:** HIGH — We just deployed two major changes and need a thorough audit before DNS cutover
+> **Context:** Task #9 (activate 358 colleges by removing ACTIVE_SLUGS gate) and Task #10 (fix 6 display bugs) have both been deployed. This audit must verify EVERYTHING works correctly.
+
+---
+
+## Ultimate Objective — Why This Site Exists
+
+CollegeAndFees.com is an SEO-first engineering college directory. The entire business model is:
+
+1. **Rank on Google + AI search** (ChatGPT, Perplexity, Gemini) for queries like "RVCE management quota fees 2026", "IIT Bombay fees", "BITS Pilani direct admission", "best engineering colleges in Bangalore"
+2. **Get parents & students on the site** — every page must load fast, show real data, and look professional
+3. **Convert to WhatsApp leads** — every page should guide visitors to click WhatsApp (wa.me/917975193033)
+
+**More pages with real data = more SEO rankings = more traffic = more WhatsApp leads.**
+
+We now have **358 colleges** with **8,877 real fee rows** across **6 quotas** and **28 branches**, plus **1,790 FAQs** and **358 content entries**. Every college should have a complete, functional set of 4 pages: overview, fees, management-quota, and direct-admission. The site should feel like a polished, trustworthy resource — not a half-built prototype.
+
+---
+
+## What Just Changed (Tasks 9 + 10)
+
+### Task 9: Removed hardcoded ACTIVE_SLUGS gate
+- `lib/constants.js` no longer has a hardcoded `ACTIVE_SLUGS` Set
+- All 7 page files (`[college-slug].js`, `fees.js`, both `management-quota/[slug].js`, both `direct-admission/[slug].js`, and `engineering-colleges/bangalore.js`) now query Supabase for `is_active = true` instead of checking a hardcoded Set
+- The sitemap and listing page also query from DB directly
+- **Net effect:** 358 colleges should now render (previously only 50)
+
+### Task 10: Fixed 6 display bugs
+1. Fee notes now use `college.short_name` instead of hardcoded "RVCE"
+2. Footer links changed from RVCE-specific to generic hub links
+3. Overview page shows real Management quota fees (top 5 branches) when data exists
+4. Fees page renders ALL quotas from DB (KCET, COMEDK, Management, SNQ, NRI, JEE) — not just 3
+5. Comparison cards show actual fee ranges instead of "Contact for details"
+6. "4-yr Estimate" column renamed to "If Fee Unchanged*" with disclaimer
+
+---
+
+## AUDIT CHECKLIST — Go through EVERY item
+
+### A. Page Rendering (are all 358 colleges live?)
+
+1. **Pick 10 colleges from different categories and verify each has all 4 pages returning 200:**
+
+   | College | Slug | Type | Expected Quotas |
+   |---------|------|------|-----------------|
+   | RVCE | rvce-bangalore | Karnataka Private | KCET, COMEDK, Management, SNQ, NRI |
+   | BMS College | bms-college-of-engineering | Karnataka Private | KCET, COMEDK, Management |
+   | IIT Bombay | iit-bombay | IIT (Govt) | JEE |
+   | NIT Trichy | nit-trichy | NIT (Govt) | JEE |
+   | BITS Pilani | bits-pilani | Deemed | Management, NRI |
+   | VIT Vellore | vit-vellore | Deemed | Management, NRI |
+   | IIIT Hyderabad | iiit-hyderabad | IIIT | JEE |
+   | SIT Tumkur | siddaganga-institute-of-technology-tumkur | Karnataka Private | KCET, COMEDK, Management |
+   | Ghousia College | ghousia-college-of-engineering-ramanagara | Karnataka minor | KCET, COMEDK, Management |
+   | KIIT Bhubaneswar | kiit-bhubaneswar | Pan-India Private | Management, NRI |
+
+   For each college, check:
+   - `/colleges/[slug]` → 200, correct title with college name
+   - `/colleges/[slug]/fees` → 200, fee tables render
+   - `/management-quota/[slug]` → 200
+   - `/direct-admission/[slug]` → 200
+
+2. **Verify that a NON-EXISTENT slug returns 404:**
+   - `/colleges/this-college-does-not-exist` → should be 404
+   - `/colleges/rvce` → should be 404 (old Lovable format, not valid)
+
+3. **Count total colleges on listing page:**
+   - `/engineering-colleges/bangalore` should list colleges. Check count.
+   - Run: `const res = await fetch('/api/...'); // or inspect page source` to confirm
+
+### B. Bug Fix Verification (Task 10)
+
+4. **Bug 1 — Fee notes college name:**
+   - Go to `/colleges/bms-college-of-engineering/fees`
+   - Find the "Notes on the Fees Above" section
+   - It should say "BMSCE" or "BMS College of Engineering", NOT "RVCE"
+   - Also check `/colleges/iit-bombay/fees` — should say "IIT Bombay"
+   - Also check `/colleges/bits-pilani/fees` — should say "BITS Pilani"
+
+5. **Bug 2 — Footer links:**
+   - On ANY college page, scroll to footer → "Quick Links"
+   - Should NOT show "RVCE Direct Admission" or "RVCE Fees 2026"
+   - Should show generic links like "Direct Admission Bangalore", "Management Quota Colleges", "Compare College Fees"
+
+6. **Bug 3 — Overview page fees:**
+   - Go to `/colleges/rvce-bangalore` (overview page)
+   - The "Management Quota Fees" section should show a table with top branches and actual fees (CSE ₹36,00,000, ECE ₹19,00,000, etc.)
+   - It should NOT say "Fee data is being verified" (because RVCE has real fees in DB)
+   - Now check `/colleges/iit-bombay` — this IS a Government college with only JEE quota and no Management fees. It SHOULD show "being verified" or a WhatsApp CTA (since it has no Management quota rows)
+
+7. **Bug 4 — All quotas displayed:**
+   - Go to `/colleges/rvce-bangalore/fees`
+   - Should see sections for: KCET, COMEDK, Management, SNQ, NRI (RVCE has all 5)
+   - Previously only showed KCET, COMEDK, Management
+   - Check section headers match: "KCET — Branch-wise Fees", "COMEDK — Branch-wise Fees", "Management Quota — Branch-wise Fees", "SNQ (Supernumerary) — Branch-wise Fees", "NRI Quota — Branch-wise Fees"
+
+8. **Bug 5 — Comparison cards:**
+   - On `/colleges/rvce-bangalore/fees`, scroll to "How RVCE Fees Compare" section
+   - Each card should show actual fee ranges (e.g., "₹44,311/yr" for KCET, "₹4,50,000 – ₹36,00,000/yr" for Management)
+   - Should NOT say "Contact for details"
+   - Cards for quotas with no data should be hidden entirely
+
+9. **Bug 6 — 4-year column:**
+   - On any fees page with a fee table, check the last column header
+   - Should say "If Fee Unchanged*" (NOT "4-yr Estimate")
+   - There should be an asterisk note explaining that actual totals may differ
+
+### C. SEO Health
+
+10. **Titles and meta descriptions:**
+    - Check 5 random college overview pages — each `<title>` should include the college's `short_name`, city, "Fees & Admission 2026"
+    - Check 5 random fee pages — each `<title>` should include college name + "Fees"
+    - No title should be empty or say "undefined"
+    - Meta descriptions should be 100-160 chars, include fee data where available
+
+11. **Canonical URLs:**
+    - Every page's `<link rel="canonical">` should point to `collegeandfees.com` (NOT `vercel.app`)
+    - Example: `/colleges/rvce-bangalore` should have canonical `https://collegeandfees.com/colleges/rvce-bangalore`
+
+12. **robots meta tag:**
+    - Active college pages should have `<meta name="robots" content="index, follow">`
+    - No active page should have `noindex`
+
+13. **JSON-LD schemas:**
+    - Overview pages should have: EducationalOrganization, BreadcrumbList, FAQPage
+    - Fees pages should have: BreadcrumbList (at minimum)
+    - Verify JSON-LD is valid (no `null` or `undefined` in the output)
+
+14. **Sitemap:**
+    - Fetch `/sitemap.xml`
+    - Count total URLs — should be approximately 358 colleges × 4 pages + hub pages = ~1,437+ URLs
+    - Verify it includes new colleges: search for `iit-bombay`, `bits-pilani`, `vit-vellore`
+    - All URLs should use `collegeandfees.com` as the domain (not `vercel.app`)
+
+15. **Breadcrumbs:**
+    - Check 3 college pages — breadcrumbs should show: Home > Engineering Colleges Bangalore > [College Name]
+    - No breadcrumb should say "undefined" or be empty
+
+### D. Data Integrity
+
+16. **Fee tables not empty:**
+    - Pick 5 colleges that should have fees (RVCE, BMS, BITS Pilani, VIT, SIT Tumkur)
+    - On each `/colleges/[slug]/fees`, verify the fee table has actual rows with ₹ amounts
+    - No fee should show ₹0 or ₹100 (these are placeholders that were deleted)
+
+17. **FAQs render:**
+    - Pick 5 colleges and check their overview pages
+    - Each should have a "Frequently Asked Questions" section with 5+ questions
+    - Questions should mention the college's actual name (not a generic template)
+    - Answers should include real fee data where applicable
+
+18. **College names correct:**
+    - No page should show "null" or "undefined" in place of a college name
+    - The H1, title, and breadcrumb should all use the correct college name
+    - `short_name` should be used in titles (e.g., "RVCE" not "RV College of Engineering")
+
+19. **WhatsApp links functional:**
+    - Click/check 3 WhatsApp CTAs on different pages
+    - All should link to `wa.me/917975193033` with a pre-filled message mentioning the specific college
+
+### E. Performance & UX
+
+20. **Page load:**
+    - No page should take more than 5 seconds for SSR
+    - If any page is extremely slow, note which one and why
+
+21. **Mobile responsiveness:**
+    - Check 3 pages on a narrow viewport (375px)
+    - Fee tables should be horizontally scrollable, not overflowing
+    - WhatsApp float button should be visible and not overlap content
+
+22. **No console errors:**
+    - Open browser DevTools on 3 different pages
+    - Report any JavaScript errors or React hydration warnings
+    - Minor warnings are OK, but errors that break functionality are not
+
+23. **Images:**
+    - All `<img>` tags should use `next/image` (no raw `<img>`)
+    - Alt text should be descriptive (not empty or "image")
+    - Check that the fallback image loads for colleges without a custom image
+
+### F. Edge Cases
+
+24. **Government colleges:**
+    - IIT Bombay, NIT Trichy — should NOT show "Management Quota" tab or section
+    - Should show JEE/JOSAA quota fees only
+    - Overview should correctly state it's a government college
+
+25. **Deemed universities:**
+    - BITS Pilani, VIT — should show Management + NRI quotas
+    - Should NOT show KCET or COMEDK sections (they don't participate)
+
+26. **Colleges with minimal data:**
+    - Pick a small Karnataka government college (e.g., `government-engineering-college-hassan`)
+    - It should still render without errors
+    - Sections with no data should show appropriate fallbacks (not crash)
+
+---
+
+## OUTPUT FORMAT
+
+After running through all checks, produce a report with:
+
+1. **PASS/FAIL summary** — count of passed vs failed checks
+2. **Critical issues** — anything that breaks rendering, shows wrong data, or hurts SEO
+3. **Minor issues** — cosmetic problems, missing but non-critical data
+4. **Suggestions** — things that could improve but aren't broken
+
+Save the report as a structured output. If you find issues, describe exactly what's wrong and on which page/slug so they can be fixed.
+
+---
+
+## Reference: Key Technical Details
+
+- **Supabase project:** `safucmoasypfvnwhrovo`
+- **Vercel project:** `prj_tRN3DiiD0ZeNRrDpukgDwzdQPJvc`
+- **GitHub:** `mailentranceplus-stack/collegeandfees`
+- **DB quota values:** `Management`, `KCET`, `COMEDK`, `SNQ`, `NRI`, `JEE`, `JOSAA` (capitalized)
+- **WhatsApp:** wa.me/917975193033
+- **Architecture:** Next.js 14, Pages Router, SSR via `getServerSideProps`
+- **The audit script** `scripts/audit.js` exists and can be run with: `BASE_URL=https://collegeandfees.vercel.app node scripts/audit.js`
+  - Run this FIRST as a baseline, then do the manual checks above for things the script can't catch
+
+---
+
+## "Done" Looks Like
+
+1. You've checked all 26 items above
+2. You've run `scripts/audit.js` and it passes
+3. You've produced a clear PASS/FAIL report
+4. Any critical issues are flagged with exact page URLs
+5. The report is saved so it can be shared back to the team
