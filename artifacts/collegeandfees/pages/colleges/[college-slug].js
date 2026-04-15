@@ -295,7 +295,7 @@ export default function CollegeOverviewPage({ college, content, placements, rank
               Management Quota Fees at {shortName} 2026-27
             </h2>
             {(() => {
-              const realFees = fees.filter((f) => (f.tuition_fee || 0) > 100);
+              const realFees = fees.filter((f) => (f.year1_fee || f.tuition_fee || 0) > 100);
               if (realFees.length > 0) {
                 return (
                   <div className="info-box" style={{ padding: 0, overflow: "hidden" }}>
@@ -304,23 +304,26 @@ export default function CollegeOverviewPage({ college, content, placements, rank
                         <thead>
                           <tr>
                             <th>Branch</th>
-                            <th style={{ textAlign: "right" }}>Annual Fee</th>
+                            <th style={{ textAlign: "right" }}>Year 1 Fee</th>
                           </tr>
                         </thead>
                         <tbody>
-                          {realFees.map((fee, i) => (
-                            <tr key={i}>
-                              <td style={{ fontWeight: 600 }}>{fee.courses?.name || `Branch ${i + 1}`}</td>
-                              <td style={{ textAlign: "right" }} className="fees-highlight">
-                                {`₹${fee.tuition_fee.toLocaleString("en-IN")}`}
-                              </td>
-                            </tr>
-                          ))}
+                          {realFees.map((fee, i) => {
+                            const y1 = fee.year1_fee || fee.tuition_fee || 0;
+                            return (
+                              <tr key={i}>
+                                <td style={{ fontWeight: 600 }}>{fee.courses?.name || `Branch ${i + 1}`}</td>
+                                <td style={{ textAlign: "right" }} className="fees-highlight">
+                                  {`₹${y1.toLocaleString("en-IN")}`}
+                                </td>
+                              </tr>
+                            );
+                          })}
                         </tbody>
                       </table>
                     </div>
                     <div style={{ padding: "12px 16px", borderTop: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "8px" }}>
-                      <p style={{ fontSize: "12px", color: "var(--muted-foreground)" }}>* Top 5 branches shown. 2026-27 fees may vary.</p>
+                      <p style={{ fontSize: "12px", color: "var(--muted-foreground)" }}>* Top 5 branches shown. Year 1 includes one-time fees where applicable.</p>
                       <Link href={`/colleges/${slug}/fees`} style={{ fontSize: "13px", color: "var(--primary)", fontWeight: 600, textDecoration: "none" }}>
                         See all branch-wise fees →
                       </Link>
@@ -561,8 +564,8 @@ export async function getServerSideProps({ params }) {
       supabase.from("college_content").select("*").eq("college_id", college.id).maybeSingle(),
       supabase.from("placements").select("*").eq("college_id", college.id).order("year", { ascending: false }).limit(1).maybeSingle(),
       supabase.from("rankings").select("rank, year").eq("college_id", college.id).eq("source", "NIRF").order("year", { ascending: false }).limit(1).maybeSingle(),
-      supabase.from("fees").select("tuition_fee, quota, courses(name, short_name)").eq("college_id", college.id).ilike("quota", "management").order("tuition_fee", { ascending: false }).limit(5),
-      supabase.from("college_courses").select("total_seats, mgmt_quota_seats, govt_quota_seats, courses(name, short_name, degree)").eq("college_id", college.id),
+      supabase.from("fees").select("*, courses(name, short_name)").eq("college_id", college.id).ilike("quota", "management").order("tuition_fee", { ascending: false }).limit(5),
+      supabase.from("college_courses").select("course_id, total_seats, mgmt_quota_seats, govt_quota_seats, courses(name, short_name, degree)").eq("college_id", college.id),
       supabase.from("college_facilities").select("facilities(name, icon)").eq("college_id", college.id),
       supabase.from("faqs").select("id, question, answer").eq("college_id", college.id).neq("is_active", false).order("sort_order").limit(8),
       supabase.from("faqs").select("id, question, answer").is("college_id", null).neq("is_active", false).order("sort_order").limit(3),
@@ -576,7 +579,14 @@ export async function getServerSideProps({ params }) {
         content: contentRes.data || null,
         placements: placementsRes.data || null,
         ranking: rankingRes.data || null,
-        fees: feesRes.data || [],
+        fees: (() => {
+          const rawFees = feesRes.data || [];
+          const courseRows = coursesRes.data || [];
+          if (courseRows.length === 0) return rawFees;
+          const validIds = new Set();
+          courseRows.forEach((c) => { if (c.course_id != null) validIds.add(c.course_id); });
+          return validIds.size > 0 ? rawFees.filter((f) => validIds.has(f.course_id)) : rawFees;
+        })(),
         courses: coursesRes.data || [],
         facilities: facilitiesRes.data || [],
         faqs: [...(faqsRes.data || []), ...(generalFaqsRes.data || [])].slice(0, 8),

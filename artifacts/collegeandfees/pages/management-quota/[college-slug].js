@@ -22,7 +22,9 @@ function isMbaCourse(fee) {
   return name.includes("mba") || short.includes("mba");
 }
 
-function FeesTable({ fees, slug }) {
+function FeesTable({ fees }) {
+  const hasYearWise = fees.some((f) => f.year2_fee != null && f.year2_fee !== (f.year1_fee || f.tuition_fee));
+
   return (
     <div className="info-box" style={{ padding: 0, overflow: "hidden" }}>
       <div style={{ overflowX: "auto" }}>
@@ -30,45 +32,49 @@ function FeesTable({ fees, slug }) {
           <thead>
             <tr>
               <th>Branch</th>
-              <th style={{ textAlign: "right" }}>Tuition Fee/yr</th>
-              <th style={{ textAlign: "right" }}>Hostel Fee/yr</th>
-              <th style={{ textAlign: "right" }}>Total/yr</th>
-              <th style={{ textAlign: "right" }}>4-yr Total</th>
+              {hasYearWise ? (
+                <>
+                  <th style={{ textAlign: "right" }}>Year 1 Fee</th>
+                  <th style={{ textAlign: "right" }}>Year 2-4 Fee (per year)</th>
+                  <th style={{ textAlign: "right" }}>4-Year Total</th>
+                </>
+              ) : (
+                <th style={{ textAlign: "right" }}>Year 1 Fee</th>
+              )}
             </tr>
           </thead>
           <tbody>
-            {fees.map((fee, i) => (
-              <tr key={i}>
-                <td style={{ fontWeight: 600 }}>
-                  {fee.course_name}{" "}
-                  <span style={{ color: "var(--muted-foreground)", fontSize: "12px" }}>({fee.course_short})</span>
-                </td>
-                <td style={{ textAlign: "right" }} className="fees-highlight">
-                  ₹{fee.tuition_fee?.toLocaleString("en-IN")}
-                </td>
-                <td style={{ textAlign: "right", color: "var(--muted-foreground)" }}>
-                  {fee.hostel_fee ? `₹${fee.hostel_fee.toLocaleString("en-IN")}` : "—"}
-                </td>
-                <td style={{ textAlign: "right", fontWeight: 600 }}>
-                  ₹{((fee.tuition_fee || 0) + (fee.hostel_fee || 0)).toLocaleString("en-IN")}
-                </td>
-                <td style={{ textAlign: "right", color: "var(--muted-foreground)" }}>
-                  ₹{((fee.tuition_fee || 0) * 4).toLocaleString("en-IN")}
-                </td>
-              </tr>
-            ))}
+            {fees.map((fee, i) => {
+              const y1 = fee.year1_fee || fee.tuition_fee || 0;
+              return (
+                <tr key={i}>
+                  <td style={{ fontWeight: 600 }}>
+                    {fee.course_name}{" "}
+                    <span style={{ color: "var(--muted-foreground)", fontSize: "12px" }}>({fee.course_short})</span>
+                  </td>
+                  <td style={{ textAlign: "right" }} className="fees-highlight">
+                    {`₹${y1.toLocaleString("en-IN")}`}
+                  </td>
+                  {hasYearWise && (
+                    <>
+                      <td style={{ textAlign: "right", color: "var(--muted-foreground)" }}>
+                        {fee.year2_fee != null ? `₹${fee.year2_fee.toLocaleString("en-IN")}` : "—"}
+                      </td>
+                      <td style={{ textAlign: "right", fontWeight: 600 }}>
+                        {fee.four_year_total != null ? `₹${fee.four_year_total.toLocaleString("en-IN")}` : "—"}
+                      </td>
+                    </>
+                  )}
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
       <div style={{ padding: "12px 16px", borderTop: "1px solid var(--border)" }}>
         <p style={{ fontSize: "12px", color: "var(--muted-foreground)" }}>
-          * Fees shown are for academic year {fees[0]?.academic_year?.split("-")[0] || "2026"}. 2026-27 fees may vary by 5–10%. Contact counsellor for confirmed figures.
+          * Year 1 includes one-time development/donation fee where applicable. Year 2-4 fees are typically lower. Contact counsellor for confirmed 4-year total.
         </p>
-        {slug === "rvce-bangalore" && (
-          <p style={{ fontSize: "12px", color: "var(--primary)", marginTop: "6px", fontWeight: 600 }}>
-            * For RVCE, Year 1 management quota fees are higher than subsequent years. The 4-year total shown is confirmed for 2026-27. Year 1 fee is higher; Years 2–4 are lower.
-          </p>
-        )}
       </div>
     </div>
   );
@@ -388,13 +394,13 @@ export default function MgmtQuotaCollegePage({ college, fees, admissions, conten
                   {engineeringFees.length > 0 && (
                     <div style={{ marginBottom: "24px" }}>
                       <h3 style={{ fontSize: "16px", fontWeight: 700, marginBottom: "12px" }}>B.Tech / B.E. Management Quota Fees</h3>
-                      <FeesTable fees={engineeringFees} slug={slug} />
+                      <FeesTable fees={engineeringFees} />
                     </div>
                   )}
                   {mbaFees.length > 0 && (
                     <div>
                       <h3 style={{ fontSize: "16px", fontWeight: 700, marginBottom: "12px" }}>MBA Management Quota Fees</h3>
-                      <FeesTable fees={mbaFees} slug={slug} />
+                      <FeesTable fees={mbaFees} />
                     </div>
                   )}
                   {engineeringFees.length === 0 && mbaFees.length === 0 && (
@@ -409,7 +415,7 @@ export default function MgmtQuotaCollegePage({ college, fees, admissions, conten
                   )}
                 </>
               ) : (
-                <FeesTable fees={fees} slug={slug} />
+                <FeesTable fees={fees} />
               )
             ) : (
               <div className="info-box">
@@ -538,7 +544,7 @@ export default function MgmtQuotaCollegePage({ college, fees, admissions, conten
           <section className="info-box" style={{ marginBottom: "32px" }} id="about">
             <h2 style={{ fontSize: "20px", fontWeight: 700, marginBottom: "16px" }}>About {college.name}</h2>
             <p style={{ color: "var(--muted-foreground)", lineHeight: "1.8", marginBottom: "16px", fontSize: "15px" }}>
-              {content?.about || `${college.name} is a ${college.type || "private"} engineering college in ${college.city}, established in ${college.established || "Karnataka"}. Affiliated to ${college.affiliation || "VTU"}, the college holds a NAAC grade of ${college.naac_grade || "A"}. It offers undergraduate and postgraduate engineering programmes.`}
+              {content?.about || `${college.name} is a ${college.type || "private"} engineering college in ${college.city}, established in ${college.established || "Karnataka"}. Affiliated to ${college.affiliation || "VTU"}${college.naac_grade ? `, the college holds a NAAC grade of ${college.naac_grade}` : ""}. It offers undergraduate and postgraduate engineering programmes.`}
             </p>
             {content?.highlights?.length > 0 && (
               <ul className="doc-list" style={{ marginTop: "16px" }}>
@@ -691,10 +697,10 @@ export async function getServerSideProps({ params }) {
       return { notFound: true };
     }
 
-    const [feesResult, admissionsResult, contentResult, placementsResult, rankingResult, collegeFaqsResult, generalFaqsResult, similarResult] = await Promise.all([
+    const [feesResult, admissionsResult, contentResult, placementsResult, rankingResult, collegeFaqsResult, generalFaqsResult, similarResult, courseIdsResult] = await Promise.all([
       supabase
         .from("fees")
-        .select("course_id, academic_year, quota, tuition_fee, hostel_fee, other_fees, total_fee, courses(name, short_name)")
+        .select("*, courses(name, short_name)")
         .eq("college_id", college.id)
         .ilike("quota", "management")
         .order("tuition_fee", { ascending: false }),
@@ -705,9 +711,16 @@ export async function getServerSideProps({ params }) {
       supabase.from("faqs").select("id, question, answer").eq("college_id", college.id).neq("is_active", false).order("sort_order").limit(6),
       supabase.from("faqs").select("id, question, answer").is("college_id", null).neq("is_active", false).order("sort_order").limit(3),
       supabase.from("colleges").select("id, slug, name, naac_grade").eq("city", college.city).eq("is_active", true).neq("id", college.id).limit(4),
+      supabase.from("college_courses").select("course_id").eq("college_id", college.id),
     ]);
 
-    const fees = (feesResult.data || []).map((f) => ({
+    const validCourseIds = (courseIdsResult.data || []).map((c) => c.course_id);
+    const rawFees = feesResult.data || [];
+    const filteredFees = validCourseIds.length > 0
+      ? rawFees.filter((f) => validCourseIds.includes(f.course_id))
+      : rawFees;
+
+    const fees = filteredFees.map((f) => ({
       course_id: f.course_id,
       course_name: f.courses?.name || `Branch ${f.course_id}`,
       course_short: f.courses?.short_name || "",
@@ -716,6 +729,9 @@ export async function getServerSideProps({ params }) {
       hostel_fee: f.hostel_fee,
       other_fees: f.other_fees,
       total_fee: f.total_fee,
+      year1_fee: f.year1_fee || null,
+      year2_fee: f.year2_fee || null,
+      four_year_total: f.four_year_total || null,
     }));
 
     const allFaqs = [...(collegeFaqsResult.data || []), ...(generalFaqsResult.data || [])].slice(0, 8);

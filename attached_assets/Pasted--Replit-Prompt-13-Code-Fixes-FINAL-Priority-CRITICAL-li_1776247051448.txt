@@ -1,0 +1,204 @@
+# Replit Prompt #13 — Code Fixes (FINAL)
+
+**Priority:** CRITICAL — live site has wrong fee totals visible to parents RIGHT NOW.
+
+**Rule:** After completing ALL tasks, report back exactly what you changed — file names, line numbers, and what the change was. Push to GitHub when done.
+
+**Context:** This is a college fee comparison site (Next.js 14 Pages Router + Supabase PostgreSQL + Vercel). 358 colleges, ~8,900 fee rows. The issues below affect ALL colleges, not one.
+
+---
+
+## Task 1: CRITICAL — Fix Fee Table UX (ALL 358 COLLEGES)
+
+### The Problem
+
+The Management Quota fee table has **two fatal UX bugs** that make parents close the tab:
+
+**Bug 1: "Annual Tuition" column label is WRONG for Management Quota.**
+The `tuition_fee` column in the DB stores the **Year 1 fee** — which includes a one-time development/donation fee. It is NOT the annual recurring fee.
+
+Real example — RVCE CSE Management Quota (from official PDF):
+- Year 1: ₹36,00,000 (₹13L annual tuition + ₹23L one-time development fee)
+- Year 2: ₹13,00,000 (annual tuition only)
+- Year 3: ₹13,00,000
+- Year 4: ₹13,00,000
+- **Actual 4-year Total: ₹75,00,000**
+
+The site currently labels ₹36L as "Annual Tuition". Parents think the fee is ₹36L EVERY year.
+
+**Bug 2: "If Fee Unchanged" column multiplies Year 1 × 4.**
+For RVCE CSE it shows ₹36L × 4 = **₹1,44,00,000 (₹1.44 Crore)**. The real total is ₹75L. This is a 92% overstatement. Parents seeing ₹1.44 Crore will close the tab. Trust destroyed.
+
+This pattern (Year 1 higher than Years 2-4) applies to MOST private engineering colleges in Karnataka. This is not an RVCE-specific issue.
+
+### The Fix
+
+**Step 1: Add new columns to `fees` table (via migration):**
+```sql
+ALTER TABLE fees ADD COLUMN IF NOT EXISTS year1_fee NUMERIC(12,2);
+ALTER TABLE fees ADD COLUMN IF NOT EXISTS year2_fee NUMERIC(12,2);
+ALTER TABLE fees ADD COLUMN IF NOT EXISTS four_year_total NUMERIC(12,2);
+```
+
+- `year1_fee`: First year fee (includes one-time fees). Currently stored in `tuition_fee`.
+- `year2_fee`: Recurring annual fee for Years 2, 3, 4. NULL if same as Year 1 (or unknown).
+- `four_year_total`: Pre-calculated total cost. NULL if breakdown unknown.
+
+**Step 2: Seed year1_fee from existing data:**
+```sql
+UPDATE fees SET year1_fee = tuition_fee WHERE year1_fee IS NULL;
+```
+
+We (data team) will populate `year2_fee` and `four_year_total` college-by-college. The code must handle NULLs gracefully.
+
+**Step 3: Redesign the Management Quota fee table.**
+
+New table layout when year-wise data exists:
+
+| Branch | Year 1 Fee | Year 2-4 Fee (per year) | 4-Year Total |
+|--------|-----------|------------------------|-------------|
+| CSE | ₹36,00,000 | ₹13,00,000 | ₹75,00,000 |
+| CSE AI&ML | ₹31,00,000 | ₹12,00,000 | ₹67,00,000 |
+| ECE | ₹19,00,000 | ₹8,00,000 | ₹43,00,000 |
+
+**Display rules for Management Quota table:**
+
+1. **REMOVE these columns for MQ tables: "Hostel (Annual)", "Other Fees", "Total Annual", "If Fee Unchanged".** MQ other fees vary college-by-college and are unreliable in the DB. Only show tuition/fee columns.
+
+2. **If `year2_fee` is NOT NULL and differs from `year1_fee`:**
+   - Show 3 columns: "Branch" | "Year 1 Fee" | "Year 2-4 Fee (per year)" | "4-Year Total"
+   - This tells parents the real cost structure
+
+3. **If `year2_fee` IS NULL or equals `year1_fee`:**
+   - Show 2 columns: "Branch" | "Annual Fee"
+   - This is the simple case where fee is same every year
+   - Do NOT show any calculated total (no multiplication)
+
+4. **If `four_year_total` is NOT NULL:** show it in the Total column
+   - If NULL: don't show total for that row (leave blank or dash)
+   - **NEVER calculate total by multiplying Year 1 × 4** — this is the bug we're fixing
+
+5. **Column headers must change based on data:**
+   - Has year-wise breakdown → "Year 1 Fee"
+   - No breakdown → "Annual Fee"
+
+**Display rules for KCET and COMEDK tables:**
+These are government-regulated and genuinely the same every year. Keep "Annual Tuition" label. Show "Hostel" and "Other Fees" columns only if the data exists (non-zero). The 4-year total (Annual × 4) IS correct for these quotas — show it.
+
+**Step 5: Overview page mini MQ table:**
+On `/colleges/[slug]` (overview page), the top-5 MQ fee table column header says "Annual Fee". Change to "Year 1 Fee" and add a note below: *"Year 1 includes one-time development fee. Year 2-4 fees are lower. See full fee breakdown →"*
+
+---
+
+## Task 2: Fix Orphaned Fee Display (240+ COLLEGES AFFECTED)
+
+**Problem:** Colleges show fee rows for courses they don't offer. Fees link via `course_id` but the code doesn't check `college_courses`.
+
+**Example:** College offers only CSE, ECE, ME — but fee table shows Civil, EEE too because orphaned rows exist in `fees`.
+
+**Fix:** When querying fees for a college page, filter through `college_courses`:
+```sql
+SELECT f.*, c.name as course_name 
+FROM fees f 
+JOIN courses c ON c.id = f.course_id
+WHERE f.college_id = $1
+AND f.course_id IN (
+  SELECT course_id FROM college_courses WHERE college_id = $1
+)
+ORDER BY f.quota, c.name;
+```
+
+**Fallback:** If `college_courses` has 0 rows for a college, show all fee rows (avoid blank pages).
+
+**Impact:** 240+ colleges currently show fees for wrong courses.
+
+---
+
+## Task 3: IndexNow Protocol Setup
+
+IndexNow lets Bing (and ChatGPT, which uses Bing's index) discover pages instantly.
+
+**3a. Host API key file at site root:**
+Create `/public/2d063111ca6f49dcac0717ebeb2845ae.txt` containing:
+```
+2d063111ca6f49dcac0717ebeb2845ae
+```
+
+**3b. Create API route `/api/indexnow.js`:**
+```javascript
+// POST handler that submits URLs to IndexNow
+const payload = {
+  host: "collegeandfees.com",
+  key: "2d063111ca6f49dcac0717ebeb2845ae",
+  keyLocation: "https://collegeandfees.com/2d063111ca6f49dcac0717ebeb2845ae.txt",
+  urlList: [] // populated from sitemap
+};
+// POST to https://api.indexnow.org/indexnow
+```
+
+**3c. Auto-submit on build (recommended):**
+Add a post-build script that reads the sitemap XML and submits all URLs via the IndexNow API. Every deploy pings Bing.
+
+**Test:** Visit `https://collegeandfees.com/2d063111ca6f49dcac0717ebeb2845ae.txt` — should return the key text.
+
+---
+
+## Task 4: Display College Type Context on Fee Tables
+
+**Problem:** KCET/COMEDK fees vary hugely by college type. Parents don't understand why RVCE (Private Unaided) KCET fee is ₹1L+ while BMS (Private Aided) is ₹44K.
+
+**Fix:** Above the KCET and COMEDK fee tables, show:
+```
+"[College Name] is a [type] institution. [Quota] fees for [type] colleges are set by Karnataka's Fee Regulatory Committee."
+```
+
+The `type` column already exists in the `colleges` table. Just read and display it. Values are: Government, Private Aided, Private (meaning Private Unaided), Deemed University, Autonomous.
+
+---
+
+## Task 5: NAAC Grade — Ensure Code Reads from DB
+
+The NAAC grade must come from the `naac_grade` column in the `colleges` table. No hardcoding.
+
+**Check:** Search the codebase for any hardcoded NAAC values (strings like "A+", "A", "A++"). If found, replace with the DB value.
+
+The `naac_grade` column has the correct values. The code just needs to display whatever is in the DB.
+
+---
+
+## Task 6: Production Audit
+
+```bash
+BASE_URL=https://collegeandfees.com node scripts/audit.js
+```
+
+Previous audit ran against `collegeandfees.vercel.app`. Run against the live domain. Fix any failures.
+
+---
+
+## Summary
+
+| # | Task | Type | Impact |
+|---|------|------|--------|
+| 1 | Fee table redesign (remove wrong totals, add year-wise) | **CRITICAL UX** | ALL 358 colleges |
+| 2 | Filter orphaned fees through college_courses | Bug fix | 240+ colleges |
+| 3 | IndexNow setup | New feature | Bing/ChatGPT discovery |
+| 4 | College type context on fee tables | UX | All colleges with KCET/COMEDK |
+| 5 | NAAC grade from DB | Bug fix | All colleges |
+| 6 | Production audit | Verification | Entire site |
+
+**Priority order:** Task 1 first (it's destroying trust on every page), then 2, then 3-6 in any order.
+
+---
+
+## Important Notes
+
+**DO NOT auto-correct fee data.** Display exactly what's in the DB. The data team manages correct values.
+
+**The `year2_fee` and `four_year_total` columns will be NULL for most colleges initially.** The code must handle this gracefully — when NULL, fall back to the simple "Annual Fee" display without any multiplication total.
+
+**The fee table changes affect every single college page.** Test on at least 3 different colleges: one with year-wise data (RVCE), one without (any other college), and one with 0 college_courses rows.
+
+---
+
+**After completing:** Push to GitHub, report back what changed (file names, line numbers, what the change was), and confirm the Vercel deploy is live.

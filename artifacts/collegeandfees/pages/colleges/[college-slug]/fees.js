@@ -26,8 +26,10 @@ function isMbaCourse(fee) {
   return degree.includes("mba") || name.includes("mba") || short.includes("mba");
 }
 
-function FeesTableSection({ fees, slug }) {
+function MqFeesTable({ fees }) {
   if (fees.length === 0) return null;
+  const hasYearWise = fees.some((f) => f.year2_fee != null && f.year2_fee !== (f.year1_fee || f.tuition_fee));
+
   return (
     <div className="info-box" style={{ padding: 0, overflow: "hidden", marginBottom: "8px" }}>
       <div style={{ overflowX: "auto" }}>
@@ -35,35 +37,39 @@ function FeesTableSection({ fees, slug }) {
           <thead>
             <tr>
               <th>Branch</th>
-              <th>Degree</th>
-              <th style={{ textAlign: "right" }}>Annual Tuition</th>
-              <th style={{ textAlign: "right" }}>Hostel (Annual)</th>
-              <th style={{ textAlign: "right" }}>Total Annual</th>
-              <th style={{ textAlign: "right" }}>If Fee Unchanged*</th>
+              {hasYearWise ? (
+                <>
+                  <th style={{ textAlign: "right" }}>Year 1 Fee</th>
+                  <th style={{ textAlign: "right" }}>Year 2-4 Fee (per year)</th>
+                  <th style={{ textAlign: "right" }}>4-Year Total</th>
+                </>
+              ) : (
+                <th style={{ textAlign: "right" }}>Year 1 Fee</th>
+              )}
             </tr>
           </thead>
           <tbody>
             {fees.map((fee, i) => {
-              const total = (fee.tuition_fee || 0) + (fee.hostel_fee || 0) + (fee.other_fees || 0);
+              const y1 = fee.year1_fee || fee.tuition_fee || 0;
               return (
                 <tr key={i}>
                   <td style={{ fontWeight: 600 }}>
                     {fee.courses?.name || "—"}{" "}
                     {fee.courses?.short_name && <span style={{ color: "var(--muted-foreground)", fontSize: "12px" }}>({fee.courses.short_name})</span>}
                   </td>
-                  <td style={{ color: "var(--muted-foreground)", fontSize: "13px" }}>{fee.courses?.degree || "B.E."}</td>
                   <td style={{ textAlign: "right" }} className="fees-highlight">
-                    ₹{(fee.tuition_fee || 0).toLocaleString("en-IN")}
+                    {`₹${y1.toLocaleString("en-IN")}`}
                   </td>
-                  <td style={{ textAlign: "right", color: "var(--muted-foreground)" }}>
-                    {fee.hostel_fee ? `₹${fee.hostel_fee.toLocaleString("en-IN")}` : "—"}
-                  </td>
-                  <td style={{ textAlign: "right", fontWeight: 600 }}>
-                    ₹{(fee.total_fee || total).toLocaleString("en-IN")}
-                  </td>
-                  <td style={{ textAlign: "right", color: "var(--muted-foreground)" }}>
-                    ₹{((fee.tuition_fee || 0) * 4).toLocaleString("en-IN")}
-                  </td>
+                  {hasYearWise && (
+                    <>
+                      <td style={{ textAlign: "right", color: "var(--muted-foreground)" }}>
+                        {fee.year2_fee != null ? `₹${fee.year2_fee.toLocaleString("en-IN")}` : "—"}
+                      </td>
+                      <td style={{ textAlign: "right", fontWeight: 600 }}>
+                        {fee.four_year_total != null ? `₹${fee.four_year_total.toLocaleString("en-IN")}` : "—"}
+                      </td>
+                    </>
+                  )}
                 </tr>
               );
             })}
@@ -72,11 +78,65 @@ function FeesTableSection({ fees, slug }) {
       </div>
       <div style={{ padding: "10px 16px", borderTop: "1px solid var(--border)" }}>
         <p style={{ fontSize: "12px", color: "var(--muted-foreground)" }}>
-          * This column assumes the same fee every year. Actual totals may differ — first-year fees at some colleges are higher than subsequent years. Contact counsellor for exact 4-year total.
+          * Year 1 includes one-time development/donation fee where applicable. Year 2-4 fees are typically lower. Contact counsellor for confirmed 4-year total.
         </p>
       </div>
     </div>
   );
+}
+
+function GovtFeesTable({ fees }) {
+  if (fees.length === 0) return null;
+  const hasHostel = fees.some((f) => f.hostel_fee && f.hostel_fee > 0);
+
+  return (
+    <div className="info-box" style={{ padding: 0, overflow: "hidden", marginBottom: "8px" }}>
+      <div style={{ overflowX: "auto" }}>
+        <table className="fees-table">
+          <thead>
+            <tr>
+              <th>Branch</th>
+              <th style={{ textAlign: "right" }}>Annual Tuition</th>
+              {hasHostel && <th style={{ textAlign: "right" }}>Hostel (Annual)</th>}
+              <th style={{ textAlign: "right" }}>4-Year Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {fees.map((fee, i) => (
+              <tr key={i}>
+                <td style={{ fontWeight: 600 }}>
+                  {fee.courses?.name || "—"}{" "}
+                  {fee.courses?.short_name && <span style={{ color: "var(--muted-foreground)", fontSize: "12px" }}>({fee.courses.short_name})</span>}
+                </td>
+                <td style={{ textAlign: "right" }} className="fees-highlight">
+                  {`₹${(fee.tuition_fee || 0).toLocaleString("en-IN")}`}
+                </td>
+                {hasHostel && (
+                  <td style={{ textAlign: "right", color: "var(--muted-foreground)" }}>
+                    {fee.hostel_fee ? `₹${fee.hostel_fee.toLocaleString("en-IN")}` : "—"}
+                  </td>
+                )}
+                <td style={{ textAlign: "right", color: "var(--muted-foreground)" }}>
+                  {`₹${((fee.tuition_fee || 0) * 4).toLocaleString("en-IN")}`}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div style={{ padding: "10px 16px", borderTop: "1px solid var(--border)" }}>
+        <p style={{ fontSize: "12px", color: "var(--muted-foreground)" }}>
+          * Government-regulated fees. The 4-year total assumes same annual fee each year.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function FeesTableSection({ fees, slug, quota }) {
+  if (fees.length === 0) return null;
+  const isMQ = (quota || "").toLowerCase() === "management";
+  return isMQ ? <MqFeesTable fees={fees} /> : <GovtFeesTable fees={fees} />;
 }
 
 function InactiveFeesPage({ college, slug }) {
@@ -299,6 +359,11 @@ export default function CollegeFeesPage({ college, fees, content, ranking, slug 
                     <p style={{ fontSize: "13px", color: "var(--muted-foreground)", marginBottom: "14px" }}>
                       Fee figures shown for 2026-27 academic year.
                     </p>
+                    {(quota === "kcet" || quota === "govt" || quota === "comedk") && college.type && (
+                      <p style={{ fontSize: "13px", color: "var(--muted-foreground)", marginBottom: "14px", fontStyle: "italic" }}>
+                        {`${college.name} is a ${college.type} institution. ${label} fees for ${college.type} colleges are set by Karnataka's Fee Regulatory Committee.`}
+                      </p>
+                    )}
 
                     {isChrist ? (
                       <>
@@ -307,7 +372,7 @@ export default function CollegeFeesPage({ college, fees, content, ranking, slug 
                             <h3 style={{ fontSize: "15px", fontWeight: 700, marginBottom: "10px", color: "var(--muted-foreground)" }}>
                               B.Tech / B.E. Courses
                             </h3>
-                            <FeesTableSection fees={engFees} slug={slug} />
+                            <FeesTableSection fees={engFees} slug={slug} quota={quota} />
                           </div>
                         )}
                         {mbaFees.length > 0 && (
@@ -315,12 +380,12 @@ export default function CollegeFeesPage({ college, fees, content, ranking, slug 
                             <h3 style={{ fontSize: "15px", fontWeight: 700, marginBottom: "10px", color: "var(--muted-foreground)" }}>
                               MBA / Postgraduate Fees
                             </h3>
-                            <FeesTableSection fees={mbaFees} slug={slug} />
+                            <FeesTableSection fees={mbaFees} slug={slug} quota={quota} />
                           </div>
                         )}
                       </>
                     ) : (
-                      <FeesTableSection fees={quotaFees} slug={slug} />
+                      <FeesTableSection fees={quotaFees} slug={slug} quota={quota} />
                     )}
 
                     {/* Mid-content CTA after management quota */}
@@ -453,22 +518,29 @@ export async function getServerSideProps({ params }) {
 
     if (collegeError || !college) return { notFound: true };
 
-    const [feesRes, contentRes, rankingRes] = await Promise.all([
+    const [feesRes, contentRes, rankingRes, courseIdsRes] = await Promise.all([
       supabase
         .from("fees")
-        .select("tuition_fee, hostel_fee, other_fees, total_fee, academic_year, quota, courses(id, name, short_name, degree)")
+        .select("*, courses(id, name, short_name, degree)")
         .eq("college_id", college.id)
         .order("quota", { ascending: true })
         .order("tuition_fee", { ascending: false }),
       supabase.from("college_content").select("meta_title, meta_desc").eq("college_id", college.id).maybeSingle(),
       supabase.from("rankings").select("rank").eq("college_id", college.id).eq("source", "NIRF").order("year", { ascending: false }).limit(1).maybeSingle(),
+      supabase.from("college_courses").select("course_id").eq("college_id", college.id),
     ]);
+
+    let fees = feesRes.data || [];
+    const validCourseIds = (courseIdsRes.data || []).map((c) => c.course_id);
+    if (validCourseIds.length > 0) {
+      fees = fees.filter((f) => validCourseIds.includes(f.course_id));
+    }
 
     return {
       props: {
         slug,
         college,
-        fees: feesRes.data || [],
+        fees,
         content: contentRes.data || null,
         ranking: rankingRes.data || null,
       },
