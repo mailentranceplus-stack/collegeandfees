@@ -251,7 +251,7 @@ export default function CollegeFeesPage({ college, fees, content, ranking, slug 
 
           {/* Section 3: H1 */}
           <h1 style={{ fontSize: "clamp(20px, 3vw, 28px)", fontWeight: 800, marginBottom: "28px" }}>
-            {college.name} Fees 2026-27 — KCET, COMEDK and Management Quota
+            {college.name} Fees 2026-27{quotaSuffix}
           </h1>
 
           {/* Section 4: Fee Tables per quota */}
