@@ -129,15 +129,16 @@ export default function CollegeOverviewPage({ college, content, placements, rank
     url: canonicalUrl,
   };
 
-  const citySlug = (college.city || "Bangalore").toLowerCase().replace(/\s+/g, "-");
   const cityLabel = college.city || "Bangalore";
+  const breadcrumbHref = "/engineering-colleges/bangalore";
+  const breadcrumbText = `Engineering Colleges ${cityLabel}`;
 
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
       { "@type": "ListItem", position: 1, name: "Home", item: "https://collegeandfees.com" },
-      { "@type": "ListItem", position: 2, name: `Engineering Colleges ${cityLabel}`, item: `https://collegeandfees.com/engineering-colleges/${citySlug}` },
+      { "@type": "ListItem", position: 2, name: breadcrumbText, item: "https://collegeandfees.com/engineering-colleges/bangalore" },
       { "@type": "ListItem", position: 3, name: college.name, item: canonicalUrl },
     ],
   };
@@ -215,7 +216,7 @@ export default function CollegeOverviewPage({ college, content, placements, rank
           <nav className="breadcrumb">
             <Link href="/">Home</Link>
             <span className="breadcrumb-sep">›</span>
-            <Link href={`/engineering-colleges/${citySlug}`}>{`Engineering Colleges ${cityLabel}`}</Link>
+            <Link href={breadcrumbHref}>{breadcrumbText}</Link>
             <span className="breadcrumb-sep">›</span>
             <span style={{ color: "var(--foreground)", fontWeight: 600 }}>{shortName}</span>
           </nav>
