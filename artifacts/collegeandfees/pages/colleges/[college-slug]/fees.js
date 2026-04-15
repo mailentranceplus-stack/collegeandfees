@@ -140,7 +140,7 @@ export default function CollegeFeesPage({ college, fees, content, ranking, slug 
   const waMsg = `Hi, I want to know the exact fees at ${college.name}. Can you help?`;
 
   const quotaNames = [...new Set(fees.map((f) => (f.quota || "").toLowerCase()))].filter(Boolean);
-  const quotaLabelList = QUOTA_ORDER.filter((q) => quotaNames.includes(q)).map((q) => QUOTA_LABELS[q] || q);
+  const quotaLabelList = [...new Set(QUOTA_ORDER.filter((q) => quotaNames.includes(q)).map((q) => QUOTA_LABELS[q] || q))];
   const quotaSuffix = quotaLabelList.length > 0 ? ` — ${quotaLabelList.join(", ")}` : "";
   const metaTitle = `${shortName} Fees 2026-27${quotaSuffix}`;
   const quotaDescList = quotaLabelList.length > 0 ? `${quotaLabelList.join(", ")} fees` : "fees";
